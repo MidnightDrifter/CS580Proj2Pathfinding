@@ -26,6 +26,9 @@
     <Filter Include="GameEngine\StateMachineLanguage">
       <UniqueIdentifier>{c3919002-4d85-4c09-b22a-991bfe99b3a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\AStar">
+      <UniqueIdentifier>{6c0d15df-3601-43bb-87ac-2d372d302e62}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\body.cpp">
@@ -141,6 +144,15 @@
     </ClCompile>
     <ClCompile Include="Source\MultiAnimation.cpp" />
     <ClCompile Include="Source\MultiAnimationLib.cpp" />
+    <ClCompile Include="AStar.cpp">
+      <Filter>GameObject\AStar</Filter>
+    </ClCompile>
+    <ClCompile Include="AStarHeuristic.cpp">
+      <Filter>GameObject\AStar</Filter>
+    </ClCompile>
+    <ClCompile Include="AStarNode.cpp">
+      <Filter>GameObject\AStar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\body.h">
@@ -261,6 +273,15 @@
       <Filter>GameEngine\StateMachineLanguage</Filter>
     </ClInclude>
     <ClInclude Include="Source\MultiAnimation.h" />
+    <ClInclude Include="AStar.h">
+      <Filter>GameObject\AStar</Filter>
+    </ClInclude>
+    <ClInclude Include="AStarHeuristic.h">
+      <Filter>GameObject\AStar</Filter>
+    </ClInclude>
+    <ClInclude Include="AStarNode.h">
+      <Filter>GameObject\AStar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\DXUT\directx.ico">
