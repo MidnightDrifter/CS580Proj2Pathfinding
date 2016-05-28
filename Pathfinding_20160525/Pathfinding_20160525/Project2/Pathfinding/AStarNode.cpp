@@ -1,10 +1,11 @@
 #include "DXUT.h"
 #include "AStarNode.h"
 #include <math.h>
-#define float SQRT_2 = sqrtf(2)
-AStarNode::AStarNode() : xCoord(-1), yCoord(-1) {}
-AStarNode::AStarNode(int x, int y) : xCoord(x), yCoord(y) {}
-AStarNode::AStarNode(const AStarNode& other) : xCoord(other.getXCoord()), yCoord(other.getYCoord()) {}
+#define SQRT2 1.41421356237  //A truncation of sqrt(2) to cut down on computation--can always replace with actual sqrt(2)
+AStarNode::AStarNode() : xCoord(-1), yCoord(-1), isWall(false) {}
+AStarNode::AStarNode(int x, int y) : xCoord(x), yCoord(y), isWall(false) {}
+AStarNode::AStarNode(int x, int y, bool w) : xCoord(x), yCoord(y), isWall(w) {}
+AStarNode::AStarNode(const AStarNode& other) : xCoord(other.getXCoord()), yCoord(other.getYCoord()), isWall(other.getWall()) {}
 
 
 AStarNode::~AStarNode()  {}
@@ -29,6 +30,16 @@ int AStarNode::getYCoord() const
 	return this->yCoord;
 }
 
+bool AStarNode::getWall() const
+{
+	return this->isWall;
+}
+
+void AStarNode::setWall(bool w)
+{
+	this->isWall = w;
+}
+
 int AStarNode::getChebyshevDistance( AStarNode& other) const
 {
 	return static_cast<int>(fmax(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord())));
@@ -39,14 +50,14 @@ int AStarNode::getManhattanDistance(AStarNode& other) const
 	return static_cast<int>(abs(this->getXCoord() - other.getXCoord()) + abs(this->getYCoord() - other.getYCoord()));
 }
 
-float AStarNode::getEuclideanDistance(AStarNode& other)const
+float AStarNode::getEuclideanDistance(AStarNode& other) const
 {
 	return sqrtf(powf(this->getXCoord() - other.getXCoord(), 2.f) + powf(this->getYCoord() - other.getYCoord(), 2.f));
 }
 
 float AStarNode::getOctileDistance(AStarNode& other) const
 {
-	return fmin(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord())) * SQRT_2 + fmax(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord())) - fmin(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord()));
+	return (SQRT2*fmin(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord()))) + fmax(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord())) - fmin(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord()));
 }
 
 
