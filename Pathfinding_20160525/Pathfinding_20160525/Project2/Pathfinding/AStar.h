@@ -21,13 +21,14 @@ public:
 	int getRowCount() const;
 	int getColCount() const;
 	std::vector<AStarNode*>* getRow(int i);
-	 AStarNode* getNode(int i, int j) ;
+	AStarNode* editNode(int i, int j);
+	 const AStarNode* getNode(int i, int j) const;
 	void setRowCount(int r);
 	void setColCount(int c);
 
 	void initalize();
 
-	const AStar& operator=( AStar& rhs);
+	const AStar& operator=(const AStar& rhs);
 
 private:
 	int numRows;

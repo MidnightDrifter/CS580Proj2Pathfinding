@@ -43,7 +43,7 @@ AStar::AStar(int r, int c) : numRows(r), numCols(c), map(new std::vector<std::ve
 	}
 }
 
-const AStar&  AStar::operator=( AStar& rhs)  //Assumes both AStar objects have same size
+const AStar&  AStar::operator=(const AStar& rhs)  //Assumes both AStar objects have same size
 {
 
 	if (this->getRowCount() == rhs.getRowCount() || this->getColCount() == rhs.getColCount())
@@ -52,11 +52,11 @@ const AStar&  AStar::operator=( AStar& rhs)  //Assumes both AStar objects have s
 		{
 			for (int j = 0; j < this->getColCount(); j++)
 			{
-				(this)->getNode(i, j)->setXCoord( (rhs).getNode(i, j)->getXCoord());
-				this->getNode(i, j)->setYCoord(rhs.getNode(i, j)->getYCoord());
-				this->getNode(i, j)->setWall(rhs.getNode(i, j)->getWall());
-				this->getNode(i, j)->setClosed(rhs.getNode(i, j)->getClosed());
-				this->getNode(i, j)->setOpen(rhs.getNode(i, j)->getOpen());
+				(this)->editNode(i, j)->setXCoord( (rhs).getNode(i, j)->getXCoord());
+				this->editNode(i, j)->setYCoord(rhs.getNode(i, j)->getYCoord());
+				this->editNode(i, j)->setWall(rhs.getNode(i, j)->getWall());
+				this->editNode(i, j)->setClosed(rhs.getNode(i, j)->getClosed());
+				this->editNode(i, j)->setOpen(rhs.getNode(i, j)->getOpen());
 			}
 		}
 
@@ -81,7 +81,12 @@ std::vector<AStarNode*>* AStar::getRow(int i)
 	return this->map->at(i);
 }
 
- AStarNode* AStar::getNode(int i, int j) 
+AStarNode* AStar::editNode(int i, int j)
+{
+	return this->map->at(i)->at(j);
+}
+
+const AStarNode* AStar::getNode(int i, int j) const
 {
 	return this->map->at(i)->at(j);
 }
