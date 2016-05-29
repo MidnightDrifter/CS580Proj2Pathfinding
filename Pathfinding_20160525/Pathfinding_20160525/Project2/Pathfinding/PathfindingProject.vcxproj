@@ -118,7 +118,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AStar.cpp" />
-    <ClCompile Include="AStarHeuristic.cpp" />
     <ClCompile Include="AStarNode.cpp" />
     <ClCompile Include="Source\body.cpp" />
     <ClCompile Include="Source\gameobject.cpp" />
@@ -166,7 +165,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AStar.h" />
-    <ClInclude Include="AStarHeuristic.h" />
     <ClInclude Include="AStarNode.h" />
     <ClInclude Include="Source\body.h" />
     <ClInclude Include="Source\gameobject.h" />

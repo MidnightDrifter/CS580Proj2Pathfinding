@@ -147,9 +147,6 @@
     <ClCompile Include="AStar.cpp">
       <Filter>GameObject\AStar</Filter>
     </ClCompile>
-    <ClCompile Include="AStarHeuristic.cpp">
-      <Filter>GameObject\AStar</Filter>
-    </ClCompile>
     <ClCompile Include="AStarNode.cpp">
       <Filter>GameObject\AStar</Filter>
     </ClCompile>
@@ -274,9 +271,6 @@
     </ClInclude>
     <ClInclude Include="Source\MultiAnimation.h" />
     <ClInclude Include="AStar.h">
-      <Filter>GameObject\AStar</Filter>
-    </ClInclude>
-    <ClInclude Include="AStarHeuristic.h">
       <Filter>GameObject\AStar</Filter>
     </ClInclude>
     <ClInclude Include="AStarNode.h">

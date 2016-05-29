@@ -26,7 +26,7 @@ public:
 	float getOctileDistance(AStarNode& other) const;
 	int getChebyshevDistance(AStarNode& other)const;
 
-	const AStarNode& operator=(AStarNode& rhs);
+	const AStarNode& operator=(const AStarNode& rhs);
 private:
 	int xCoord;
 	int yCoord;

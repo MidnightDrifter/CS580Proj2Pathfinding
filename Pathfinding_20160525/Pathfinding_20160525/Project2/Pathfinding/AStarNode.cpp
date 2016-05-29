@@ -84,7 +84,7 @@ float AStarNode::getOctileDistance(AStarNode& other) const
 }
 
 
-const AStarNode& AStarNode::operator=( AStarNode& rhs)
+const AStarNode& AStarNode::operator=(const AStarNode& rhs) 
 {
 	if (this->getXCoord() != rhs.getXCoord() && this->getYCoord() != rhs.getYCoord() && this->getWall() != rhs.getWall() && this->getOpen() != rhs.getOpen() && this->getClosed() != rhs.getClosed())
 	{
