@@ -26,7 +26,7 @@ public:
 	void setRowCount(int r);
 	void setColCount(int c);
 
-	void initalize();
+	//void initalize();
 
 	const AStar& operator=(const AStar& rhs);
 

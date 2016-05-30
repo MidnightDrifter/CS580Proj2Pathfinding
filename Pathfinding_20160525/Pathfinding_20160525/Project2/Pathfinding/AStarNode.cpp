@@ -1,12 +1,14 @@
 #include "DXUT.h"
 #include "AStarNode.h"
 #include <math.h>
+#include <limits>
 #define SQRT2 1.41421356237  //A truncation of sqrt(2) to cut down on computation--can always replace with actual sqrt(2)
-AStarNode::AStarNode() : xCoord(-1), yCoord(-1), isWall(false), isOpen(false), isClosed(false) {}
-AStarNode::AStarNode(int x, int y) : xCoord(x), yCoord(y), isWall(false), isOpen(false), isClosed(false) {}
+AStarNode::AStarNode() : xCoord(-1), yCoord(-1), isWall(false), isOpen(false), isClosed(false), heuristicCost(std::numeric_limits<float>::max()), trueCost(std::numeric_limits<float>::max()) {}
+AStarNode::AStarNode(int x, int y) : xCoord(x), yCoord(y), isWall(false), isOpen(false), isClosed(false), heuristicCost(std::numeric_limits<float>::max()), trueCost(std::numeric_limits<float>::max()) {}
 AStarNode::AStarNode(int x, int y, bool w) : xCoord(x), yCoord(y), isWall(w), isOpen(false), isClosed(false) {}
-AStarNode::AStarNode(int x, int y, bool a, bool b, bool c) : xCoord(x), yCoord(y), isWall(a), isOpen(b), isClosed(c) {}
-AStarNode::AStarNode(const AStarNode& other) : xCoord(other.getXCoord()), yCoord(other.getYCoord()), isWall(other.getWall()), isOpen(other.getOpen()), isClosed(other.getClosed()) {}
+AStarNode::AStarNode(int x, int y, bool a, bool b, bool c) : xCoord(x), yCoord(y), isWall(a), isOpen(b), isClosed(c), heuristicCost(std::numeric_limits<float>::max()), trueCost(std::numeric_limits<float>::max()) {}
+AStarNode::AStarNode(int x, int y, bool a, bool b, bool c, float h, float t) : xCoord(x), yCoord(y), isWall(a), isOpen(b), isClosed(c), heuristicCost(h), trueCost(t) {}
+AStarNode::AStarNode(const AStarNode& other) : xCoord(other.getXCoord()), yCoord(other.getYCoord()), isWall(other.getWall()), isOpen(other.getOpen()), isClosed(other.getClosed()), heuristicCost(other.getHeuristicCost()), trueCost(other.getTrueCost()) {}
 
 
 AStarNode::~AStarNode()  {}
@@ -32,12 +34,22 @@ void AStarNode::setClosed(bool x)
 
 }
 
+void AStarNode::setHeuristicCost(float f)
+{
+	this->heuristicCost = f;
+}
+
+void AStarNode::setTrueCost(float f)
+{
+	this->trueCost = f;
+}
+
 bool AStarNode::getClosed() const
 {
 	return this->isClosed;
 }
 
-bool AStarNode::getClosed() const
+bool AStarNode::getOpen() const
 {
 	return this->isOpen;
  }
@@ -61,6 +73,21 @@ bool AStarNode::getWall() const
 void AStarNode::setWall(bool w)
 {
 	this->isWall = w;
+}
+
+float AStarNode::getTotalCost() const
+{
+	return (this->heuristicCost + this->trueCost);
+}
+
+float AStarNode::getHeuristicCost() const
+{
+	return this->heuristicCost;
+}
+
+float AStarNode::getTrueCost() const
+{
+	return this->trueCost;
 }
 
 int AStarNode::getChebyshevDistance( AStarNode& other) const
@@ -93,6 +120,8 @@ const AStarNode& AStarNode::operator=(const AStarNode& rhs)
 		this->setWall(rhs.getWall());
 		this->setOpen(rhs.getOpen());
 		this->setClosed(rhs.getClosed());
+		this->setHeuristicCost(rhs.getHeuristicCost());
+		this->setTrueCost(rhs.getHeuristicCost());
 	}
 
 	return *this;

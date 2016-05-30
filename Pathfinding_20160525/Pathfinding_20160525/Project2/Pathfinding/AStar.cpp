@@ -43,6 +43,19 @@ AStar::AStar(int r, int c) : numRows(r), numCols(c), map(new std::vector<std::ve
 	}
 }
 
+AStar::AStar(const AStar& other) : numRows(other.getRowCount()), numCols(other.getColCount()), map(new std::vector<std::vector<AStarNode*>*>)
+{
+	for(int i=0;i<numRows;i++)
+	{
+		map->at(i) = new std::vector<AStarNode*>;
+		for (int j = 0; j < numCols; j++)
+		{
+			*(map->at(i)->at(j)) = *(other.map->at(i)->at(j));  //Double check this!!!!
+																
+		}
+	}
+}
+
 const AStar&  AStar::operator=(const AStar& rhs)  //Assumes both AStar objects have same size
 {
 
@@ -57,6 +70,8 @@ const AStar&  AStar::operator=(const AStar& rhs)  //Assumes both AStar objects h
 				this->editNode(i, j)->setWall(rhs.getNode(i, j)->getWall());
 				this->editNode(i, j)->setClosed(rhs.getNode(i, j)->getClosed());
 				this->editNode(i, j)->setOpen(rhs.getNode(i, j)->getOpen());
+				this->editNode(i, j)->setHeuristicCost(rhs.getNode(i, j)->getHeuristicCost());
+				this->editNode(i, j)->setTrueCost(rhs.getNode(i, j)->getTrueCost());
 			}
 		}
 
