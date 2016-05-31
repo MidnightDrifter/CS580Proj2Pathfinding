@@ -4,7 +4,10 @@
 
 
 
-
+void AStar::setStartingNode(int x, int y)  //Assumes grid has already been initialized
+{
+	this->map->at(x)->at(y)->setCostToGetToThisNode(0.f);
+}
 
 
 AStar::AStar() : numRows(40), numCols(40), map(new std::vector<std::vector<AStarNode*>*>)

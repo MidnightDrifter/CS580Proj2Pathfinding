@@ -26,6 +26,8 @@ public:
 	void setRowCount(int r);
 	void setColCount(int c);
 
+	void setStartingNode(int x, int y);
+
 	//void initalize();
 
 	const AStar& operator=(const AStar& rhs);

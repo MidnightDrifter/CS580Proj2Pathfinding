@@ -3,15 +3,36 @@
 #include <math.h>
 #include <limits>
 #define SQRT2 1.41421356237  //A truncation of sqrt(2) to cut down on computation--can always replace with actual sqrt(2)
-AStarNode::AStarNode() : xCoord(-1), yCoord(-1), isWall(false), isOpen(false), isClosed(false), heuristicCost(std::numeric_limits<float>::max()), trueCost(std::numeric_limits<float>::max()) {}
-AStarNode::AStarNode(int x, int y) : xCoord(x), yCoord(y), isWall(false), isOpen(false), isClosed(false), heuristicCost(std::numeric_limits<float>::max()), trueCost(std::numeric_limits<float>::max()) {}
-AStarNode::AStarNode(int x, int y, bool w) : xCoord(x), yCoord(y), isWall(w), isOpen(false), isClosed(false) {}
-AStarNode::AStarNode(int x, int y, bool a, bool b, bool c) : xCoord(x), yCoord(y), isWall(a), isOpen(b), isClosed(c), heuristicCost(std::numeric_limits<float>::max()), trueCost(std::numeric_limits<float>::max()) {}
-AStarNode::AStarNode(int x, int y, bool a, bool b, bool c, float h, float t) : xCoord(x), yCoord(y), isWall(a), isOpen(b), isClosed(c), heuristicCost(h), trueCost(t) {}
-AStarNode::AStarNode(const AStarNode& other) : xCoord(other.getXCoord()), yCoord(other.getYCoord()), isWall(other.getWall()), isOpen(other.getOpen()), isClosed(other.getClosed()), heuristicCost(other.getHeuristicCost()), trueCost(other.getTrueCost()) {}
+AStarNode::AStarNode() : xCoord(-1), yCoord(-1), isWall(false), isOpen(false), isClosed(false), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
+AStarNode::AStarNode(int x, int y) : xCoord(x), yCoord(y), isWall(false), isOpen(false), isClosed(false), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
+AStarNode::AStarNode(int x, int y, bool w) : xCoord(x), yCoord(y), isWall(w), isOpen(false), isClosed(false), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
+AStarNode::AStarNode(int x, int y, bool a, bool b, bool c) : xCoord(x), yCoord(y), isWall(a), isOpen(b), isClosed(c), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
+AStarNode::AStarNode(int x, int y, bool a, bool b, bool c, float h, float t) : xCoord(x), yCoord(y), isWall(a), isOpen(b), isClosed(c), totalCost(h), costToGetToThisNode(t), parent(NULL) {}
+AStarNode::AStarNode(int x, int y, bool a, bool b, bool c, float h, float t, AStarNode* p) : xCoord(x), yCoord(y), isWall(a), isOpen(b), isClosed(c), totalCost(h), costToGetToThisNode(t), parent(p) {}
+AStarNode::AStarNode(const AStarNode& other) : xCoord(other.getXCoord()), yCoord(other.getYCoord()), isWall(other.getWall()), isOpen(other.getOpen()), isClosed(other.getClosed()), totalCost(other.getHeuristicCost()), costToGetToThisNode(other.getCostToGetToThisNode()), parent(other.getParent()) {}
 
 
 AStarNode::~AStarNode()  {}
+
+void AStarNode::intializeStartingCost()
+{
+	startingCost = 0.f;
+}
+
+void AStarNode::setStartingCost(float f)
+{
+	startingCost = f;
+}
+
+void AStarNode::addToStartingCost(float f)
+{
+	startingCost += f;
+}
+
+void AStarNode::subtractFromStartingCost(float f)
+{
+	startingCost -= f;
+}
 
 void AStarNode::setXCoord(int x)
 {
@@ -34,14 +55,14 @@ void AStarNode::setClosed(bool x)
 
 }
 
-void AStarNode::setHeuristicCost(float f)
+void AStarNode::setTotalCost(float f)
 {
-	this->heuristicCost = f;
+	this->totalCost = f;
 }
 
-void AStarNode::setTrueCost(float f)
+void AStarNode::setCostToGetToThisNode(float f)
 {
-	this->trueCost = f;
+	this->costToGetToThisNode = f;
 }
 
 bool AStarNode::getClosed() const
@@ -77,17 +98,17 @@ void AStarNode::setWall(bool w)
 
 float AStarNode::getTotalCost() const
 {
-	return (this->heuristicCost + this->trueCost);
+	return (this->totalCost);
 }
 
 float AStarNode::getHeuristicCost() const
 {
-	return this->heuristicCost;
+	return (this->totalCost - this->costToGetToThisNode);
 }
 
-float AStarNode::getTrueCost() const
+float AStarNode::getCostToGetToThisNode() const
 {
-	return this->trueCost;
+	return this->costToGetToThisNode;
 }
 
 int AStarNode::getChebyshevDistance( AStarNode& other) const
@@ -111,18 +132,46 @@ float AStarNode::getOctileDistance(AStarNode& other) const
 }
 
 
+AStarNode* AStarNode::getParent() const
+{
+	return this->parent;
+}
+
+void AStarNode::setParent(AStarNode* p)
+{
+	this->parent = p;
+}
+
+
 const AStarNode& AStarNode::operator=(const AStarNode& rhs) 
 {
-	if (this->getXCoord() != rhs.getXCoord() && this->getYCoord() != rhs.getYCoord() && this->getWall() != rhs.getWall() && this->getOpen() != rhs.getOpen() && this->getClosed() != rhs.getClosed())
+	if (this->getXCoord() != rhs.getXCoord() && this->getYCoord() != rhs.getYCoord() && this->getWall() != rhs.getWall() && this->getOpen() != rhs.getOpen() && this->getClosed() != rhs.getClosed() )
 	{
 		this->setXCoord(rhs.getXCoord());
 		this->setYCoord(rhs.getYCoord());
 		this->setWall(rhs.getWall());
 		this->setOpen(rhs.getOpen());
 		this->setClosed(rhs.getClosed());
-		this->setHeuristicCost(rhs.getHeuristicCost());
-		this->setTrueCost(rhs.getHeuristicCost());
+		this->setTotalCost(rhs.getTotalCost());
+		this->setCostToGetToThisNode(rhs.getCostToGetToThisNode());
 	}
 
 	return *this;
+}
+
+
+bool AStarNode::updateCostToGetToThisNode(float newCost, AStarNode* newParent)  //Note:  this assumes that there will be few / no cases where a path with a lower cost will be found going through the same parent node
+{
+	if (newCost < this->getCostToGetToThisNode())
+	{
+		this->setTotalCost(this->getTotalCost() - (this->getCostToGetToThisNode() - newCost));
+		this->setcostToGetToThisNode(newCost);
+		this->setParent(newParent);
+		this->setOpen(true);
+		this->setClosed(false);
+
+		return true;
+	}
+
+	return false;
 }
