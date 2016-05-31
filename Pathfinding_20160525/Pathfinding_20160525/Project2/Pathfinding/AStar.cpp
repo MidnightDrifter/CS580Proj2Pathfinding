@@ -4,13 +4,14 @@
 
 
 
+
 void AStar::setStartingNode(int x, int y)  //Assumes grid has already been initialized
 {
-	this->map->at(x)->at(y)->setCostToGetToThisNode(0.f);
+	map->at(x)->at(y)->setCostToGetToThisNode(0.f);
 }
 
 
-AStar::AStar() : numRows(40), numCols(40), map(new std::vector<std::vector<AStarNode*>*>)
+AStar::AStar() : numRows(40), numCols(40))
 {
 	for (int i = 0; i < numRows; i++)
 	{
@@ -29,7 +30,7 @@ AStar::AStar() : numRows(40), numCols(40), map(new std::vector<std::vector<AStar
 
 }
 
-AStar::AStar(int r, int c) : numRows(r), numCols(c), map(new std::vector<std::vector<AStarNode*>*>)
+AStar::AStar(int r, int c) : numRows(r), numCols(c))
 {
 	for (int i = 0; i < numRows; i++)
 	{
@@ -46,7 +47,7 @@ AStar::AStar(int r, int c) : numRows(r), numCols(c), map(new std::vector<std::ve
 	}
 }
 
-AStar::AStar(const AStar& other) : numRows(other.getRowCount()), numCols(other.getColCount()), map(new std::vector<std::vector<AStarNode*>*>)
+AStar::AStar(const AStar& other) : numRows(other.getRowCount()), numCols(other.getColCount()))
 {
 	for(int i=0;i<numRows;i++)
 	{
@@ -73,8 +74,8 @@ const AStar&  AStar::operator=(const AStar& rhs)  //Assumes both AStar objects h
 				this->editNode(i, j)->setWall(rhs.getNode(i, j)->getWall());
 				this->editNode(i, j)->setClosed(rhs.getNode(i, j)->getClosed());
 				this->editNode(i, j)->setOpen(rhs.getNode(i, j)->getOpen());
-				this->editNode(i, j)->setHeuristicCost(rhs.getNode(i, j)->getHeuristicCost());
-				this->editNode(i, j)->setTrueCost(rhs.getNode(i, j)->getTrueCost());
+				this->editNode(i, j)->setTotalCost(rhs.getNode(i, j)->getTotalCost());
+				this->editNode(i, j)->setCostToGetToThisNode(rhs.getNode(i, j)->getCostToGetToThisNode());
 			}
 		}
 
@@ -96,17 +97,17 @@ int AStar::getColCount() const
 
 std::vector<AStarNode*>* AStar::getRow(int i)
 {
-	return this->map->at(i);
+	return map->at(i);
 }
 
 AStarNode* AStar::editNode(int i, int j)
 {
-	return this->map->at(i)->at(j);
+	return map->at(i)->at(j);
 }
 
 const AStarNode* AStar::getNode(int i, int j) const
 {
-	return this->map->at(i)->at(j);
+	return map->at(i)->at(j);
 }
 
 
@@ -133,6 +134,38 @@ AStar::~AStar()
 	delete(map);
 }
 
+
+
+void AStar::pushOpen(AStarNode* p)
+{
+	p->setOpen(true);
+	openList.insert(*p);
+}
+
+void AStar::pushClosed(AStarNode* p)
+{
+	p->setClosed(true);
+	closedList.insert(*p);
+}
+
+AStarNode AStar::popOpen()
+{
+	
+	AStarNode temp = *(std::min_element(openList.begin(), openList.end()));
+	openList.erase(temp);
+	temp.setOpen(false);
+	return temp;
+ }
+
+
+AStarNode AStar::popClosed()
+{
+
+	AStarNode temp = *(std::min_element(closedList.begin(), closedList.end()));
+	closedList.erase(temp);
+	temp.setClosed(false);
+	return temp;
+}
 
 
 	

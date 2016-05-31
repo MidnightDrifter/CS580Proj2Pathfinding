@@ -1,4 +1,5 @@
 #pragma once
+#include <limits>
 class AStarNode
 {
 public:
@@ -37,6 +38,8 @@ public:
 	static void subtractFromStartingCost(float f);
 
 	bool updateCostToGetToThisNode(float newCost, AStarNode* newParent);
+
+	friend bool operator<(const AStarNode& lhs, const AStarNode& rhs);
 
 
 

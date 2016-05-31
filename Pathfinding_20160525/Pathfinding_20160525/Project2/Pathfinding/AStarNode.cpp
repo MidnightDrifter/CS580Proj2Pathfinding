@@ -14,6 +14,12 @@ AStarNode::AStarNode(const AStarNode& other) : xCoord(other.getXCoord()), yCoord
 
 AStarNode::~AStarNode()  {}
 
+bool operator<(const AStarNode& lhs, const AStarNode& rhs) 
+{
+	return (lhs.totalCost < rhs.totalCost);
+}
+
+
 void AStarNode::intializeStartingCost()
 {
 	startingCost = 0.f;
@@ -165,7 +171,7 @@ bool AStarNode::updateCostToGetToThisNode(float newCost, AStarNode* newParent)  
 	if (newCost < this->getCostToGetToThisNode())
 	{
 		this->setTotalCost(this->getTotalCost() - (this->getCostToGetToThisNode() - newCost));
-		this->setcostToGetToThisNode(newCost);
+		this->setCostToGetToThisNode(newCost);
 		this->setParent(newParent);
 		this->setOpen(true);
 		this->setClosed(false);

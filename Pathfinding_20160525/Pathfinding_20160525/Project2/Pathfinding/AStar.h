@@ -4,9 +4,10 @@
 #include "Source/Map.h"
 #include <math.h>
 #include <vector>
+#include <set>
+#include <algorithm>
 #define HORIZONTAL_VERTICAL_DISTANCE 1
 #define DIAGONAL_DISTANCE  1.41421356237  //A truncation of sqrt(2) to cut down on computation--can always replace with actual sqrt(2)
-
 class AStar
 {
 
@@ -26,6 +27,11 @@ public:
 	void setRowCount(int r);
 	void setColCount(int c);
 
+	void pushOpen(AStarNode* p);
+	AStarNode popOpen();
+	void pushClosed(AStarNode* p);
+	AStarNode popClosed();
+
 	void setStartingNode(int x, int y);
 
 	//void initalize();
@@ -35,7 +41,9 @@ public:
 private:
 	int numRows;
 	int numCols;
-	std::vector<std::vector<AStarNode*>*>*  map;
+	static std::vector<std::vector<AStarNode*>*>*  map;
+	static std::set<AStarNode> openList;
+	static std::set<AStarNode> closedList;
 	
 };
 
