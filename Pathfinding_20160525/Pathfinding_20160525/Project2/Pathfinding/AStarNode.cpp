@@ -66,6 +66,30 @@ void AStarNode::setTotalCost(float f)
 	this->totalCost = f;
 }
 
+
+
+void AStarNode::calculateTotalCost( int i, AStarNode& goal)
+{
+	if (i == AStarNode::EUCLIDEAN)
+	{
+		this->setTotalCost(this->costToGetToThisNode + this->getEuclideanDistance(goal));
+	}
+	else if (i == AStarNode::OCTILE)
+	{
+		this->setTotalCost(this->costToGetToThisNode + this->getOctileDistance(goal));
+	}
+	else if (i == AStarNode::CHEBYSHEV)
+	{
+		this->setTotalCost(this->costToGetToThisNode + this->getChebyshevDistance(goal));
+	}
+
+	else if (i == AStarNode::MANHATTAN)
+	{
+		this->setTotalCost(this->costToGetToThisNode + this->getManhattanDistance(goal));
+	}
+}
+
+
 void AStarNode::setCostToGetToThisNode(float f)
 {
 	this->costToGetToThisNode = f;

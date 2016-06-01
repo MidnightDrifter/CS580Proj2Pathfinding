@@ -7,10 +7,10 @@ public:
 
 	enum HEURISTIC
 	{
-		MANHATTAN,
-		CHEBYSHEV,
 		EUCLIDEAN,
-		OCTILE
+		OCTILE,
+		CHEBYSHEV,
+		MANHATTAN
 
 	};
 	AStarNode();
@@ -55,6 +55,10 @@ public:
 	int getManhattanDistance(AStarNode& other) const;
 	float getOctileDistance(AStarNode& other) const;
 	int getChebyshevDistance(AStarNode& other)const;
+
+	
+	void calculateTotalCost(int i,  AStarNode& goal);
+
 
 	const AStarNode& operator=(const AStarNode& rhs);
 private:

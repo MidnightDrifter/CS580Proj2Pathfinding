@@ -168,4 +168,13 @@ AStarNode AStar::popClosed()
 }
 
 
+void AStar::calculateTotalCost(AStarNode* current, int i)
+{
+	current->calculateTotalCost(i, *goalNode);
+}
+
+void AStar::calculateTotalCost(int x, int y, int i)
+{
+	this->editNode(x, y)->calculateTotalCost(i, *goalNode);
+}
 	

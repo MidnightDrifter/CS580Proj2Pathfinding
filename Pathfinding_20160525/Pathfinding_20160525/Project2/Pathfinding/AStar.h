@@ -38,12 +38,18 @@ public:
 
 	const AStar& operator=(const AStar& rhs);
 
+	void calculateTotalCost(AStarNode* current, int i);
+	void calculateTotalCost(int x, int y, int i);
+		
 private:
 	int numRows;
 	int numCols;
 	static std::vector<std::vector<AStarNode*>*>*  map;
 	static std::set<AStarNode> openList;
 	static std::set<AStarNode> closedList;
+	static AStarNode* goalNode;
+	
+	
 	
 };
 
