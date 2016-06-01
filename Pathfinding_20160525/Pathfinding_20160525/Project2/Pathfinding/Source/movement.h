@@ -9,8 +9,10 @@
  */
 
 #pragma once
+#include "../AStar.h"
 
 class GameObject;
+
 
 typedef std::list<D3DXVECTOR3> WaypointList;
 
@@ -82,4 +84,7 @@ protected:
 	float m_speedJog;
 
 	bool ComputePath( int r, int c, bool newRequest );
+
+	AStar m_AStarGrid;
+
 };

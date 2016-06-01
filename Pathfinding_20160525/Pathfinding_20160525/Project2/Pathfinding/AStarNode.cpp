@@ -14,6 +14,17 @@ AStarNode::AStarNode(const AStarNode& other) : xCoord(other.getXCoord()), yCoord
 
 AStarNode::~AStarNode()  {}
 
+//AStarNode::AStarNode() : xCoord(-1), yCoord(-1), isWall(false), isOpen(false), isClosed(false), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
+void AStarNode::clearNode()
+{
+	this->setWall(false);
+	this->setOpen(false);
+	this->setClosed(false);
+	this->setCostToGetToThisNode(std::numeric_limits<float>::max());
+	this->setTotalCost(std::numeric_limits<float>::max());
+	this->setParent(NULL);
+}
+
 bool operator<(const AStarNode& lhs, const AStarNode& rhs) 
 {
 	return (lhs.totalCost < rhs.totalCost);

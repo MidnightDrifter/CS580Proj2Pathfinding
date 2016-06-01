@@ -32,9 +32,11 @@ Movement::Movement( GameObject& owner )
   m_aStarUsesAnalysis(false),
   m_heuristicWeight(1.0f),
   m_heuristicCalc(0),
-  m_fogOfWar(false)
+  m_fogOfWar(false),
+	m_AStarGrid(AStar(g_terrain.GetWidth(), g_terrain.GetWidth()))
 {
 	m_target.x = m_target.y = m_target.z = 0.0f;
+	
 }
 
 Movement::~Movement( void )

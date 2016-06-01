@@ -59,6 +59,7 @@ public:
 	
 	void calculateTotalCost(int i,  AStarNode& goal);
 
+	void clearNode();
 
 	const AStarNode& operator=(const AStarNode& rhs);
 private:

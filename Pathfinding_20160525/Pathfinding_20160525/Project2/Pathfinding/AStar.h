@@ -40,13 +40,18 @@ public:
 
 	void calculateTotalCost(AStarNode* current, int i);
 	void calculateTotalCost(int x, int y, int i);
+
+	 void setGoalNode(AStarNode* goalNode);
+	 void setGoalNode(int x, int y);
+
+	 void clean();
 		
 private:
 	int numRows;
 	int numCols;
 	static std::vector<std::vector<AStarNode*>*>*  map;
-	static std::set<AStarNode> openList;
-	static std::set<AStarNode> closedList;
+	static std::set<AStarNode> * openList;
+	static std::set<AStarNode> * closedList;
 	static AStarNode* goalNode;
 	
 	
