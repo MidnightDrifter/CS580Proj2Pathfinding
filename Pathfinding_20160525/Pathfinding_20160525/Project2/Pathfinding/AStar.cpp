@@ -3,7 +3,20 @@
 #include "AStar.h"
 
 
+bool AStar::isValidNode(int x, int y) const
+{
+	if(x < 0 || y < 0 || x >= this->getRowCount() || y>= this->getColCount())
+	{
+		return false;
+	}
+	return true;
+}
 
+
+std::set<AStarNode> const * const AStar::getOpenList() const
+{
+	return this->openList;
+}
 
 void AStar::setStartingNode(int x, int y)  //Assumes grid has already been initialized
 {

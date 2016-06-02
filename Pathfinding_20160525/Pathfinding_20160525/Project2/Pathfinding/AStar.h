@@ -47,6 +47,10 @@ public:
 	 void setGoalNode(int x, int y);
 
 	 void clean();
+
+	 std::set<AStarNode> const * const getOpenList() const;
+
+	 bool isValidNode(int x, int y) const;
 		
 private:
 	int numRows;

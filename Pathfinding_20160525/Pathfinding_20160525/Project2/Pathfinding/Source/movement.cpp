@@ -162,6 +162,7 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	AStar& myMap = this->editAStar();
 	myMap.setGoalNode(r, c);
 	myMap.setStartingNode(curR, curC);
+	myMap.pushOpen(myMap.editNode(curR, curC));
 	
 	bool useAStar = false;
 	if( useAStar )
@@ -173,6 +174,24 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 		//2. You will need to make this function remember the current progress if it preemptively exits.
 		//3. Return "true" if the path is complete, otherwise "false".
 		///////////////////////////////////////////////////////////////////////////////////////////////////
+
+		AStarNode currentNode = myMap.popOpen();
+		myMap.pushClosed(&currentNode);
+
+		do
+		{
+			for (int i = currentNode.getXCoord() - 1; i < currentNode.getXCoord() + 1; ++i)
+			{
+				for (int j = currentNode.getYCoord() - 1; j < currentNode.getYCoord() + 1; ++j)
+				{
+					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall())
+					{
+						//push onto open list
+					}
+				}
+			}
+		} while(!myMap.getOpenList()->empty());
+
 
 		return false;
 	}
