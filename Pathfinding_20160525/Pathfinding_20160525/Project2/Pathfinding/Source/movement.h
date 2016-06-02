@@ -60,6 +60,8 @@ public:
     void SetFogOfWar( bool enable )                         { m_fogOfWar = enable; }
     bool GetFogOfWar() const                                { return m_fogOfWar; }
 
+	AStar& editAStar() { return m_AStarGrid; }
+
 protected:
 
 	GameObject* m_owner;

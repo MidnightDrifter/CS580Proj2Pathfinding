@@ -156,9 +156,17 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	m_goal = g_terrain.GetCoordinates( r, c );
 	m_movementMode = MOVEMENT_WAYPOINT_LIST;
 
+	int curR, curC;
+	D3DXVECTOR3 cur = m_owner->GetBody.GetPos();
+	g_terrain.GetRowColumn(&cur, &curR, &curC);
+	AStar& myMap = this->editAStar();
+	myMap.setGoalNode(r, c);
+	myMap.setStartingNode(curR, curC);
+	
 	bool useAStar = false;
 	if( useAStar )
 	{
+
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		//INSERT YOUR A* CODE HERE
 		//1. You should probably make your own A* class.
@@ -171,9 +179,9 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	else
 	{	
 		//Randomly meander toward goal (might get stuck at wall)
-		int curR, curC;
-		D3DXVECTOR3 cur = m_owner->GetBody().GetPos();
-		g_terrain.GetRowColumn( &cur, &curR, &curC );
+		//int curR, curC;
+		//D3DXVECTOR3 cur = m_owner->GetBody().GetPos();
+		//g_terrain.GetRowColumn( &cur, &curR, &curC );
 
 		m_waypointList.clear();
 		m_waypointList.push_back( cur );

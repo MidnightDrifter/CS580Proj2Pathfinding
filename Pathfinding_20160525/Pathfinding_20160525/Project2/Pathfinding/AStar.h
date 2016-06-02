@@ -38,8 +38,10 @@ public:
 
 	const AStar& operator=(const AStar& rhs);
 
-	void calculateTotalCost(AStarNode* current, int i);
-	void calculateTotalCost(int x, int y, int i);
+	 void calculateTotalCost(AStarNode* current, int i);
+	 void calculateTotalCost(int x, int y, int i);
+
+	
 
 	 void setGoalNode(AStarNode* goalNode);
 	 void setGoalNode(int x, int y);
