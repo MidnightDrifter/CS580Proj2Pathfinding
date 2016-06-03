@@ -160,7 +160,7 @@ AStar::~AStar()
 
 void AStar::setGoalNode(AStarNode* g)
 {
-	goalNode = g;
+goalNode = g;
 }
 
 void AStar::setGoalNode(int x, int y)
@@ -183,12 +183,99 @@ void AStar::pushClosed(AStarNode* p)
 
 AStarNode AStar::popOpen()
 {
-	
+
 	AStarNode temp = *(std::min_element(openList->begin(), openList->end()));
 	openList->erase(temp);
 	temp.setOpen(false);
 	return temp;
- }
+}
+
+
+bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destination) const   //yeah double check this
+{
+	if (this->isValidNode(destination.getXCoord(), destination.getYCoord()))
+	{
+		//upper left  & upper right diags
+		if (destination.getXCoord() == current.getXCoord() - 1)
+		{
+			//upper left
+			if (!this->getNode(destination.getXCoord() - 1, destination.getYCoord())->getWall())
+			{
+				if (destination.getYCoord() == current.getYCoord() - 1)
+				{
+					return (this->getNode(current.getXCoord() - 1, current.getYCoord() - 1)->getWall());
+				}
+
+				else if (destination.getYCoord == current.getYCoord() + 1)
+				{
+					return (this->getNode(current.getXCoord() - 1, current.getYCoord() + 1)->getWall());
+				}
+				else
+				{
+					return false;
+
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		//lower left & lower right diags
+		else if (destination.getXCoord() == current.getXCoord() + 1)
+		{
+			if (!this->getNode(destination.getXCoord() + 1, destination.getYCoord())->getWall())
+			{
+				if (destination.getYCoord() == current.getYCoord() - 1)
+				{
+					return this->getNode(current.getXCoord() + 1, current.getYCoord() - 1);
+				}
+				else if (destination.getYCoord() == current.getYCoord() + 1)
+				{
+					return this->getNode(current.getXCoord() + 1, current.getYCoord() + 1);
+
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+bool AStar::canMoveHorizontal(const AStarNode& current, const AStarNode& destination) const
+{
+	if (this->isValidNode(destination.getXCoord(), destination.getYCoord()) && !destination.getWall())
+	{
+		return true;
+	}
+
+	else
+	{
+		return false;
+	}
+}
+
+
+
+AStarNode const & AStar::getGoalNode() const
+{
+	return *(this->goalNode);
+}
 
 
 AStarNode AStar::popClosed()

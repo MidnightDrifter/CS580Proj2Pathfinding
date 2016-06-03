@@ -162,6 +162,7 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	AStar& myMap = this->editAStar();
 	myMap.setGoalNode(r, c);
 	myMap.setStartingNode(curR, curC);
+	g_terrain.SetColor(curR, curC, DEBUG_COLOR_PURPLE);
 	myMap.pushOpen(myMap.editNode(curR, curC));
 	
 	bool useAStar = false;
@@ -176,7 +177,16 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 
 		AStarNode currentNode = myMap.popOpen();
+		
 		myMap.pushClosed(&currentNode);
+		g_terrain.SetColor(currentNode.getXCoord(), currentNode.getYCoord(), DEBUG_COLOR_RED);
+		//change current node color to [closed list color]
+		
+		//If pop off goal node, path found
+		if (currentNode.getXCoord() == myMap.getGoalNode().getXCoord() && currentNode.getYCoord() == myMap.getGoalNode().getYCoord())
+		{
+			return true;   //Push it onto the waypoint list?  Rubber band & smooth the waypoint list?
+		}
 
 		do
 		{
@@ -186,7 +196,12 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 				{
 					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall())
 					{
+						//change color of node to [open list color]
+						g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
+						//use diagonal and horizontal checks to determine cost & parent node
 						//push onto open list
+
+						//if push onto open 
 					}
 				}
 			}

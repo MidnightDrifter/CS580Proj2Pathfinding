@@ -46,6 +46,13 @@ public:
 	 void setGoalNode(AStarNode* goalNode);
 	 void setGoalNode(int x, int y);
 
+	 AStarNode const & getGoalNode() const;
+
+	 bool canMoveDiagonal(const AStarNode& current, const AStarNode& destination) const;
+	 bool canMoveHorizontal(const AStarNode& current, const AStarNode& destination) const;
+
+
+
 	 void clean();
 
 	 std::set<AStarNode> const * const getOpenList() const;
