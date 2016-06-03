@@ -32,7 +32,7 @@ public:
 	void setColCount(int c);
 
 	void pushOpen(AStarNode* p);
-	AStarNode popOpenMin();
+	AStarNode& popOpenMin();
 	AStarNode* popOpen(AStarNode* p);
 	void pushClosed(AStarNode* p);
 	AStarNode popClosed();

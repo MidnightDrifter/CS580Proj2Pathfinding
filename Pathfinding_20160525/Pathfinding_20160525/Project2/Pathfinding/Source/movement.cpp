@@ -36,8 +36,7 @@ Movement::Movement( GameObject& owner )
 	m_AStarGrid(AStar(g_terrain.GetWidth(), g_terrain.GetWidth()))
 {
 	AStar::DIAG_DISTANCE = sqrtf(2);
-}
-{
+
 	m_target.x = m_target.y = m_target.z = 0.0f;
 	
 }
@@ -179,10 +178,10 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 		//3. Return "true" if the path is complete, otherwise "false".
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 
-		AStarNode currentNode = myMap.popOpen();
+		AStarNode& currentNode = myMap.popOpenMin();
 		
-		myMap.pushClosed(&currentNode);
-		g_terrain.SetColor(currentNode.getXCoord(), currentNode.getYCoord(), DEBUG_COLOR_RED);
+		
+		
 		//change current node color to [closed list color]
 		
 		//If pop off goal node, path found
@@ -217,10 +216,20 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 
 						myMap.updateOpen(i, j);
 
-						//if push onto open 
-					}
+											}
 				}
 			}
+
+
+			myMap.pushClosed(&currentNode);
+			g_terrain.SetColor(currentNode.getXCoord(), currentNode.getYCoord(), DEBUG_COLOR_RED);
+
+			if(m_singleStep)
+			{
+				break;
+			}
+
+
 		} while(!myMap.getOpenList()->empty());
 
 

@@ -181,7 +181,7 @@ void AStar::pushClosed(AStarNode* p)
 	closedList->insert(*p);
 }
 
-AStarNode AStar::popOpenMin()
+AStarNode& AStar::popOpenMin()
 {
 
 	AStarNode temp = *(std::min_element(openList->begin(), openList->end()));
