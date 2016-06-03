@@ -181,7 +181,7 @@ void AStar::pushClosed(AStarNode* p)
 	closedList->insert(*p);
 }
 
-AStarNode AStar::popOpen()
+AStarNode AStar::popOpenMin()
 {
 
 	AStarNode temp = *(std::min_element(openList->begin(), openList->end()));
@@ -190,6 +190,42 @@ AStarNode AStar::popOpen()
 	return temp;
 }
 
+AStarNode* AStar::popOpen(AStarNode* a)
+{
+	std::set<AStarNode>::iterator it = openList->find(*a);
+	AStarNode* temp = NULL;
+	if (it != openList->end())
+	{
+		*temp = *it;
+		openList->erase(it);
+	}
+	return temp;
+}
+
+
+void AStar::updateOpen(AStarNode* a)
+{
+	if (a)
+	{
+		AStarNode* temp = this->popOpen(a);
+		if (temp)
+		{
+			if ((*temp) < (*a))
+			{
+				this->pushOpen(temp);
+			}
+			else
+			{
+				this->pushOpen(a);
+			}
+		}
+	}
+}
+
+void AStar::updateOpen(int x, int y)
+{
+	this->updateOpen(this->editNode(x, y));
+}
 
 bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destination) const   //yeah double check this
 {

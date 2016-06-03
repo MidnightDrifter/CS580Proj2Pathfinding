@@ -14,6 +14,10 @@ class AStar
 
 
 public:
+
+	const static int HV_DISTANCE = 1;
+	static float DIAG_DISTANCE;// = sqrtf(2);
+
 	AStar();
 	AStar(int rows, int cols);
 	AStar(const AStar& other);
@@ -28,7 +32,8 @@ public:
 	void setColCount(int c);
 
 	void pushOpen(AStarNode* p);
-	AStarNode popOpen();
+	AStarNode popOpenMin();
+	AStarNode* popOpen(AStarNode* p);
 	void pushClosed(AStarNode* p);
 	AStarNode popClosed();
 
@@ -41,7 +46,8 @@ public:
 	 void calculateTotalCost(AStarNode* current, int i);
 	 void calculateTotalCost(int x, int y, int i);
 
-	
+	 void updateOpen(AStarNode* a); 
+		 void updateOpen(int x, int y);
 
 	 void setGoalNode(AStarNode* goalNode);
 	 void setGoalNode(int x, int y);

@@ -77,7 +77,24 @@ void AStarNode::setTotalCost(float f)
 	this->totalCost = f;
 }
 
+bool AStarNode::operator==(const AStarNode& r) const
+{
+	if(r.getXCoord() == this->getXCoord() && r.getYCoord() == this->getYCoord())
+	{
+		return true;
+	}
 
+	return false;
+}
+
+bool operator==(const AStarNode& rhs, const AStarNode& lhs)
+{
+	if(rhs.getXCoord() == lhs.getXCoord() && rhs.getYCoord() == lhs.getYCoord())
+	{
+		return true;
+	}
+	return false;
+}
 
 void AStarNode::calculateTotalCost( int i, AStarNode& goal)
 {

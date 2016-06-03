@@ -35,6 +35,9 @@ Movement::Movement( GameObject& owner )
   m_fogOfWar(false),
 	m_AStarGrid(AStar(g_terrain.GetWidth(), g_terrain.GetWidth()))
 {
+	AStar::DIAG_DISTANCE = sqrtf(2);
+}
+{
 	m_target.x = m_target.y = m_target.z = 0.0f;
 	
 }
@@ -196,10 +199,23 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 				{
 					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall())
 					{
+
 						//change color of node to [open list color]
 						g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
 						//use diagonal and horizontal checks to determine cost & parent node
+						if (myMap.canMoveDiagonal(currentNode, *(myMap.getNode(i, j))))
+						{
+							
+							myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + AStar::DIAG_DISTANCE);
+						}
+
+						else if(myMap.canMoveHorizontal(currentNode, *(myMap.getNode(i,j))))
+						{
+							myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + AStar::HV_DISTANCE);
+						}
 						//push onto open list
+
+						myMap.updateOpen(i, j);
 
 						//if push onto open 
 					}

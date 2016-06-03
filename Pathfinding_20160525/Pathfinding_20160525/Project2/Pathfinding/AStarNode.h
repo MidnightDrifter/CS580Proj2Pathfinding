@@ -41,7 +41,8 @@ public:
 
 	friend bool operator<(const AStarNode& lhs, const AStarNode& rhs);
 
-
+	friend bool operator==(const AStarNode& lhs, const AStarNode& rhs);
+	bool operator==(const AStarNode& lhs) const;
 
 	void setXCoord(int x);
 	void setYCoord(int y);
