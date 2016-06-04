@@ -15,8 +15,7 @@ class AStar
 
 public:
 
-	const static int HV_DISTANCE = 1;
-	static float DIAG_DISTANCE;// = sqrtf(2);
+
 
 	AStar();
 	AStar(int rows, int cols);
@@ -62,7 +61,7 @@ public:
 	 void clean();
 
 	 std::set<AStarNode> const * const getOpenList() const;
-
+	 std::set<AStarNode> const* const getClosedList() const;
 	 bool isValidNode(int x, int y) const;
 		
 private:

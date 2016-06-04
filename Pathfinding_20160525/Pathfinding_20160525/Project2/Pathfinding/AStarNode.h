@@ -32,10 +32,10 @@ public:
 	float getCostToGetToThisNode() const;
 	AStarNode* getParent() const;
 
-	static void intializeStartingCost();
-	static void setStartingCost(float f);
-	static void addToStartingCost(float f);
-	static void subtractFromStartingCost(float f);
+	//static void intializeStartingCost();
+	//static void setStartingCost(float f);
+	//static void addToStartingCost(float f);
+	//static void subtractFromStartingCost(float f);
 
 	bool updateCostToGetToThisNode(float newCost, AStarNode* newParent);
 
@@ -72,6 +72,6 @@ private:
 	float costToGetToThisNode;
 	float totalCost;
 	AStarNode* parent;
-	static float startingCost; 
+	
 };
 

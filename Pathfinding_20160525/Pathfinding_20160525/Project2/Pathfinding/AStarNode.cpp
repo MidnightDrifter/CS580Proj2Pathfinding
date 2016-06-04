@@ -2,7 +2,10 @@
 #include "AStarNode.h"
 #include <math.h>
 #include <limits>
+#undef max
 #define SQRT2 1.41421356237  //A truncation of sqrt(2) to cut down on computation--can always replace with actual sqrt(2)
+
+
 AStarNode::AStarNode() : xCoord(-1), yCoord(-1), isWall(false), isOpen(false), isClosed(false), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
 AStarNode::AStarNode(int x, int y) : xCoord(x), yCoord(y), isWall(false), isOpen(false), isClosed(false), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
 AStarNode::AStarNode(int x, int y, bool w) : xCoord(x), yCoord(y), isWall(w), isOpen(false), isClosed(false), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
@@ -31,25 +34,25 @@ bool operator<(const AStarNode& lhs, const AStarNode& rhs)
 }
 
 
-void AStarNode::intializeStartingCost()
-{
-	startingCost = 0.f;
-}
-
-void AStarNode::setStartingCost(float f)
-{
-	startingCost = f;
-}
-
-void AStarNode::addToStartingCost(float f)
-{
-	startingCost += f;
-}
-
-void AStarNode::subtractFromStartingCost(float f)
-{
-	startingCost -= f;
-}
+//void AStarNode::intializeStartingCost()
+//{
+//	startingCost = 0.f;
+//}
+//
+//void AStarNode::setStartingCost(float f)
+//{
+//	startingCost = f;
+//}
+//
+//void AStarNode::addToStartingCost(float f)
+//{
+//	startingCost += f;
+//}
+//
+//void AStarNode::subtractFromStartingCost(float f)
+//{
+//	startingCost -= f;
+//}
 
 void AStarNode::setXCoord(int x)
 {

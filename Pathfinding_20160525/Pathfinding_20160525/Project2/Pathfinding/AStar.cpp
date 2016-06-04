@@ -1,7 +1,14 @@
 
 #include "DXUT.h"
 #include "AStar.h"
+#include "Source/singleton.h"
+#include "Source/terrain.h"
 
+
+std::set<AStarNode>* AStar::openList = new  std::set<AStarNode>;
+std::set<AStarNode>* AStar::closedList = new std::set<AStarNode>;
+AStarNode* AStar::goalNode = new AStarNode();
+std::vector<std::vector<AStarNode*>*>* AStar::map = new std::vector<std::vector<AStarNode*>*>;
 
 bool AStar::isValidNode(int x, int y) const
 {
@@ -18,6 +25,11 @@ std::set<AStarNode> const * const AStar::getOpenList() const
 	return this->openList;
 }
 
+std::set<AStarNode> const * const AStar::getClosedList() const
+{
+	return this->closedList;
+}
+
 void AStar::setStartingNode(int x, int y)  //Assumes grid has already been initialized
 {
 	map->at(x)->at(y)->setCostToGetToThisNode(0.f);
@@ -26,46 +38,51 @@ void AStar::setStartingNode(int x, int y)  //Assumes grid has already been initi
 
 AStar::AStar() : numRows(40), numCols(40)
 {
+	//AStar::map = new std::vector<std::vector<AStarNode*>*>;
 	for (int i = 0; i < numRows; i++)
 	{
 		map->at(i) = new std::vector<AStarNode*>;
 		for (int j = 0; j < numCols; j++)
 		{
 			bool b = true;
-			if (!(g_terrain.isWall(i, j)))
+			if (!(g_terrain.IsWall(i, j)))
 			{
 				b = false;
 			}
 			map->at(i)->at(j) = new AStarNode(i, j, b);
 		}
 	}
-	openList = new  std::set<AStarNode>;
-	closedList = new std::set<AStarNode>;
+	//AStar::openList = new  std::set<AStarNode>;
+	//AStar::closedList = new std::set<AStarNode>;
+	//AStar::goalNode = new AStarNode();
 
 }
 
 AStar::AStar(int r, int c) : numRows(r), numCols(c)
 {
+	//AStar::map = new std::vector<std::vector<AStarNode*>*>;
 	for (int i = 0; i < numRows; i++)
 	{
 		map->at(i) = new std::vector<AStarNode*>;
 		for (int j = 0; j < numCols; j++)
 		{
 			bool b = true;
-			if (!(g_terrain.isWall(i, j)))
+			if (!(g_terrain.IsWall(i, j)))
 			{
 				b = false;
 			}
 			map->at(i)->at(j) = new AStarNode(i, j, b);
 		}
 	}
-	openList = new  std::set<AStarNode>;
-	closedList = new std::set<AStarNode>;
+	//AStar::openList = new  std::set<AStarNode>;
+	//AStar::closedList = new std::set<AStarNode>;
+	//AStar::goalNode = new AStarNode();
 
 }
 
 AStar::AStar(const AStar& other) : numRows(other.getRowCount()), numCols(other.getColCount())
 {
+	//AStar::map = new std::vector<std::vector<AStarNode*>*>;
 	for(int i=0;i<numRows;i++)
 	{
 		map->at(i) = new std::vector<AStarNode*>;
@@ -75,8 +92,9 @@ AStar::AStar(const AStar& other) : numRows(other.getRowCount()), numCols(other.g
 																
 		}
 	}
-	(*openList) = *(other.openList);
-	(*closedList) = *(other.closedList);
+	//AStar::openList = new std::set<AStarNode>(*other.getOpenList());
+	//AStar::closedList = new std::set<AStarNode>(*other.getClosedList());
+	//AStar::goalNode = new AStarNode(other.getGoalNode());
 	
 }
 
@@ -99,7 +117,7 @@ const AStar&  AStar::operator=(const AStar& rhs)  //Assumes both AStar objects h
 			
 			}
 		}
-		(*map) = *(rhs.map);
+		//(*map) = *(rhs.map);
 		(*openList) = *(rhs.openList);
 		(*closedList) = *(rhs.closedList);
 		(*goalNode) = *(rhs.goalNode);
@@ -242,7 +260,7 @@ bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destinati
 					return (this->getNode(current.getXCoord() - 1, current.getYCoord() - 1)->getWall());
 				}
 
-				else if (destination.getYCoord == current.getYCoord() + 1)
+				else if (destination.getYCoord() == current.getYCoord() + 1)
 				{
 					return (this->getNode(current.getXCoord() - 1, current.getYCoord() + 1)->getWall());
 				}
@@ -342,7 +360,7 @@ void AStar::clean()
 		for (int j = 0; j < map->size(); j++)
 		{
 			map->at(i)->at(j)->clearNode();
-			if(!g_terrain.isWall(i,j))
+			if(!g_terrain.IsWall(i,j))
 			{
 				map->at(i)->at(j)->setWall(false);
 			}

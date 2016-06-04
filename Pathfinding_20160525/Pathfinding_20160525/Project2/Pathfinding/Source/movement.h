@@ -27,6 +27,8 @@ enum MovementMode
 class Movement
 {
 public:
+	const static int HV_DISTANCE = 1;
+	static float DIAG_DISTANCE;
 	Movement( GameObject& owner );
 	~Movement( void );
 

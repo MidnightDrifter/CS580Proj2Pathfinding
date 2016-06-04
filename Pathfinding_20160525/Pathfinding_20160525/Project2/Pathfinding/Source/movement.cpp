@@ -18,6 +18,7 @@
 #include "terrain.h"
 #include "time.h"
 
+float Movement::DIAG_DISTANCE = sqrtf(2);
 
 Movement::Movement( GameObject& owner )
 : m_owner( &owner ),
@@ -35,7 +36,7 @@ Movement::Movement( GameObject& owner )
   m_fogOfWar(false),
 	m_AStarGrid(AStar(g_terrain.GetWidth(), g_terrain.GetWidth()))
 {
-	AStar::DIAG_DISTANCE = sqrtf(2);
+	
 
 	m_target.x = m_target.y = m_target.z = 0.0f;
 	
@@ -159,7 +160,7 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	m_movementMode = MOVEMENT_WAYPOINT_LIST;
 
 	int curR, curC;
-	D3DXVECTOR3 cur = m_owner->GetBody.GetPos();
+	D3DXVECTOR3 cur = m_owner->GetBody().GetPos();
 	g_terrain.GetRowColumn(&cur, &curR, &curC);
 	AStar& myMap = this->editAStar();
 	myMap.setGoalNode(r, c);
@@ -205,12 +206,12 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 						if (myMap.canMoveDiagonal(currentNode, *(myMap.getNode(i, j))))
 						{
 							
-							myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + AStar::DIAG_DISTANCE);
+							myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + Movement::DIAG_DISTANCE);
 						}
 
 						else if(myMap.canMoveHorizontal(currentNode, *(myMap.getNode(i,j))))
 						{
-							myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + AStar::HV_DISTANCE);
+							myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + Movement::HV_DISTANCE);
 						}
 						//push onto open list
 
