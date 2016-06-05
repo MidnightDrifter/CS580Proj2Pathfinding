@@ -63,7 +63,9 @@ public:
     bool GetFogOfWar() const                                { return m_fogOfWar; }
 
 	AStar& editAStar() { return m_AStarGrid; }
-
+	std::list<D3DXVECTOR3>* editSplineNodesList() { return m_splineNodesList; }
+	std::vector<const D3DXVECTOR3*>* editSplineNodesVector() { return m_splineNodesVector; }
+	D3DXVECTOR3* getTempVector() { return m_tempVector; }
 protected:
 
 	GameObject* m_owner;
@@ -90,5 +92,8 @@ protected:
 	bool ComputePath( int r, int c, bool newRequest );
 
 	AStar m_AStarGrid;
+	std::list<D3DXVECTOR3>* m_splineNodesList;
+	D3DXVECTOR3* m_tempVector;
+	std::vector<const D3DXVECTOR3*>* m_splineNodesVector;
 
 };

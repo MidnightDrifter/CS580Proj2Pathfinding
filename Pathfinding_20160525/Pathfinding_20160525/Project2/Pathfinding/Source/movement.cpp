@@ -34,7 +34,10 @@ Movement::Movement( GameObject& owner )
   m_heuristicWeight(1.0f),
   m_heuristicCalc(0),
   m_fogOfWar(false),
-	m_AStarGrid(AStar(g_terrain.GetWidth(), g_terrain.GetWidth()))
+	m_AStarGrid(AStar(g_terrain.GetWidth(), g_terrain.GetWidth())),
+	m_tempVector(new D3DXVECTOR3()),
+	m_splineNodesList(new std::list<D3DXVECTOR3>),
+	m_splineNodesVector(new std::vector<const D3DXVECTOR3*>)
 {
 	
 
@@ -172,6 +175,29 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	if( useAStar )
 	{
 
+		if (this->GetStraightlinePath())
+		{
+			bool b = true;
+			for(int i=min(curR, r); i<=max(curR,r); ++i)
+			{
+				for (int j = min(curC, c); j <= max(curC, c); j++)
+				{
+					if(myMap.getNode(i,j)->getWall())
+					{
+						b=false;
+						break;
+					}
+				}
+			}
+			//
+			if (b)
+			{
+				m_waypointList.push_back(m_goal);
+			}
+		}
+
+
+
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		//INSERT YOUR A* CODE HERE
 		//1. You should probably make your own A* class.
@@ -188,6 +214,183 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 		//If pop off goal node, path found
 		if (currentNode.getXCoord() == myMap.getGoalNode().getXCoord() && currentNode.getYCoord() == myMap.getGoalNode().getYCoord())
 		{
+			while (&currentNode)
+			{
+				m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates(currentNode.getXCoord(), currentNode.getYCoord())));
+				currentNode = (*currentNode.getParent());
+
+
+			}
+
+			if (this->GetSmoothPath() && this->GetRubberbandPath())
+			{
+
+				//Do rubberbanding on A* path
+				std::list<D3DXVECTOR3>::iterator it = m_waypointList.end();
+
+
+
+				while (m_waypointList.size() >= 3)
+				{
+					D3DXVECTOR3 a = m_waypointList.back();
+					m_waypointList.pop_back();
+					D3DXVECTOR3 b = m_waypointList.back();
+					m_waypointList.pop_back();
+					D3DXVECTOR3 c = m_waypointList.back();
+
+					bool bb = true;
+					for (int i = min(a.x, c.x); i <= max(a.x, a.y); ++i)
+					{
+						for (int j = min(a.y, c.y); j <= max(a.y, c.y); j++)
+						{
+							if (myMap.getNode(i, j)->getWall())
+							{
+								bb = false;
+								break;
+							}
+						}
+					}
+					if (bb)
+					{
+						m_waypointList.push_back(a);
+						it = m_waypointList.end();
+					}
+					else
+					{
+						m_waypointList.push_back(b);
+						m_waypointList.push_back(a);
+						--it;
+					}
+
+
+				}
+
+				/*
+[2:31:16 AM] Cordial Treatise: pop off the first one, peek at the second
+[2:31:20 AM] Cordial Treatise: I'm assuming peek is a thing you can do
+[2:31:25 AM] Cordial Treatise: I'd have to double check
+[2:31:36 AM] Cordial Treatise: ANYWAY
+[2:31:55 AM | Edited 2:32:01 AM] Cordial Treatise: If the distance between them is > 1.5, make their midpoint, push it back on to the front
+[2:32:11 AM] Cordial Treatise: peek & compare again
+[2:32:43 AM] Cordial Treatise: repeat as needed until distance is <= 1.5
+[2:32:49 AM] Cordial Treatise: push that head node onto other list
+[2:33:17 AM] Cordial Treatise: repeat with new head node
+				
+				*/
+
+			}
+
+
+
+			else if (this->GetSmoothPath())
+			{
+
+			std::list<D3DXVECTOR3>::iterator it = m_waypointList.begin();
+			int waypointListSize = m_waypointList.size();
+			D3DXVECTOR3* temp = this->getTempVector();
+			//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
+			std::vector<const D3DXVECTOR3*>* splineVector = this->editSplineNodesVector();
+			//splineList->resize()
+			splineVector->resize(1 + (4 * waypointListSize));
+			
+			for (int i = 0, int j = 0; j < waypointListSize; i += 4, j += 1)
+			{
+				splineVector->at(i) = &m_waypointList.front();
+				m_waypointList.pop_front();
+			}
+			int splineVectorSize = splineVector->size();
+
+			for (int i = 0; i < splineVectorSize; i += 4)
+			{
+				if (i == 0)
+				{
+					D3DXVec3CatmullRom(temp, splineVector->at(i), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.25f);
+						splineVector->at(i + 1) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.5f);
+						splineVector->at(i + 2) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.75f);
+						splineVector->at(i + 3) = temp;
+				}
+
+				else if (i == (splineVector->size() - 9))
+				{
+					
+					D3DXVec3CatmullRom(temp, splineVector->at(splineVectorSize - 9), splineVector->at(splineVectorSize - 5), splineVector->at(splineVectorSize - 1), splineVector->at(splineVectorSize - 1), 0.25f);
+					splineVector->at(splineVectorSize - 4) = temp;
+					D3DXVec3CatmullRom(temp, splineVector->at(splineVectorSize - 9), splineVector->at(splineVectorSize - 5), splineVector->at(splineVectorSize - 1), splineVector->at(splineVectorSize - 1), 0.5f);
+					splineVector->at(splineVectorSize - 3) = temp;
+					D3DXVec3CatmullRom(temp, splineVector->at(splineVectorSize - 9), splineVector->at(splineVectorSize - 5), splineVector->at(splineVectorSize - 1), splineVector->at(splineVectorSize - 1), 0.75f);
+					splineVector->at(splineVectorSize - 2) = temp;
+
+				}
+				else
+				{
+					
+						D3DXVec3CatmullRom(temp, splineVector->at(i - 4), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8),0.25f);
+						splineVector->at(i + 1)=temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i - 4), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.5f);
+						splineVector->at(i + 2) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i - 4), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.75f);
+						splineVector->at(i + 3) = temp;
+					}
+
+				}
+
+			for(int i=0; i<splineVectorSize; i++)
+			{
+				m_waypointList.push_back(*(splineVector->at(i)));
+			}
+
+			splineVector->erase(splineVector->begin(), splineVector->end());
+
+			}
+
+			else if (this->GetRubberbandPath())
+			{
+				
+				
+				std::list<D3DXVECTOR3>::iterator it = m_waypointList.end();
+
+
+
+				while (m_waypointList.size() >= 3)
+				{
+					D3DXVECTOR3 a = m_waypointList.back();
+					m_waypointList.pop_back();
+					D3DXVECTOR3 b = m_waypointList.back();
+					m_waypointList.pop_back();
+					D3DXVECTOR3 c = m_waypointList.back();
+
+					bool bb= true;
+					for (int i = min(a.x, c.x); i <= max(a.x, a.y); ++i)
+					{
+						for (int j = min(a.y, c.y); j <= max(a.y, c.y); j++)
+						{
+							if (myMap.getNode(i, j)->getWall())
+							{
+								bb = false;
+								break;
+							}
+						}
+					}
+					if(bb)
+					{
+						m_waypointList.push_back(a);
+						it = m_waypointList.end();
+					}
+					else
+					{ 
+						m_waypointList.push_back(b);
+						m_waypointList.push_back(a);
+						--it;
+					}
+
+					
+				 }
+
+
+			}
+
 			return true;   //Push it onto the waypoint list?  Rubber band & smooth the waypoint list?
 		}
 
