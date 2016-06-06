@@ -206,7 +206,7 @@ void AStarNode::setParent(AStarNode* p)
 
 const AStarNode& AStarNode::operator=(const AStarNode& rhs) 
 {
-	if (this->getXCoord() != rhs.getXCoord() && this->getYCoord() != rhs.getYCoord() && this->getWall() != rhs.getWall() && this->getOpen() != rhs.getOpen() && this->getClosed() != rhs.getClosed() )
+	if (!this || (this->getXCoord() != rhs.getXCoord() && this->getYCoord() != rhs.getYCoord() && this->getWall() != rhs.getWall() && this->getOpen() != rhs.getOpen() && this->getClosed() != rhs.getClosed() ))
 	{
 		this->setXCoord(rhs.getXCoord());
 		this->setYCoord(rhs.getYCoord());

@@ -31,7 +31,7 @@ public:
 	void setColCount(int c);
 
 	void pushOpen(AStarNode* p);
-	AStarNode& popOpenMin();
+	AStarNode popOpenMin();
 	AStarNode* popOpen(AStarNode* p);
 	void pushClosed(AStarNode* p);
 	AStarNode popClosed();
@@ -60,7 +60,7 @@ public:
 	//static std::set<AStarNode>* editClosedList();
 	//static AStarNode* editGoalNode();
 
-	 void initialize();
+	// void initialize();
 	 void clean();
 
 	 std::set<AStarNode> const * const getOpenList() const;
@@ -70,10 +70,10 @@ public:
 private:
 	int numRows;
 	int numCols;
-	static std::vector<std::vector<AStarNode*>*>*  map;
-	static std::set<AStarNode> * openList;
-	static std::set<AStarNode> * closedList;
-	static AStarNode* goalNode;
+	 std::vector<std::vector<AStarNode*>*>*  map;
+	 std::set<AStarNode> * openList;
+	 std::set<AStarNode> * closedList;
+	 AStarNode* goalNode;
 	
 	
 	

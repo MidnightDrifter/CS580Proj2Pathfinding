@@ -5,30 +5,26 @@
 #include "Source/terrain.h"
 
 
-std::set<AStarNode>* AStar::openList = new  std::set<AStarNode>;
-std::set<AStarNode>* AStar::closedList = new std::set<AStarNode>;
-AStarNode* AStar::goalNode = new AStarNode();
-std::vector<std::vector<AStarNode*>*>* AStar::map = new std::vector<std::vector<AStarNode*>*>(40, new std::vector<AStarNode*>(40, new AStarNode));
+//std::set<AStarNode>* AStar::openList = new  std::set<AStarNode>;
+//std::set<AStarNode>* AStar::closedList = new std::set<AStarNode>;
+//AStarNode* AStar::goalNode = new AStarNode();
+//std::vector<std::vector<AStarNode*>*>* AStar::map = new std::vector<std::vector<AStarNode*>*>(40, new std::vector<AStarNode*>(40, new AStarNode()));
 
-void AStar::initialize() {
-	for (int i = 0; i < numRows; i++)
-	{
-		//AStar::map->at(i) = new std::vector<AStarNode*>;
-		for (int j = 0; j < numCols; j++)
-		{
-			bool b = true;
-			if (!(g_terrain.IsWall(i, j)))
-			{
-				b = false;
-			}
-			//AStar::map->at(i)->at(j) = new AStarNode(i, j, b);
-			this->editNode(i, j)->setXCoord(i);
-			this->editNode(i, j)->setYCoord(j);
-			this->editNode(i, j)->setWall(b);
-		}
-	}
-
-}
+//void AStar::initialize() {
+//	for (int i = 0; i < numRows; i++)
+//	{
+//		//AStar::map->at(i) = new std::vector<AStarNode*>;
+//		for (int j = 0; j < numCols; j++)
+//		{
+//		
+//			//AStar::map->at(i)->at(j) = new AStarNode(i, j, b);
+//			this->editNode(i, j)->setXCoord(i);
+//			this->editNode(i, j)->setYCoord(j);
+//			this->editNode(i, j)->setWall(g_terrain.IsWall(i,j));
+//		}
+//	}
+//
+//}
 bool AStar::isValidNode(int x, int y) const
 {
 	if(x < 0 || y < 0 || x >= this->getRowCount() || y>= this->getColCount())
@@ -57,10 +53,10 @@ void AStar::setStartingNode(int x, int y)  //Assumes grid has already been initi
 
 AStar::AStar() : numRows(40), numCols(40)
 {
-	//AStar::map = new std::vector<std::vector<AStarNode*>*>;
+	map = new std::vector<std::vector<AStarNode*>*>(40);
 	for (int i = 0; i < numRows; i++)
 	{
-		//map->at(i) = new std::vector<AStarNode*>;
+		map->at(i) = new std::vector<AStarNode*>(40);
 		for (int j = 0; j < numCols; j++)
 		{
 			bool b = true;
@@ -68,15 +64,15 @@ AStar::AStar() : numRows(40), numCols(40)
 			{
 				b = false;
 			}
-			//map->at(i)->at(j) = new AStarNode(i, j, b);
-			this->editNode(i, j)->setXCoord(i);
-			this->editNode(i, j)->setYCoord(j);
-			this->editNode(i, j)->setWall(b);
+			map->at(i)->at(j) = new AStarNode(i, j, b);
+			//this->editNode(i, j)->setXCoord(i);
+			//this->editNode(i, j)->setYCoord(j);
+			//this->editNode(i, j)->setWall(b);
 		}
 	}
-	//AStar::openList = new  std::set<AStarNode>;
-	//AStar::closedList = new std::set<AStarNode>;
-	//AStar::goalNode = new AStarNode();
+	openList = new  std::set<AStarNode>;
+	closedList = new std::set<AStarNode>;
+	goalNode = new AStarNode();
 
 }
 
@@ -87,41 +83,41 @@ AStar::AStar() : numRows(40), numCols(40)
 
 AStar::AStar(int r, int c) : numRows(r), numCols(c)
 {
-	//AStar::map = new std::vector<std::vector<AStarNode*>*>;
-	//for (int i = 0; i < numRows; i++)
-	//{
-	//	//AStar::map->at(i) = new std::vector<AStarNode*>;
-	//	for (int j = 0; j < numCols; j++)
-	//	{
-	//		bool b = true;
-	//		if (!(g_terrain.IsWall(i, j)))
-	//		{
-	//			b = false;
-	//		}
-	//		AStar::map->at(i)->at(j) = new AStarNode(i, j, b);
-	//	}
-	//}
-	//AStar::openList = new  std::set<AStarNode>;
-	//AStar::closedList = new std::set<AStarNode>;
-	//AStar::goalNode = new AStarNode();
+	map = new std::vector<std::vector<AStarNode*>*>(r);
+	for (int i = 0; i < numRows; i++)
+	{
+		map->at(i) = new std::vector<AStarNode*>(c);
+		for (int j = 0; j < numCols; j++)
+		{
+			bool b = true;
+			if (!(g_terrain.IsWall(i, j)))
+			{
+				b = false;
+			}
+			map->at(i)->at(j) = new AStarNode(i, j, b);
+		}
+	}
+	openList = new  std::set<AStarNode>;
+	closedList = new std::set<AStarNode>;
+	goalNode = new AStarNode();
 
 }
 
 AStar::AStar(const AStar& other) : numRows(other.getRowCount()), numCols(other.getColCount())
 {
-	////AStar::map = new std::vector<std::vector<AStarNode*>*>;
-	//for(int i=0;i<numRows;i++)
-	//{
-	//	//map->at(i) = new std::vector<AStarNode*>;
-	//	for (int j = 0; j < numCols; j++)
-	//	{
-	//		*(map->at(i)->at(j)) = *(other.map->at(i)->at(j));  //Double check this!!!!
-	//															
-	//	}
-	//}
-	//AStar::openList = new std::set<AStarNode>(*other.getOpenList());
-	//AStar::closedList = new std::set<AStarNode>(*other.getClosedList());
-	//AStar::goalNode = new AStarNode(other.getGoalNode());
+	map = new std::vector<std::vector<AStarNode*>*>(numRows);
+	for(int i=0;i<numRows;i++)
+	{
+		map->at(i) = new std::vector<AStarNode*>(numCols);
+		for (int j = 0; j < numCols; j++)
+		{
+			*(map->at(i)->at(j)) = *(other.map->at(i)->at(j));  //Double check this!!!!
+																
+		}
+	}
+	openList = new std::set<AStarNode>(*other.getOpenList());
+	closedList = new std::set<AStarNode>(*other.getClosedList());
+	goalNode = new AStarNode(other.getGoalNode());
 	
 }
 
@@ -144,10 +140,10 @@ const AStar&  AStar::operator=(const AStar& rhs)  //Assumes both AStar objects h
 			
 			}
 		}
-		//(*map) = *(rhs.map);
-		//(*openList) = *(rhs.openList);
-		//(*closedList) = *(rhs.closedList);
-		//(*goalNode) = *(rhs.goalNode);
+		(*map) = *(rhs.map);
+		(*openList) = *(rhs.openList);
+		(*closedList) = *(rhs.closedList);
+		(*goalNode) = *(rhs.goalNode);
 
 	}
 	return *this;
@@ -171,11 +167,12 @@ std::vector<AStarNode*>* AStar::getRow(int i)
 
 AStarNode* AStar::editNode(int i, int j)
 {
-	return map->at(i)->at(j);
+	return (map->at(i))->at(j);
 }
 
 const AStarNode* AStar::getNode(int i, int j) const
 {
+	
 	return map->at(i)->at(j);
 }
 
@@ -202,7 +199,8 @@ AStar::~AStar()
 	}
 	map->erase(map->begin(), map->end());
 
-
+	openList->erase(openList->begin());
+	closedList->erase(closedList->begin());
 
 	/*for (int i = 0; i < map->size(); i++)
 	{
@@ -238,9 +236,9 @@ void AStar::pushClosed(AStarNode* p)
 	closedList->insert(*p);
 }
 
-AStarNode& AStar::popOpenMin()
+AStarNode AStar::popOpenMin()
 {
-
+	//if()
 	AStarNode temp = *(std::min_element(openList->begin(), openList->end()));
 	openList->erase(temp);
 	temp.setOpen(false);
@@ -249,14 +247,22 @@ AStarNode& AStar::popOpenMin()
 
 AStarNode* AStar::popOpen(AStarNode* a)
 {
-	std::set<AStarNode>::iterator it = openList->find(*a);
-	AStarNode* temp = NULL;
-	if (it != openList->end())
+	if (openList->size() >= 1)
 	{
-		*temp = *it;
-		openList->erase(it);
+		std::set<AStarNode>::iterator it = openList->find(*a);
+		AStarNode* temp = new AStarNode();
+		if (it != openList->end())
+		{
+			*temp = *it;
+			openList->erase(it);
+			return temp;
+		}
+		return NULL;
 	}
-	return temp;
+	else
+	{
+		return NULL;
+	}
 }
 
 
@@ -292,16 +298,16 @@ bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destinati
 		if (destination.getXCoord() == current.getXCoord() - 1)
 		{
 			//upper left
-			if (!this->getNode(destination.getXCoord() - 1, destination.getYCoord())->getWall())
+			if ((this->isValidNode(destination.getXCoord()-1, destination.getYCoord())&&(!this->getNode(destination.getXCoord() - 1, destination.getYCoord())->getWall())))
 			{
 				if (destination.getYCoord() == current.getYCoord() - 1)
 				{
-					return (this->getNode(current.getXCoord() - 1, current.getYCoord() - 1)->getWall());
+					return (this->isValidNode(current.getXCoord()-1, current.getYCoord()-1) && (this->getNode(current.getXCoord() - 1, current.getYCoord() - 1)->getWall()));
 				}
 
 				else if (destination.getYCoord() == current.getYCoord() + 1)
 				{
-					return (this->getNode(current.getXCoord() - 1, current.getYCoord() + 1)->getWall());
+					return (this->isValidNode(current.getXCoord() - 1, current.getYCoord() + 1) && (this->getNode(current.getXCoord() - 1, current.getYCoord() + 1)->getWall()));
 				}
 				else
 				{
@@ -317,15 +323,15 @@ bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destinati
 		//lower left & lower right diags
 		else if (destination.getXCoord() == current.getXCoord() + 1)
 		{
-			if (!this->getNode(destination.getXCoord() + 1, destination.getYCoord())->getWall())
+			if ((this->isValidNode(destination.getXCoord() + 1, destination.getYCoord()) && !this->getNode(destination.getXCoord() + 1, destination.getYCoord())->getWall()))
 			{
 				if (destination.getYCoord() == current.getYCoord() - 1)
 				{
-					return this->getNode(current.getXCoord() + 1, current.getYCoord() - 1);
+					return (this->isValidNode(current.getXCoord() + 1, current.getYCoord() - 1) && this->getNode(current.getXCoord() + 1, current.getYCoord() - 1));
 				}
 				else if (destination.getYCoord() == current.getYCoord() + 1)
 				{
-					return this->getNode(current.getXCoord() + 1, current.getYCoord() + 1);
+					return (this->isValidNode(current.getXCoord() + 1, current.getYCoord() + 1) && this->getNode(current.getXCoord() + 1, current.getYCoord() + 1));
 
 				}
 				else

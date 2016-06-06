@@ -44,7 +44,7 @@ Movement::Movement( GameObject& owner )
 	
 
 	m_target.x = m_target.y = m_target.z = 0.0f;
-	m_AStarGrid.initialize();
+	//m_AStarGrid.initialize();
 	
 
 
@@ -176,7 +176,7 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	g_terrain.SetColor(curR, curC, DEBUG_COLOR_PURPLE);
 	myMap.pushOpen(myMap.editNode(curR, curC));
 	
-	bool useAStar = false;
+	bool useAStar = true;
 	if( useAStar )
 	{
 
@@ -209,20 +209,26 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 		//2. You will need to make this function remember the current progress if it preemptively exits.
 		//3. Return "true" if the path is complete, otherwise "false".
 		///////////////////////////////////////////////////////////////////////////////////////////////////
+		if (myMap.getOpenList()->size() < 1)
+		{
+			return false;
 
-		AStarNode& currentNode = myMap.popOpenMin();
-		
-		
+		}
+		AStarNode currentNode = myMap.popOpenMin();
+	
 		
 		//change current node color to [closed list color]
 		
 		//If pop off goal node, path found
-		if (currentNode.getXCoord() == myMap.getGoalNode().getXCoord() && currentNode.getYCoord() == myMap.getGoalNode().getYCoord())
+		if (&currentNode && currentNode.getXCoord() == myMap.getGoalNode().getXCoord() && currentNode.getYCoord() == myMap.getGoalNode().getYCoord())
 		{
 			while (&currentNode)
 			{
 				m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates(currentNode.getXCoord(), currentNode.getYCoord())));
-				currentNode = (*currentNode.getParent());
+				if (currentNode.getParent())
+				{
+					currentNode = (*currentNode.getParent());
+				}
 
 
 			}
@@ -527,7 +533,7 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 							myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + Movement::HV_DISTANCE);
 						}
 						//push onto open list
-
+						//myMap.pushOpen(myMap.editNode(i, j));
 						myMap.updateOpen(i, j);
 						g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
 
