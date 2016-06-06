@@ -214,9 +214,10 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 			return false;
 
 		}
-		AStarNode currentNode = myMap.popOpenMin();
+		//AStarNode currentNode = myMap.popOpenMin();
 	
-		
+		AStarNode currentNode = *myMap.getOpenList()->begin();
+		myMap.editOpenList()->erase(myMap.getOpenList()->begin());
 		//change current node color to [closed list color]
 		
 		//If pop off goal node, path found

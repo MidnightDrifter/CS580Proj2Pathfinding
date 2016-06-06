@@ -199,8 +199,8 @@ AStar::~AStar()
 	}
 	map->erase(map->begin(), map->end());
 
-	openList->erase(openList->begin());
-	closedList->erase(closedList->begin());
+	openList->erase(openList->begin(), openList->end());
+	closedList->erase(closedList->begin(), closedList->end());
 
 	/*for (int i = 0; i < map->size(); i++)
 	{
@@ -245,6 +245,11 @@ AStarNode AStar::popOpenMin()
 	return temp;
 }
 
+std::set<AStarNode>*const AStar::editOpenList()
+{
+	return openList;
+}
+
 AStarNode* AStar::popOpen(AStarNode* a)
 {
 	if (openList->size() >= 1)
@@ -273,7 +278,7 @@ void AStar::updateOpen(AStarNode* a)
 		AStarNode* temp = this->popOpen(a);
 		if (temp)
 		{
-			if ((*temp) < (*a))
+			if (temp->getTotalCost() < a->getTotalCost())
 			{
 				this->pushOpen(temp);
 			}

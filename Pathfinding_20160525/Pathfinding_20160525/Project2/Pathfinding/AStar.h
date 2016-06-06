@@ -63,6 +63,7 @@ public:
 	// void initialize();
 	 void clean();
 
+	 std::set<AStarNode>*const editOpenList();
 	 std::set<AStarNode> const * const getOpenList() const;
 	 std::set<AStarNode> const* const getClosedList() const;
 	 bool isValidNode(int x, int y) const;
