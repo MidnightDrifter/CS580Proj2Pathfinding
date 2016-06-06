@@ -55,9 +55,12 @@ public:
 
 	 bool canMoveDiagonal(const AStarNode& current, const AStarNode& destination) const;
 	 bool canMoveHorizontal(const AStarNode& current, const AStarNode& destination) const;
+	//static std::vector<std::vector<AStarNode*>*>* editMap();
+	//static std::set<AStarNode>* editOpenList();
+	//static std::set<AStarNode>* editClosedList();
+	//static AStarNode* editGoalNode();
 
-
-
+	 void initialize();
 	 void clean();
 
 	 std::set<AStarNode> const * const getOpenList() const;

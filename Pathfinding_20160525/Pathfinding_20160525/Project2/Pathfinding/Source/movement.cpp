@@ -44,7 +44,10 @@ Movement::Movement( GameObject& owner )
 	
 
 	m_target.x = m_target.y = m_target.z = 0.0f;
+	m_AStarGrid.initialize();
 	
+
+
 }
 
 Movement::~Movement( void )

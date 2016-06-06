@@ -8,8 +8,27 @@
 std::set<AStarNode>* AStar::openList = new  std::set<AStarNode>;
 std::set<AStarNode>* AStar::closedList = new std::set<AStarNode>;
 AStarNode* AStar::goalNode = new AStarNode();
-std::vector<std::vector<AStarNode*>*>* AStar::map = new std::vector<std::vector<AStarNode*>*>;
+std::vector<std::vector<AStarNode*>*>* AStar::map = new std::vector<std::vector<AStarNode*>*>(40, new std::vector<AStarNode*>(40, new AStarNode));
 
+void AStar::initialize() {
+	for (int i = 0; i < numRows; i++)
+	{
+		//AStar::map->at(i) = new std::vector<AStarNode*>;
+		for (int j = 0; j < numCols; j++)
+		{
+			bool b = true;
+			if (!(g_terrain.IsWall(i, j)))
+			{
+				b = false;
+			}
+			//AStar::map->at(i)->at(j) = new AStarNode(i, j, b);
+			this->editNode(i, j)->setXCoord(i);
+			this->editNode(i, j)->setYCoord(j);
+			this->editNode(i, j)->setWall(b);
+		}
+	}
+
+}
 bool AStar::isValidNode(int x, int y) const
 {
 	if(x < 0 || y < 0 || x >= this->getRowCount() || y>= this->getColCount())
@@ -41,7 +60,7 @@ AStar::AStar() : numRows(40), numCols(40)
 	//AStar::map = new std::vector<std::vector<AStarNode*>*>;
 	for (int i = 0; i < numRows; i++)
 	{
-		map->at(i) = new std::vector<AStarNode*>;
+		//map->at(i) = new std::vector<AStarNode*>;
 		for (int j = 0; j < numCols; j++)
 		{
 			bool b = true;
@@ -58,22 +77,27 @@ AStar::AStar() : numRows(40), numCols(40)
 
 }
 
+
+
+
+
+
 AStar::AStar(int r, int c) : numRows(r), numCols(c)
 {
 	//AStar::map = new std::vector<std::vector<AStarNode*>*>;
-	for (int i = 0; i < numRows; i++)
-	{
-		map->at(i) = new std::vector<AStarNode*>;
-		for (int j = 0; j < numCols; j++)
-		{
-			bool b = true;
-			if (!(g_terrain.IsWall(i, j)))
-			{
-				b = false;
-			}
-			map->at(i)->at(j) = new AStarNode(i, j, b);
-		}
-	}
+	//for (int i = 0; i < numRows; i++)
+	//{
+	//	//AStar::map->at(i) = new std::vector<AStarNode*>;
+	//	for (int j = 0; j < numCols; j++)
+	//	{
+	//		bool b = true;
+	//		if (!(g_terrain.IsWall(i, j)))
+	//		{
+	//			b = false;
+	//		}
+	//		AStar::map->at(i)->at(j) = new AStarNode(i, j, b);
+	//	}
+	//}
 	//AStar::openList = new  std::set<AStarNode>;
 	//AStar::closedList = new std::set<AStarNode>;
 	//AStar::goalNode = new AStarNode();
@@ -82,16 +106,16 @@ AStar::AStar(int r, int c) : numRows(r), numCols(c)
 
 AStar::AStar(const AStar& other) : numRows(other.getRowCount()), numCols(other.getColCount())
 {
-	//AStar::map = new std::vector<std::vector<AStarNode*>*>;
-	for(int i=0;i<numRows;i++)
-	{
-		map->at(i) = new std::vector<AStarNode*>;
-		for (int j = 0; j < numCols; j++)
-		{
-			*(map->at(i)->at(j)) = *(other.map->at(i)->at(j));  //Double check this!!!!
-																
-		}
-	}
+	////AStar::map = new std::vector<std::vector<AStarNode*>*>;
+	//for(int i=0;i<numRows;i++)
+	//{
+	//	//map->at(i) = new std::vector<AStarNode*>;
+	//	for (int j = 0; j < numCols; j++)
+	//	{
+	//		*(map->at(i)->at(j)) = *(other.map->at(i)->at(j));  //Double check this!!!!
+	//															
+	//	}
+	//}
 	//AStar::openList = new std::set<AStarNode>(*other.getOpenList());
 	//AStar::closedList = new std::set<AStarNode>(*other.getClosedList());
 	//AStar::goalNode = new AStarNode(other.getGoalNode());
@@ -118,9 +142,9 @@ const AStar&  AStar::operator=(const AStar& rhs)  //Assumes both AStar objects h
 			}
 		}
 		//(*map) = *(rhs.map);
-		(*openList) = *(rhs.openList);
-		(*closedList) = *(rhs.closedList);
-		(*goalNode) = *(rhs.goalNode);
+		//(*openList) = *(rhs.openList);
+		//(*closedList) = *(rhs.closedList);
+		//(*goalNode) = *(rhs.goalNode);
 
 	}
 	return *this;
