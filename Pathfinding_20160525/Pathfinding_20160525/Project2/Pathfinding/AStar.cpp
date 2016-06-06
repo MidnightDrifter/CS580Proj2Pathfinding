@@ -68,7 +68,10 @@ AStar::AStar() : numRows(40), numCols(40)
 			{
 				b = false;
 			}
-			map->at(i)->at(j) = new AStarNode(i, j, b);
+			//map->at(i)->at(j) = new AStarNode(i, j, b);
+			this->editNode(i, j)->setXCoord(i);
+			this->editNode(i, j)->setYCoord(j);
+			this->editNode(i, j)->setWall(b);
 		}
 	}
 	//AStar::openList = new  std::set<AStarNode>;
@@ -189,7 +192,19 @@ void AStar::setColCount(int c)
 
 AStar::~AStar()
 {
-	for (int i = 0; i < map->size(); i++)
+	auto i = map->begin();
+	while (i != map->end())
+	{
+		
+		
+		(*i)->erase((*i)->begin(), (*i)->end());
+		++i;
+	}
+	map->erase(map->begin(), map->end());
+
+
+
+	/*for (int i = 0; i < map->size(); i++)
 	{
 		for (int j = 0; j < map->size(); j++)
 		{
@@ -197,7 +212,7 @@ AStar::~AStar()
 		}
 		delete((map->at(i)));
 	}
-	delete(map);
+	delete(map);*/
 }
 
 void AStar::setGoalNode(AStarNode* g)
