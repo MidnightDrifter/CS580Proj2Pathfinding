@@ -66,6 +66,10 @@ public:
 	std::list<D3DXVECTOR3>* editSplineNodesList() { return m_splineNodesList; }
 	std::vector<const D3DXVECTOR3*>* editSplineNodesVector() { return m_splineNodesVector; }
 	D3DXVECTOR3* getTempVector() { return m_tempVector; }
+
+	D3DXVECTOR3* editFirstTempSmoothingVector() { return m_firstTempSmoothingVector; }
+	D3DXVECTOR3* editSecondTempSmoothingVector() { return m_secondTempSmoothingVector; }
+
 protected:
 
 	GameObject* m_owner;
@@ -95,5 +99,7 @@ protected:
 	std::list<D3DXVECTOR3>* m_splineNodesList;
 	D3DXVECTOR3* m_tempVector;
 	std::vector<const D3DXVECTOR3*>* m_splineNodesVector;
+	D3DXVECTOR3* m_firstTempSmoothingVector;
+	D3DXVECTOR3* m_secondTempSmoothingVector;
 
 };
