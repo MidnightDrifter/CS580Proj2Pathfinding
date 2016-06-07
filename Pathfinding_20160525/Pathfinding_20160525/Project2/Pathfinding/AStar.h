@@ -32,7 +32,7 @@ public:
 
 	void pushOpen(AStarNode* p);
 	AStarNode popOpenMin();
-	AStarNode* popOpen(AStarNode* p);
+	//AStarNode* popOpen(AStarNode* p);
 	void pushClosed(AStarNode* p);
 	AStarNode popClosed();
 
@@ -45,8 +45,8 @@ public:
 	 void calculateTotalCost(AStarNode* current, int i);
 	 void calculateTotalCost(int x, int y, int i);
 
-	 void updateOpen(AStarNode* a); 
-		 void updateOpen(int x, int y);
+	 void updateOpen(AStarNode* a);// , AStarOpenListFunctor* f);
+	 void updateOpen(int x, int y);// , AStarOpenListFunctor* f);
 
 	 void setGoalNode(AStarNode* goalNode);
 	 void setGoalNode(int x, int y);
@@ -63,17 +63,17 @@ public:
 	// void initialize();
 	 void clean();
 
-	 std::set<AStarNode>*const editOpenList();
-	 std::set<AStarNode> const * const getOpenList() const;
-	 std::set<AStarNode> const* const getClosedList() const;
+	 std::vector<AStarNode>*const editOpenList();
+	 std::vector<AStarNode> const * const getOpenList() const;
+	 std::vector<AStarNode> const* const getClosedList() const;
 	 bool isValidNode(int x, int y) const;
 		
 private:
 	int numRows;
 	int numCols;
 	 std::vector<std::vector<AStarNode*>*>*  map;
-	 std::set<AStarNode> * openList;
-	 std::set<AStarNode> * closedList;
+	 std::vector<AStarNode> * openList;
+	 std::vector<AStarNode> * closedList;
 	 AStarNode* goalNode;
 	//Probably just replace sets with unordered list for ease of use because ow my brain
 	

@@ -40,6 +40,7 @@ Movement::Movement( GameObject& owner )
 	m_splineNodesVector(new std::vector<const D3DXVECTOR3*>),
 	m_firstTempSmoothingVector(new D3DXVECTOR3()),
 	m_secondTempSmoothingVector(new D3DXVECTOR3())
+	
 {
 	
 

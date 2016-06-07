@@ -11,6 +11,7 @@
 #pragma once
 #include "../AStar.h"
 
+
 class GameObject;
 
 
@@ -96,6 +97,7 @@ protected:
 	bool ComputePath( int r, int c, bool newRequest );
 
 	AStar m_AStarGrid;
+	
 	std::list<D3DXVECTOR3>* m_splineNodesList;
 	D3DXVECTOR3* m_tempVector;
 	std::vector<const D3DXVECTOR3*>* m_splineNodesVector;

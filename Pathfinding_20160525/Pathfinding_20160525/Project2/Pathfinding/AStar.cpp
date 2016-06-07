@@ -5,8 +5,8 @@
 #include "Source/terrain.h"
 
 
-//std::set<AStarNode>* AStar::openList = new  std::set<AStarNode>;
-//std::set<AStarNode>* AStar::closedList = new std::set<AStarNode>;
+//std::vector<AStarNode>* AStar::openList = new  std::vector<AStarNode>;
+//std::vector<AStarNode>* AStar::closedList = new std::vector<AStarNode>;
 //AStarNode* AStar::goalNode = new AStarNode();
 //std::vector<std::vector<AStarNode*>*>* AStar::map = new std::vector<std::vector<AStarNode*>*>(40, new std::vector<AStarNode*>(40, new AStarNode()));
 
@@ -35,12 +35,12 @@ bool AStar::isValidNode(int x, int y) const
 }
 
 
-std::set<AStarNode> const * const AStar::getOpenList() const
+std::vector<AStarNode> const * const AStar::getOpenList() const
 {
 	return this->openList;
 }
 
-std::set<AStarNode> const * const AStar::getClosedList() const
+std::vector<AStarNode> const * const AStar::getClosedList() const
 {
 	return this->closedList;
 }
@@ -70,8 +70,8 @@ AStar::AStar() : numRows(40), numCols(40)
 			//this->editNode(i, j)->setWall(b);
 		}
 	}
-	openList = new  std::set<AStarNode>;
-	closedList = new std::set<AStarNode>;
+	openList = new  std::vector<AStarNode>;
+	closedList = new std::vector<AStarNode>;
 	goalNode = new AStarNode();
 
 }
@@ -97,8 +97,8 @@ AStar::AStar(int r, int c) : numRows(r), numCols(c)
 			map->at(i)->at(j) = new AStarNode(i, j, b);
 		}
 	}
-	openList = new  std::set<AStarNode>;
-	closedList = new std::set<AStarNode>;
+	openList = new  std::vector<AStarNode>;
+	closedList = new std::vector<AStarNode>;
 	goalNode = new AStarNode();
 
 }
@@ -115,8 +115,8 @@ AStar::AStar(const AStar& other) : numRows(other.getRowCount()), numCols(other.g
 																
 		}
 	}
-	openList = new std::set<AStarNode>(*other.getOpenList());
-	closedList = new std::set<AStarNode>(*other.getClosedList());
+	openList = new std::vector<AStarNode>(*other.getOpenList());
+	closedList = new std::vector<AStarNode>(*other.getClosedList());
 	goalNode = new AStarNode(other.getGoalNode());
 	
 }
@@ -228,79 +228,105 @@ void AStar::pushOpen(AStarNode* p)
 {
 	p->setOpen(true);
 	this->editNode(p->getXCoord(), p->getYCoord())->setOpen(true);
-	openList->insert(*p);
+	openList->push_back(*p);
 }
 
 void AStar::pushClosed(AStarNode* p)
 {
 	p->setClosed(true);
 	this->editNode(p->getXCoord(), p->getYCoord())->setClosed(true);
-	closedList->insert(*p);
+	closedList->push_back(*p);
 }
 
 AStarNode AStar::popOpenMin()
 {
 	//if()
-	AStarNode temp = *(std::min_element(openList->begin(), openList->end()));
-	openList->erase(temp);
+	auto i = std::min_element(openList->begin(), openList->end());
+	AStarNode temp = *i;
+	openList->erase(i);
+	
+	//openList->erase(std::min_element(openList->begin(), openList->end()));
 	temp.setOpen(false);
 	return temp;
 }
 
-std::set<AStarNode>*const AStar::editOpenList()
+std::vector<AStarNode>*const AStar::editOpenList()
 {
 	return openList;
 }
 
-AStarNode* AStar::popOpen(AStarNode* a)
-{
-	if (openList->size() >= 1)
-	{
-		std::set<AStarNode>::iterator it = openList->find(*a);
-		AStarNode* temp = new AStarNode();
-		if (it != openList->end())
-		{
-			*temp = *it;
-			openList->erase(it);
-			return temp;
-		}
-		return NULL;
-	}
-	else
-	{
-		return NULL;
-	}
-}
+//AStarNode* AStar::popOpen(AStarNode* a)
+//{
+//	if (openList->size() >= 1)
+//	{
+//		std::vector<AStarNode>::iterator it = openList->find(*a);
+//		AStarNode* temp = new AStarNode();
+//		if (it != openList->end())
+//		{
+//			*temp = *it;
+//			openList->erase(it);
+//			return temp;
+//		}
+//		return NULL;
+//	}
+//	else
+//	{
+//		return NULL;
+//	}
+//}
 
 
 void AStar::updateOpen(AStarNode* a)
 {
+	bool isNewElement = true;
 	if (a)
 	{
-		this->editNode(a->getXCoord(), a->getYCoord())->setOpen(true);
-		AStarNode* temp = this->popOpen(a);
-		if (temp)
+		for (int i = 0; i < openList->size(); i++)
 		{
-			if (temp->getTotalCost() < a->getTotalCost())
+			if (a[i].getXCoord() == a->getXCoord() && a[i].getYCoord() == a->getYCoord())
 			{
-				this->pushOpen(temp);
-			}
-			else
-			{
-				this->pushOpen(a);
+				if (a->getTotalCost() < a[i].getTotalCost())
+				{
+					a[i] = *a;
+				}
+				isNewElement = false;
+				break;
 			}
 		}
-		else
-		{
-			this->pushOpen(a);
-		}
+	if(isNewElement)
+	{
+		openList->push_back(*a);
 	}
+
+	}
+
+
+
+	//std::for_each()
+	//	this->openList->for_each
+	//	for_each(openList->)
+	//	if (temp)
+	//	{
+	//		if (temp->getTotalCost() < a->getTotalCost())
+	//		{
+	//			this->pushOpen(temp);
+	//		}
+	//		else
+	//		{
+	//			this->pushOpen(a);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		this->pushOpen(a);
+	//	}
+	//}
 }
 
 void AStar::updateOpen(int x, int y)
 {
 	
-	this->updateOpen(this->editNode(x, y));
+	this->updateOpen(this->editNode(x, y));// , f);
 }
 
 bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destination) const   //yeah double check this
@@ -392,9 +418,9 @@ AStarNode const & AStar::getGoalNode() const
 
 AStarNode AStar::popClosed()
 {
-
-	AStarNode temp = *(std::min_element(closedList->begin(), closedList->end()));
-	closedList->erase(temp);
+	auto i = std::min_element(closedList->begin(), closedList->end());
+	AStarNode temp = *i;
+	closedList->erase(i);
 	temp.setClosed(false);
 	return temp;
 }
