@@ -75,7 +75,7 @@ private:
 	 std::set<AStarNode> * openList;
 	 std::set<AStarNode> * closedList;
 	 AStarNode* goalNode;
-	
+	//Probably just replace sets with unordered list for ease of use because ow my brain
 	
 	
 };
