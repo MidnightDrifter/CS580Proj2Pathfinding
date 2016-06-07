@@ -517,7 +517,7 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 			{
 				for (int j = currentNode.getYCoord() - 1; j < currentNode.getYCoord() + 1; ++j)
 				{
-					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall() )  // && !myMap.getNode(i,j)->getOpen()
+					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall() && !myMap.getNode(i,j)->getClosed())//  && !myMap.getNode(i,j)->getOpen() )  // && !myMap.getNode(i,j)->getOpen()
 					{
 
 						//change color of node to [open list color]
@@ -527,15 +527,20 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 						{
 							
 							myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + Movement::DIAG_DISTANCE);
+							myMap.editNode(i, j)->calculateTotalCost(this->GetHeuristicCalc(), (myMap.getGoalNode()));
+							
 						}
 
 						else if(myMap.canMoveHorizontal(currentNode, *(myMap.getNode(i,j))))
 						{
 							myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + Movement::HV_DISTANCE);
+							myMap.editNode(i, j)->calculateTotalCost(this->GetHeuristicCalc(), myMap.getGoalNode());
 						}
 						//push onto open list
 						//myMap.pushOpen(myMap.editNode(i, j));
+						
 						myMap.updateOpen(i, j);
+
 						g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
 
 											}

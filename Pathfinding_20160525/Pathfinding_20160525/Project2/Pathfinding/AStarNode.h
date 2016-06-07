@@ -52,13 +52,13 @@ public:
 	void setTotalCost(float f);
 	void setCostToGetToThisNode(float f);
 	void setParent(AStarNode* p);
-	float getEuclideanDistance(AStarNode& other) const;
-	int getManhattanDistance(AStarNode& other) const;
-	float getOctileDistance(AStarNode& other) const;
-	int getChebyshevDistance(AStarNode& other)const;
+	float getEuclideanDistance(const AStarNode& other) const;
+	int getManhattanDistance(const AStarNode& other) const;
+	float getOctileDistance(const AStarNode& other) const;
+	int getChebyshevDistance(const AStarNode& other)const;
 
 	
-	void calculateTotalCost(int i,  AStarNode& goal);
+	void calculateTotalCost(int i, const AStarNode& goal);
 
 	void clearNode();
 

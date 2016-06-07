@@ -227,12 +227,14 @@ void AStar::setGoalNode(int x, int y)
 void AStar::pushOpen(AStarNode* p)
 {
 	p->setOpen(true);
+	this->editNode(p->getXCoord(), p->getYCoord())->setOpen(true);
 	openList->insert(*p);
 }
 
 void AStar::pushClosed(AStarNode* p)
 {
 	p->setClosed(true);
+	this->editNode(p->getXCoord(), p->getYCoord())->setClosed(true);
 	closedList->insert(*p);
 }
 
@@ -275,6 +277,7 @@ void AStar::updateOpen(AStarNode* a)
 {
 	if (a)
 	{
+		this->editNode(a->getXCoord(), a->getYCoord())->setOpen(true);
 		AStarNode* temp = this->popOpen(a);
 		if (temp)
 		{
@@ -287,11 +290,16 @@ void AStar::updateOpen(AStarNode* a)
 				this->pushOpen(a);
 			}
 		}
+		else
+		{
+			this->pushOpen(a);
+		}
 	}
 }
 
 void AStar::updateOpen(int x, int y)
 {
+	
 	this->updateOpen(this->editNode(x, y));
 }
 

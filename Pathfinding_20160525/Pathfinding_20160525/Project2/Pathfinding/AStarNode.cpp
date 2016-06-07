@@ -99,7 +99,7 @@ bool operator==(const AStarNode& rhs, const AStarNode& lhs)
 	return false;
 }
 
-void AStarNode::calculateTotalCost( int i, AStarNode& goal)
+void AStarNode::calculateTotalCost( int i, const AStarNode& goal)
 {
 	if (i == AStarNode::EUCLIDEAN)
 	{
@@ -172,22 +172,22 @@ float AStarNode::getCostToGetToThisNode() const
 	return this->costToGetToThisNode;
 }
 
-int AStarNode::getChebyshevDistance( AStarNode& other) const
+int AStarNode::getChebyshevDistance(const AStarNode& other) const
 {
 	return static_cast<int>(fmax(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord())));
 }
 
-int AStarNode::getManhattanDistance(AStarNode& other) const
+int AStarNode::getManhattanDistance(const AStarNode& other) const
 {
 	return static_cast<int>(abs(this->getXCoord() - other.getXCoord()) + abs(this->getYCoord() - other.getYCoord()));
 }
 
-float AStarNode::getEuclideanDistance(AStarNode& other) const
+float AStarNode::getEuclideanDistance(const AStarNode& other) const
 {
 	return sqrtf(powf(this->getXCoord() - other.getXCoord(), 2.f) + powf(this->getYCoord() - other.getYCoord(), 2.f));
 }
 
-float AStarNode::getOctileDistance(AStarNode& other) const
+float AStarNode::getOctileDistance(const AStarNode& other) const
 {
 	return (SQRT2*fmin(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord()))) + fmax(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord())) - fmin(abs(this->getXCoord() - other.getXCoord()), abs(this->getYCoord() - other.getYCoord()));
 }
