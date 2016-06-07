@@ -171,11 +171,14 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	D3DXVECTOR3 cur = m_owner->GetBody().GetPos();
 	g_terrain.GetRowColumn(&cur, &curR, &curC);
 	AStar& myMap = this->editAStar();
-	myMap.setGoalNode(r, c);
-	myMap.setStartingNode(curR, curC);
 	g_terrain.SetColor(curR, curC, DEBUG_COLOR_PURPLE);
-	myMap.pushOpen(myMap.editNode(curR, curC));
-	
+	if (newRequest)
+	{
+		myMap.setGoalNode(r, c);
+		myMap.setStartingNode(curR, curC);
+
+		myMap.pushOpen(myMap.editNode(curR, curC));
+	}
 	bool useAStar = true;
 	if( useAStar )
 	{
@@ -513,11 +516,11 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 		}
 		do
 	{
-			for (int i = currentNode.getXCoord() - 1; i < currentNode.getXCoord() + 1; ++i)
+			for (int i = currentNode.getXCoord() - 1; i <= currentNode.getXCoord() + 1; ++i)
 			{
-				for (int j = currentNode.getYCoord() - 1; j < currentNode.getYCoord() + 1; ++j)
+				for (int j = currentNode.getYCoord() - 1; j <= currentNode.getYCoord() + 1; ++j)
 				{
-					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall() && !myMap.getNode(i,j)->getClosed())//  && !myMap.getNode(i,j)->getOpen() )  // && !myMap.getNode(i,j)->getOpen()
+					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall() && !myMap.getNode(i,j)->getClosed())// && myMap.getNode(i,j)->getOpen())//  && !myMap.getNode(i,j)->getOpen() )  // && !myMap.getNode(i,j)->getOpen()
 					{
 
 						//change color of node to [open list color]
@@ -538,8 +541,10 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 						}
 						//push onto open list
 						//myMap.pushOpen(myMap.editNode(i, j));
-						
-						myMap.updateOpen(i, j);
+						if (!myMap.getNode(i, j)->getClosed())
+						{
+							myMap.updateOpen(i, j);
+						}
 
 						g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
 

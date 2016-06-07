@@ -1,5 +1,6 @@
 #pragma once
 #include <limits>
+#define EPSILON 0.000001f
 class AStarNode
 {
 public:

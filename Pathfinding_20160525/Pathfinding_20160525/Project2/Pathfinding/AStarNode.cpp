@@ -30,9 +30,13 @@ void AStarNode::clearNode()
 
 bool operator<(const AStarNode& lhs, const AStarNode& rhs) 
 {
-	return (lhs.totalCost < rhs.totalCost);
+	return  lhs.totalCost < rhs.totalCost;//(abs(lhs.totalCost - rhs.totalCost)< EPSILON);
 }
 
+//bool operator==(const AStarNode& lhs, const AStarNode& rhs)
+//{
+//	return abs(lhs.totalCost - rhs.totalCost) < EPSILON;
+//}
 
 //void AStarNode::intializeStartingCost()
 //{
