@@ -150,7 +150,6 @@
     <ClCompile Include="AStarNode.cpp">
       <Filter>GameObject\AStar</Filter>
     </ClCompile>
-    <ClCompile Include="AStarOpenListFunctor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\body.h">
@@ -277,7 +276,6 @@
     <ClInclude Include="AStarNode.h">
       <Filter>GameObject\AStar</Filter>
     </ClInclude>
-    <ClInclude Include="AStarOpenListFunctor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\DXUT\directx.ico">

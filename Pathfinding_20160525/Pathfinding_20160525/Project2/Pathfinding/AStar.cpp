@@ -283,11 +283,12 @@ void AStar::updateOpen(AStarNode* a)
 	{
 		for (int i = 0; i < openList->size(); i++)
 		{
-			if (a[i].getXCoord() == a->getXCoord() && a[i].getYCoord() == a->getYCoord())
+			if ((*openList)[i].getXCoord() == a->getXCoord() && (*openList)[i].getYCoord() == a->getYCoord())
 			{
-				if (a->getTotalCost() < a[i].getTotalCost())
+				if (a->getTotalCost() < (*openList)[i].getTotalCost())
 				{
-					a[i] = *a;
+					(*openList)[i] = *a;
+					//this->editNode(a->getXCoord(), a->getYCoord())->calculateTotalCost();
 				}
 				isNewElement = false;
 				break;
@@ -296,6 +297,7 @@ void AStar::updateOpen(AStarNode* a)
 	if(isNewElement)
 	{
 		openList->push_back(*a);
+		a->setOpen(true);
 	}
 
 	}
