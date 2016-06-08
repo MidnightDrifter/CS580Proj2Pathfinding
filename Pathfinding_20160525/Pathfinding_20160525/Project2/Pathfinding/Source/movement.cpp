@@ -19,7 +19,7 @@
 #include "time.h"
 
 float Movement::DIAG_DISTANCE = sqrtf(2);
-
+int Movement::HV_DISTANCE = 1;
 Movement::Movement( GameObject& owner )
 : m_owner( &owner ),
   m_speedWalk( 1.f / 5.7f ),
@@ -237,6 +237,9 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 
 
 			}
+			myMap.clean();
+			myMap.editOpenList()->clear();
+			
 
 			if (this->GetSmoothPath() && this->GetRubberbandPath())
 			{
@@ -521,7 +524,7 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 			{
 				for (int j = currentNode.getYCoord() - 1; j <= currentNode.getYCoord() + 1; ++j)
 				{
-					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall() && !myMap.getNode(i,j)->getClosed()&&!myMap.getNode(i,j)->getOpen())// && myMap.getNode(i,j)->getOpen())//  && !myMap.getNode(i,j)->getOpen() )  // && !myMap.getNode(i,j)->getOpen()
+					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall())// && !myMap.getNode(i,j)->getClosed()&&!myMap.getNode(i,j)->getOpen())// && myMap.getNode(i,j)->getOpen())//  && !myMap.getNode(i,j)->getOpen() )  // && !myMap.getNode(i,j)->getOpen()
 					{
 
 						//change color of node to [open list color]

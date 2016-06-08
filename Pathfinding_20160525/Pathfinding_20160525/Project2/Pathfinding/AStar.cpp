@@ -48,6 +48,7 @@ std::vector<AStarNode> const * const AStar::getClosedList() const
 void AStar::setStartingNode(int x, int y)  //Assumes grid has already been initialized
 {
 	map->at(x)->at(y)->setCostToGetToThisNode(0.f);
+	map->at(x)->at(y)->setTotalCost(0.f);
 }
 
 
