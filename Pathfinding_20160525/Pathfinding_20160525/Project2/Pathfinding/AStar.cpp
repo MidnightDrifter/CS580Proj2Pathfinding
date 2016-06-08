@@ -334,48 +334,32 @@ void AStar::updateOpen(int x, int y)
 
 bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destination) const   //yeah double check this
 {
-	if (this->isValidNode(destination.getXCoord(), destination.getYCoord()))
-	{
-		//upper left  & upper right diags
-		if (destination.getXCoord() == current.getXCoord() - 1)
-		{
-			//upper left
-			if ((this->isValidNode(destination.getXCoord()-1, destination.getYCoord())&&(!this->getNode(destination.getXCoord() - 1, destination.getYCoord())->getWall())))
+	
+		
+			if (this->isValidNode(destination.getXCoord(), destination.getYCoord()) && !destination.getWall())
 			{
-				if (destination.getYCoord() == current.getYCoord() - 1)
+				//return true;
+
+				if (destination.getXCoord() == current.getXCoord() + 1 && destination.getYCoord() == current.getYCoord() + 1)  //bottom right
 				{
-					return (this->isValidNode(current.getXCoord()-1, current.getYCoord()-1) && (this->getNode(current.getXCoord() - 1, current.getYCoord() - 1)->getWall()));
+					return (this->getNode(current.getXCoord() + 1, current.getYCoord())->getWall() && this->getNode(current.getXCoord(), current.getYCoord() + 1));
 				}
 
-				else if (destination.getYCoord() == current.getYCoord() + 1)
+				else if (destination.getXCoord() == current.getXCoord() - 1 && destination.getYCoord() == current.getYCoord() + 1)  //top right
 				{
-					return (this->isValidNode(current.getXCoord() - 1, current.getYCoord() + 1) && (this->getNode(current.getXCoord() - 1, current.getYCoord() + 1)->getWall()));
+					return (this->getNode(current.getXCoord() - 1, current.getYCoord()) && this->getNode(current.getXCoord(), current.getYCoord() + 1));
 				}
-				else
-				{
-					return false;
 
-				}
-			}
-			else
-			{
-				return false;
-			}
-		}
-		//lower left & lower right diags
-		else if (destination.getXCoord() == current.getXCoord() + 1)
-		{
-			if ((this->isValidNode(destination.getXCoord() + 1, destination.getYCoord()) && !this->getNode(destination.getXCoord() + 1, destination.getYCoord())->getWall()))
-			{
-				if (destination.getYCoord() == current.getYCoord() - 1)
+				else if (destination.getXCoord() == current.getXCoord() + 1 && destination.getYCoord() == current.getYCoord() - 1) //bottom left
 				{
-					return (this->isValidNode(current.getXCoord() + 1, current.getYCoord() - 1) && this->getNode(current.getXCoord() + 1, current.getYCoord() - 1));
+					return (this->getNode(current.getXCoord() + 1, current.getYCoord()) && this->getNode(current.getXCoord(), current.getYCoord() - 1));
 				}
-				else if (destination.getYCoord() == current.getYCoord() + 1)
-				{
-					return (this->isValidNode(current.getXCoord() + 1, current.getYCoord() + 1) && this->getNode(current.getXCoord() + 1, current.getYCoord() + 1));
 
+				else if (destination.getXCoord() == current.getXCoord() - 1 && destination.getYCoord() == current.getYCoord() + 1) //top left
+				{
+					return (this->getNode(current.getXCoord(), current.getYCoord() + 1) && this->getNode(current.getXCoord() - 1, current.getYCoord()));
 				}
+
 				else
 				{
 					return false;
@@ -385,16 +369,7 @@ bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destinati
 			{
 				return false;
 			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-	else
-	{
-		return false;
-	}
+	
 }
 
 
@@ -402,7 +377,18 @@ bool AStar::canMoveHorizontal(const AStarNode& current, const AStarNode& destina
 {
 	if (this->isValidNode(destination.getXCoord(), destination.getYCoord()) && !destination.getWall())
 	{
-		return true;
+		if ( current.getYCoord() == destination.getYCoord())
+		{
+			return ((destination.getXCoord() == current.getXCoord() + 1)||(destination.getXCoord() == current.getXCoord()-1));
+		}
+		else if (current.getXCoord() == destination.getXCoord())
+		{
+			return ((destination.getYCoord() == current.getYCoord() + 1) || (destination.getYCoord() == current.getYCoord() - 1));
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	else
