@@ -179,6 +179,18 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 		myMap.setStartingNode(curR, curC);
 
 		myMap.updateOpen(myMap.editNode(curR, curC));
+
+
+		if(!myMap.getClosedList()->empty())
+		{
+			//myMap.editClosedList()->erase(myMap.getClosedList()->begin(), myMap.getClosedList()->end());
+		}
+
+		if(!myMap.getOpenList()->empty())
+		{
+			//myMap.editOpenList()->erase(myMap.getOpenList()->begin(), myMap.getOpenList()->end());
+		}
+
 	}
 	bool useAStar = true;
 	if( useAStar )
@@ -220,20 +232,27 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 		}
 		//AStarNode currentNode = myMap.popOpenMin();
 	
-		AStarNode currentNode = myMap.popOpenMin();
+		AStarNode currentNode = myMap.popOpenMin(this->GetHeuristicCalc());
 		//myMap.editOpenList()->erase(myMap.getOpenList()->begin());
 		//change current node color to [closed list color]
 		
 		//If pop off goal node, path found
 		if (&currentNode && currentNode.getXCoord() == myMap.getGoalNode().getXCoord() && currentNode.getYCoord() == myMap.getGoalNode().getYCoord())
 		{
-			while (&currentNode)
+			bool breaker = true;
+			while (breaker)
 			{
 				m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates(currentNode.getXCoord(), currentNode.getYCoord())));
-				if (currentNode.getParent())
+				if (currentNode.getParent() != NULL)
 				{
 					currentNode = (*currentNode.getParent());
+					//breaker = false;
 				}
+				else
+				{
+					breaker = false;
+				}
+				
 
 
 			}
@@ -535,10 +554,14 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 							if (myMap.getNode(i, j)->getTotalCost() > currentNode.getTotalCost()+ Movement::DIAG_DISTANCE)
 							{
 								myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + Movement::DIAG_DISTANCE);
-								myMap.editNode(i, j)->calculateTotalCost(this->GetHeuristicCalc(), (myMap.getGoalNode()));
-								myMap.editNode(i, j)->setParent(&currentNode);
+								myMap.editNode(i, j)->calculateTotalCost(this->GetHeuristicCalc(), (myMap.getGoalNode()), this->GetHeuristicWeight());
+								if (currentNode.getXCoord() != i && currentNode.getYCoord() != j)
+								{
+									myMap.editNode(i, j)->setParent(&currentNode);
+								}
+								//myMap.editNode()
 								myMap.updateOpen(i, j);
-								g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
+								
 							}
 							
 						}
@@ -548,10 +571,13 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 							if (myMap.getNode(i, j)->getTotalCost() > currentNode.getTotalCost()+Movement::HV_DISTANCE)
 							{
 								myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + Movement::HV_DISTANCE);
-								myMap.editNode(i, j)->calculateTotalCost(this->GetHeuristicCalc(), (myMap.getGoalNode()));
-								myMap.editNode(i, j)->setParent(&currentNode);
+								myMap.editNode(i, j)->calculateTotalCost(this->GetHeuristicCalc(), (myMap.getGoalNode()), this->GetHeuristicWeight());
+								if (currentNode.getXCoord() != i && currentNode.getYCoord() != j)
+								{
+									myMap.editNode(i, j)->setParent(&currentNode);
+								}
 								myMap.updateOpen(i, j);
-								g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
+								
 							}
 						}
 						//push onto open list
@@ -560,16 +586,24 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 						//{
 							
 						//}
+						if(myMap.getNode(i,j)->getClosed())
+						{
+							g_terrain.SetColor(i, j, DEBUG_COLOR_RED);
+						}
 
+						else if(myMap.getNode(i,j)->getOpen())
+						{
+							g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
+						}
 						
 
-											}
+					}
 				}
 			}
 
 
 			myMap.pushClosed(&currentNode);
-			g_terrain.SetColor(currentNode.getXCoord(), currentNode.getYCoord(), DEBUG_COLOR_RED);
+			
 
 			if(m_singleStep)
 			{

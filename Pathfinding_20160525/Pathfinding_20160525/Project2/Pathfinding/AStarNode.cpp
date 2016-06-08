@@ -103,24 +103,24 @@ bool operator==(const AStarNode& rhs, const AStarNode& lhs)
 	return false;
 }
 
-void AStarNode::calculateTotalCost( int i, const AStarNode& goal)
+void AStarNode::calculateTotalCost( int i, const AStarNode& goal, float weight)
 {
 	if (i == AStarNode::EUCLIDEAN)
 	{
-		this->setTotalCost(this->costToGetToThisNode + this->getEuclideanDistance(goal));
+		this->setTotalCost(this->costToGetToThisNode + this->getEuclideanDistance(goal)*weight);
 	}
 	else if (i == AStarNode::OCTILE)
 	{
-		this->setTotalCost(this->costToGetToThisNode + this->getOctileDistance(goal));
+		this->setTotalCost(this->costToGetToThisNode + this->getOctileDistance(goal)*weight);
 	}
 	else if (i == AStarNode::CHEBYSHEV)
 	{
-		this->setTotalCost(this->costToGetToThisNode + this->getChebyshevDistance(goal));
+		this->setTotalCost(this->costToGetToThisNode + this->getChebyshevDistance(goal)*weight);
 	}
 
 	else if (i == AStarNode::MANHATTAN)
 	{
-		this->setTotalCost(this->costToGetToThisNode + this->getManhattanDistance(goal));
+		this->setTotalCost(this->costToGetToThisNode + this->getManhattanDistance(goal)*weight);
 	}
 }
 
@@ -210,7 +210,7 @@ void AStarNode::setParent(AStarNode* p)
 
 const AStarNode& AStarNode::operator=(const AStarNode& rhs) 
 {
-	if (!this || (this->getXCoord() != rhs.getXCoord() && this->getYCoord() != rhs.getYCoord() && this->getWall() != rhs.getWall() && this->getOpen() != rhs.getOpen() && this->getClosed() != rhs.getClosed() ))
+	if (!this || (this->getXCoord() != rhs.getXCoord() && this->getYCoord() != rhs.getYCoord()))  // && this->getWall() != rhs.getWall() && this->getOpen() != rhs.getOpen() && this->getClosed() != rhs.getClosed() ))
 	{
 		this->setXCoord(rhs.getXCoord());
 		this->setYCoord(rhs.getYCoord());

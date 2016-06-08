@@ -239,15 +239,17 @@ void AStar::pushClosed(AStarNode* p)
 	closedList->push_back(*p);
 }
 
-AStarNode AStar::popOpenMin()
-{
-	//if()
+AStarNode AStar::popOpenMin(int k)
+{	//if()
 	auto i = std::min_element(openList->begin(), openList->end());
 	AStarNode temp = *i;
-	openList->erase(i);
+	temp.setTotalCost((*i).getTotalCost());
+	std::vector<AStarNode>::iterator x = std::min_element(openList->begin(), openList->end());
+	openList->erase(x);
 	
 	//openList->erase(std::min_element(openList->begin(), openList->end()));
 	temp.setOpen(false);
+	this->editNode(temp.getXCoord(), temp.getYCoord())->setOpen(false);
 	return temp;
 }
 
@@ -280,7 +282,7 @@ std::vector<AStarNode>*const AStar::editOpenList()
 void AStar::updateOpen(AStarNode* a)
 {
 	bool isNewElement = true;
-	if (a)
+	if (a  && !a->getClosed())
 	{
 		for (int i = 0; i < openList->size(); i++)
 		{
@@ -299,6 +301,7 @@ void AStar::updateOpen(AStarNode* a)
 	{
 		openList->push_back(*a);
 		a->setOpen(true);
+		this->editNode(a->getXCoord(), a->getYCoord())->setOpen(true);
 	}
 
 	}
@@ -396,7 +399,10 @@ bool AStar::canMoveHorizontal(const AStarNode& current, const AStarNode& destina
 		return false;
 	}
 }
-
+std::vector<AStarNode>*const AStar::editClosedList()
+{
+	return closedList;
+}
 
 
 AStarNode const & AStar::getGoalNode() const
@@ -411,18 +417,19 @@ AStarNode AStar::popClosed()
 	AStarNode temp = *i;
 	closedList->erase(i);
 	temp.setClosed(false);
+	this->editNode(temp.getXCoord(), temp.getYCoord())->setClosed(true);
 	return temp;
 }
 
 
-void AStar::calculateTotalCost(AStarNode* current, int i)
+void AStar::calculateTotalCost(AStarNode* current, int i, float weight)
 {
-	current->calculateTotalCost(i, *goalNode);
+	current->calculateTotalCost(i, *goalNode, weight);
 }
 
-void AStar::calculateTotalCost(int x, int y, int i)
+void AStar::calculateTotalCost(int x, int y, int i, float weight)
 {
-	this->editNode(x, y)->calculateTotalCost(i, *goalNode);
+	this->editNode(x, y)->calculateTotalCost(i, *goalNode, weight);
 }
 	//AStarNode::AStarNode() : xCoord(-1), yCoord(-1), isWall(false), isOpen(false), isClosed(false), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
 void AStar::clean()
