@@ -3,6 +3,9 @@
 #include "Source/singleton.h"
 #include "Source/terrain.h"
 
+float AStarV2::DIAG_DISTANCE = sqrtf(2);
+int AStarV2::HV_DISTANCE = 1;
+
 AStarV2::AStarV2() : goalRow(-1), goalCol(-1), map(), openList(), sizeOfOpenList(0), goalPath()
 {
 
@@ -35,6 +38,11 @@ bool AStarV2::isValidNode(int x, int y) const
 {
 	return map[i][j];
 }
+
+ const AStarNode& AStarV2::getMap(int i, int j)
+ {
+	 return map[i][j];
+ }
 
  AStarNode& AStarV2::popOpenMin()
  {
@@ -111,22 +119,72 @@ bool AStarV2::isValidNode(int x, int y) const
 		 this->pushOpen(this->editMap(startR, startC));
 	 }
 
+	 do{
 	 AStarNode currentNode = this->popOpenMin();
+	 if (currentNode.getXCoord() == this->getGoalRow() && currentNode.getYCoord() == this->getGoalCol())
+	 {
+		 return true;
+	 }
 
 	 for(int i=currentNode.getXCoord()-1; i<currentNode.getXCoord()+1; i++)
 	 {
 		 for (int j = currentNode.getYCoord() - 1; j < currentNode.getYCoord() + 1; j++)
 		 {
+			 bool update = false;
 			 if (this->isValidNode(i, j) && !(currentNode.getXCoord() != i  && currentNode.getYCoord() != j) && !g_terrain.IsWall(i, j))
 			 {
-				 //horizontal-vertical check 
-				 //{}
+				 if (i == currentNode.getXCoord() + 1 && j == currentNode.getYCoord() + 1 && !g_terrain.IsWall(currentNode.getXCoord(), j) && !g_terrain.IsWall(i, currentNode.getYCoord()))
+				 {
+					 //is legal diag
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+				 }
 
-				 //diagonal check
+				 else if (i == currentNode.getXCoord() - 1 && j == currentNode.getYCoord() + 1 && !g_terrain.IsWall(i, currentNode.getYCoord()) && !g_terrain.IsWall(currentNode.getXCoord(), j))
+				 {
+					 //is legal diag
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+				 }
+
+				 else if (i == currentNode.getXCoord() - 1 && j == currentNode.getYCoord() - 1 && !g_terrain.IsWall(i, currentNode.getYCoord()) && g_terrain.IsWall(currentNode.getXCoord(), j))
+				 {
+					 //is legal diag
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+				 }
+
+				 else if (i == currentNode.getXCoord() + 1 && j == currentNode.getYCoord() - 1 && !g_terrain.IsWall(i, currentNode.getYCoord()) && !g_terrain.IsWall(currentNode.getXCoord(), j))
+				 {
+					 //is legal diag
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+				 }
+
+				 else if ((i == currentNode.getXCoord && (j == currentNode.getYCoord() - 1 || j == currentNode.getYCoord() + 1)) || (j == currentNode.getYCoord() && (i == currentNode.getXCoord() + 1 || i == currentNode.getYCoord() - 1)))
+				 {
+					 //is legal horizontal-vertical
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+				 }
+
+				 if (update)
+				 {
+					 this->pushOpen(this->getMap(i, j));
+					 g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
+				 }
+
+				 
 			 }
 		 }
+		
 	 }
 
+	 this->pushClosed(currentNode.getXCoord(), currentNode.getYCoord());
+	 g_terrain.SetColor(currentNode.getXCoord(), currentNode.getYCoord(), DEBUG_COLOR_RED);
+
+	 if (isSingleStep)
+	 {
+		 break;
+	 }
+	 } while (sizeOfOpenList > 0);
+	
+	 return false;
  }
 
 

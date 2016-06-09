@@ -4,6 +4,7 @@
 #include "Source/terrain.h"
 #include "Source/global.h"
 
+
 #define SIZE_OF_MAP	40
 #define CAPACITY_OF_OPEN_LIST 100
 class AStarV2
@@ -18,6 +19,7 @@ public:
 	int getGoalCol() const;
 	bool isValidNode(int a, int b) const;
 	 AStarNode& editMap(int x, int y);
+	 const AStarNode& getMap(int x, int y);
 	 AStarNode& popOpenMin();
 	 const AStarNode& getGoalPath();
 
@@ -32,13 +34,19 @@ public:
 	bool findPath(bool newRequest, bool singleStep, int heuristic, int goalR, int goalC, int startR, int startC);
 	
 
+
 private:
+	
+
 	AStarNode map[SIZE_OF_MAP][SIZE_OF_MAP];
 	AStarNode openList[CAPACITY_OF_OPEN_LIST];
 	int sizeOfOpenList=0;
 	int goalRow;
 	int goalCol;
 	AStarNode goalPath;
+
+	static int HV_DISTANCE;
+	static float DIAG_DISTANCE;
 
 };
 
