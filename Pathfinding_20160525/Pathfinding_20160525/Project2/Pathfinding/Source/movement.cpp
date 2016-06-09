@@ -610,6 +610,11 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 				break;
 			}
 
+			else
+			{
+				currentNode = myMap.popOpenMin(this->GetHeuristicCalc());
+			}
+
 
 		}while(!myMap.getOpenList()->empty());
 
