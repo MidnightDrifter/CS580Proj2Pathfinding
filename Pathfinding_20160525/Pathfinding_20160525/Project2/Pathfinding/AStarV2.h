@@ -30,8 +30,9 @@ public:
 	void setGoal(const AStarNode& goal);
 	void pushOpen(const AStarNode& n);
 	void clearOpenList();
+	void clearMap();
 
-	bool findPath(bool newRequest, bool singleStep, int heuristic, int goalR, int goalC, int startR, int startC);
+	bool findPath(bool newRequest, bool singleStep, int heuristic, int goalR, int goalC, int startR, int startC, float heuristicWeight);
 	
 
 

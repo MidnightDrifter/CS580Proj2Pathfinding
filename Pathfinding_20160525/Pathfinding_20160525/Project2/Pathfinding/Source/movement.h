@@ -10,6 +10,7 @@
 
 #pragma once
 #include "../AStar.h"
+#include "../AStarV2.h"
 
 
 class GameObject;
@@ -71,6 +72,11 @@ public:
 	D3DXVECTOR3* editFirstTempSmoothingVector() { return m_firstTempSmoothingVector; }
 	D3DXVECTOR3* editSecondTempSmoothingVector() { return m_secondTempSmoothingVector; }
 
+
+	const AStarV2& getAStarV2() const {return m_AStarV2; }
+	AStarV2& editAStarV2() { return m_AStarV2; }
+
+
 protected:
 
 	GameObject* m_owner;
@@ -103,5 +109,6 @@ protected:
 	std::vector<const D3DXVECTOR3*>* m_splineNodesVector;
 	D3DXVECTOR3* m_firstTempSmoothingVector;
 	D3DXVECTOR3* m_secondTempSmoothingVector;
+	AStarV2 m_AStarV2;
 
 };

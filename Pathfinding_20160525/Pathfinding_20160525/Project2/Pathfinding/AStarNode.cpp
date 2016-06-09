@@ -103,7 +103,28 @@ bool operator==(const AStarNode& rhs, const AStarNode& lhs)
 	return false;
 }
 
-void AStarNode::calculateTotalCost( int i, const AStarNode& goal, float weight)
+float AStarNode::calculateTotalCost(int i, const AStarNode& goal, float weight) const
+{
+	if (i == AStarNode::EUCLIDEAN)
+	{
+		return (this->costToGetToThisNode + this->getEuclideanDistance(goal)*weight);
+	}
+	else if (i == AStarNode::OCTILE)
+	{
+		return (this->costToGetToThisNode + this->getOctileDistance(goal)*weight);
+	}
+	else if (i == AStarNode::CHEBYSHEV)
+	{
+		return (this->costToGetToThisNode + this->getChebyshevDistance(goal)*weight);
+	}
+
+	else if (i == AStarNode::MANHATTAN)
+	{
+		return (this->costToGetToThisNode + this->getManhattanDistance(goal)*weight);
+	}
+}
+
+void AStarNode::calculateAndSetTotalCost( int i, const AStarNode& goal, float weight)
 {
 	if (i == AStarNode::EUCLIDEAN)
 	{

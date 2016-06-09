@@ -32,7 +32,7 @@ public:
 	float getHeuristicCost() const;
 	float getCostToGetToThisNode() const;
 	AStarNode* getParent() const;
-
+	float calculateTotalCost(int i, const AStarNode& n, float w) const;
 	//static void intializeStartingCost();
 	//static void setStartingCost(float f);
 	//static void addToStartingCost(float f);
@@ -59,7 +59,7 @@ public:
 	int getChebyshevDistance(const AStarNode& other)const;
 
 	
-	void calculateTotalCost(int i, const AStarNode& goal, float weight);
+	void calculateAndSetTotalCost(int i, const AStarNode& goal, float weight);
 
 	void clearNode();
 

@@ -107,8 +107,20 @@ bool AStarV2::isValidNode(int x, int y) const
 	 this->sizeOfOpenList = 0;
  }
 
+ void AStarV2::clearMap()
+ {
+	 for(int i=0; i<SIZE_OF_MAP; i++)
+	 {
+		 for (int j = 0; j<SIZE_OF_MAP; j++)
+		 {
+			 map[i][j].clearNode();
+		 }
+	 }
+ }
 
- bool AStarV2::findPath(bool newRequest, bool isSingleStep, int heuristic, int goalR, int goalC, int startR, int startC)
+
+
+ bool AStarV2::findPath(bool newRequest, bool isSingleStep, int heuristic, int goalR, int goalC, int startR, int startC, float hWeight)
  {
 	 if (newRequest)
 	 {

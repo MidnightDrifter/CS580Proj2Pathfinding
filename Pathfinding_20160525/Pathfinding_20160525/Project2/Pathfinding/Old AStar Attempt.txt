@@ -1,0 +1,450 @@
+	g_terrain.GetRowColumn(&cur, &curR, &curC);
+	AStar& myMap = this->editAStar();
+	g_terrain.SetColor(curR, curC, DEBUG_COLOR_PURPLE);
+	if (newRequest)
+	{
+		myMap.setGoalNode(r, c);
+		myMap.setStartingNode(curR, curC);
+
+		myMap.updateOpen(myMap.editNode(curR, curC));
+
+
+		if(!myMap.getClosedList()->empty())
+		{
+			//myMap.editClosedList()->erase(myMap.getClosedList()->begin(), myMap.getClosedList()->end());
+		}
+
+		if(!myMap.getOpenList()->empty())
+		{
+			//myMap.editOpenList()->erase(myMap.getOpenList()->begin(), myMap.getOpenList()->end());
+		}
+
+	}
+	bool useAStar = true;
+	if( useAStar )
+	{
+
+		if (this->GetStraightlinePath())
+		{
+			bool b = true;
+			for(int i=min(curR, r); i<=max(curR,r); ++i)
+			{
+				for (int j = min(curC, c); j <= max(curC, c); j++)
+				{
+					if(myMap.getNode(i,j)->getWall())
+					{
+						b=false;
+						break;
+					}
+				}
+			}
+			//
+			if (b)
+			{
+				m_waypointList.push_back(m_goal);
+			}
+		}
+
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		//INSERT YOUR A* CODE HERE
+		//1. You should probably make your own A* class.
+		//2. You will need to make this function remember the current progress if it preemptively exits.
+		//3. Return "true" if the path is complete, otherwise "false".
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		if (myMap.getOpenList()->size() < 1)
+		{
+			return false;
+
+		}
+		//AStarNode currentNode = myMap.popOpenMin();
+	
+		AStarNode currentNode = myMap.popOpenMin(this->GetHeuristicCalc());
+		//myMap.editOpenList()->erase(myMap.getOpenList()->begin());
+		//change current node color to [closed list color]
+		
+		//If pop off goal node, path found
+		if (&currentNode && currentNode.getXCoord() == myMap.getGoalNode().getXCoord() && currentNode.getYCoord() == myMap.getGoalNode().getYCoord())
+		{
+			bool breaker = true;
+			while (breaker)
+			{
+				m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates(currentNode.getXCoord(), currentNode.getYCoord())));
+				if (currentNode.getParent() != NULL)
+				{
+					currentNode = (*currentNode.getParent());
+					//breaker = false;
+				}
+				else
+				{
+					breaker = false;
+				}
+				
+
+
+			}
+			myMap.clean();
+			myMap.editOpenList()->clear();
+			
+
+			if (this->GetSmoothPath() && this->GetRubberbandPath())
+			{
+
+				//Do rubberbanding on A* path
+				std::list<D3DXVECTOR3>::iterator it1 = m_waypointList.end();
+
+
+
+				while (m_waypointList.size() >= 3)
+				{
+					D3DXVECTOR3 a = m_waypointList.back();
+					m_waypointList.pop_back();
+					D3DXVECTOR3 b = m_waypointList.back();
+					m_waypointList.pop_back();
+					D3DXVECTOR3 c = m_waypointList.back();
+
+					bool bb = true;
+					for (int i = min(a.x, c.x); i <= max(a.x, a.y); ++i)
+					{
+						for (int j = min(a.y, c.y); j <= max(a.y, c.y); j++)
+						{
+							if (myMap.getNode(i, j)->getWall())
+							{
+								bb = false;
+								break;
+							}
+						}
+					}
+					if (bb)
+					{
+						m_waypointList.push_back(a);
+						it1 = m_waypointList.end();
+					}
+					else
+					{
+						m_waypointList.push_back(b);
+						m_waypointList.push_back(a);
+						--it1;
+					}
+
+
+				}
+
+				/*
+[2:31:16 AM] Cordial Treatise: pop off the first one, peek at the second
+[2:31:20 AM] Cordial Treatise: I'm assuming peek is a thing you can do
+[2:31:25 AM] Cordial Treatise: I'd have to double check
+[2:31:36 AM] Cordial Treatise: ANYWAY
+[2:31:55 AM | Edited 2:32:01 AM] Cordial Treatise: If the distance between them is > 1.5, make their midpoint, push it back on to the front
+[2:32:11 AM] Cordial Treatise: peek & compare again
+[2:32:43 AM] Cordial Treatise: repeat as needed until distance is <= 1.5
+[2:32:49 AM] Cordial Treatise: push that head node onto other list
+[2:33:17 AM] Cordial Treatise: repeat with new head node
+
+				*/
+
+				std::list<D3DXVECTOR3>* smoothingList = this->editSplineNodesList();
+				D3DXVECTOR3* first = this->editFirstTempSmoothingVector();
+				D3DXVECTOR3* second = this->editSecondTempSmoothingVector();
+
+				if (m_waypointList.size() >= 2)
+				{
+					*first = m_waypointList.front();
+					m_waypointList.pop_front();
+					*second = m_waypointList.front();
+					m_waypointList.pop_front();
+
+					do {
+						if (sqrtf(pow((first->x - second->x), 2) + pow((first->y - second->y), 2)) > 1.5f)
+						{
+							m_waypointList.push_front(*second);
+							//m_waypointList.push_front(D3DXVECTOR3((first->x + second->x) / 2.f, (first->y + second->y) / 2.f, (first->z + second->z) / 2.f));
+							//*second = m_waypointList.front();
+							(second->x) = ((first->x + second->x) / 2.f);
+							(second->y) = ((first->y + second->y) / 2.f);
+							(second->z) = ((first->z + second->z) / 2.f);
+
+						}
+
+						else
+						{
+							smoothingList->push_back(*first);
+							smoothingList->push_back(*second);
+							*first = *second;
+							*second = m_waypointList.front();
+							m_waypointList.pop_front();
+						}
+
+					} while (m_waypointList.size() >= 1);
+
+					m_waypointList.merge(*smoothingList);
+
+					smoothingList->erase(smoothingList->begin(), smoothingList->end());
+				}
+
+				std::list<D3DXVECTOR3>::iterator it = m_waypointList.begin();
+				int waypointListSize = m_waypointList.size();
+				D3DXVECTOR3* temp = this->getTempVector();
+				//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
+				std::vector<const D3DXVECTOR3*>* splineVector = this->editSplineNodesVector();
+				//splineList->resize()
+				splineVector->resize(1 + (4 * waypointListSize));
+				int k = 0;
+				for ( int j = 0; j < waypointListSize;  j += 1)
+				{
+					splineVector->at(k) = &m_waypointList.front();
+					m_waypointList.pop_front();
+					k += 4;
+				}
+				int splineVectorSize = splineVector->size();
+
+				for (int i = 0; i < splineVectorSize; i += 4)
+				{
+					if (i == 0)
+					{
+						D3DXVec3CatmullRom(temp, splineVector->at(i), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.25f);
+						splineVector->at(i + 1) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.5f);
+						splineVector->at(i + 2) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.75f);
+						splineVector->at(i + 3) = temp;
+					}
+
+					else if (i == (splineVector->size() - 9))
+					{
+
+						D3DXVec3CatmullRom(temp, splineVector->at(splineVectorSize - 9), splineVector->at(splineVectorSize - 5), splineVector->at(splineVectorSize - 1), splineVector->at(splineVectorSize - 1), 0.25f);
+						splineVector->at(splineVectorSize - 4) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(splineVectorSize - 9), splineVector->at(splineVectorSize - 5), splineVector->at(splineVectorSize - 1), splineVector->at(splineVectorSize - 1), 0.5f);
+						splineVector->at(splineVectorSize - 3) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(splineVectorSize - 9), splineVector->at(splineVectorSize - 5), splineVector->at(splineVectorSize - 1), splineVector->at(splineVectorSize - 1), 0.75f);
+						splineVector->at(splineVectorSize - 2) = temp;
+
+					}
+					else
+					{
+
+						D3DXVec3CatmullRom(temp, splineVector->at(i - 4), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.25f);
+						splineVector->at(i + 1) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i - 4), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.5f);
+						splineVector->at(i + 2) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i - 4), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.75f);
+						splineVector->at(i + 3) = temp;
+					}
+
+				}
+
+				for (int i = 0; i < splineVectorSize; i++)
+				{
+					m_waypointList.push_back(*(splineVector->at(i)));
+				}
+
+				splineVector->erase(splineVector->begin(), splineVector->end());
+
+			}
+
+
+
+
+
+
+
+
+
+			else if (this->GetSmoothPath())
+			{
+
+				std::list<D3DXVECTOR3>::iterator it = m_waypointList.begin();
+				int waypointListSize = m_waypointList.size();
+				D3DXVECTOR3* temp = this->getTempVector();
+				//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
+				std::vector<const D3DXVECTOR3*>* splineVector = this->editSplineNodesVector();
+				//splineList->resize()
+				splineVector->resize(1 + (4 * waypointListSize));
+				int k = 0;
+				for ( int j = 0; j < waypointListSize;  j += 1)
+				{
+					splineVector->at(k) = &m_waypointList.front();
+					m_waypointList.pop_front();
+					k += 4;
+				}
+				int splineVectorSize = splineVector->size();
+
+				for (int i = 0; i < splineVectorSize; i += 4)
+				{
+					if (i == 0)
+					{
+						D3DXVec3CatmullRom(temp, splineVector->at(i), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.25f);
+						splineVector->at(i + 1) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.5f);
+						splineVector->at(i + 2) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.75f);
+						splineVector->at(i + 3) = temp;
+					}
+
+					else if (i == (splineVector->size() - 9))
+					{
+
+						D3DXVec3CatmullRom(temp, splineVector->at(splineVectorSize - 9), splineVector->at(splineVectorSize - 5), splineVector->at(splineVectorSize - 1), splineVector->at(splineVectorSize - 1), 0.25f);
+						splineVector->at(splineVectorSize - 4) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(splineVectorSize - 9), splineVector->at(splineVectorSize - 5), splineVector->at(splineVectorSize - 1), splineVector->at(splineVectorSize - 1), 0.5f);
+						splineVector->at(splineVectorSize - 3) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(splineVectorSize - 9), splineVector->at(splineVectorSize - 5), splineVector->at(splineVectorSize - 1), splineVector->at(splineVectorSize - 1), 0.75f);
+						splineVector->at(splineVectorSize - 2) = temp;
+
+					}
+					else
+					{
+
+						D3DXVec3CatmullRom(temp, splineVector->at(i - 4), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.25f);
+						splineVector->at(i + 1) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i - 4), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.5f);
+						splineVector->at(i + 2) = temp;
+						D3DXVec3CatmullRom(temp, splineVector->at(i - 4), splineVector->at(i), splineVector->at(i + 4), splineVector->at(i + 8), 0.75f);
+						splineVector->at(i + 3) = temp;
+					}
+
+				}
+
+				for (int i = 0; i < splineVectorSize; i++)
+				{
+					m_waypointList.push_back(*(splineVector->at(i)));
+				}
+
+				splineVector->erase(splineVector->begin(), splineVector->end());
+
+			}
+
+			else if (this->GetRubberbandPath())
+			{
+
+
+				std::list<D3DXVECTOR3>::iterator it = m_waypointList.end();
+
+
+
+				while (m_waypointList.size() >= 3)
+				{
+					D3DXVECTOR3 a = m_waypointList.back();
+					m_waypointList.pop_back();
+					D3DXVECTOR3 b = m_waypointList.back();
+					m_waypointList.pop_back();
+					D3DXVECTOR3 c = m_waypointList.back();
+
+					bool bb = true;
+					for (int i = min(a.x, c.x); i <= max(a.x, a.y); ++i)
+					{
+						for (int j = min(a.y, c.y); j <= max(a.y, c.y); j++)
+						{
+							if (myMap.getNode(i, j)->getWall())
+							{
+								bb = false;
+								break;
+							}
+						}
+					}
+					if (bb)
+					{
+						m_waypointList.push_back(a);
+						it = m_waypointList.end();
+					}
+					else
+					{
+						m_waypointList.push_back(b);
+						m_waypointList.push_back(a);
+						--it;
+					}
+
+
+				}
+
+
+			}
+
+			return true;   //Push it onto the waypoint list?  Rubber band & smooth the waypoint list?
+
+		}
+		do
+	{
+			for (int i = currentNode.getXCoord() - 1; i <= currentNode.getXCoord() + 1; ++i)
+			{
+				for (int j = currentNode.getYCoord() - 1; j <= currentNode.getYCoord() + 1; ++j)
+				{
+					if (!(i == currentNode.getXCoord() && j == currentNode.getYCoord()) && myMap.isValidNode(i, j) && !myMap.getNode(i, j)->getWall())// && !myMap.getNode(i,j)->getClosed()&&!myMap.getNode(i,j)->getOpen())// && myMap.getNode(i,j)->getOpen())//  && !myMap.getNode(i,j)->getOpen() )  // && !myMap.getNode(i,j)->getOpen()
+					{
+
+						//change color of node to [open list color]
+						
+						//use diagonal and horizontal checks to determine cost & parent node
+						if (myMap.canMoveDiagonal(currentNode, *(myMap.getNode(i, j))))
+						{
+							if (myMap.getNode(i, j)->getTotalCost() > currentNode.getTotalCost()+ Movement::DIAG_DISTANCE)
+							{
+								myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + Movement::DIAG_DISTANCE);
+								myMap.editNode(i, j)->calculateTotalCost(this->GetHeuristicCalc(), (myMap.getGoalNode()), this->GetHeuristicWeight());
+								if (currentNode.getXCoord() != i && currentNode.getYCoord() != j)
+								{
+									myMap.editNode(i, j)->setParent(&currentNode);
+								}
+								//myMap.editNode()
+								myMap.updateOpen(i, j);
+								
+							}
+							
+						}
+
+						else if(myMap.canMoveHorizontal(currentNode, *(myMap.getNode(i,j))))
+						{
+							if (myMap.getNode(i, j)->getTotalCost() > currentNode.getTotalCost()+Movement::HV_DISTANCE)
+							{
+								myMap.editNode(i, j)->setCostToGetToThisNode(currentNode.getCostToGetToThisNode() + Movement::HV_DISTANCE);
+								myMap.editNode(i, j)->calculateTotalCost(this->GetHeuristicCalc(), (myMap.getGoalNode()), this->GetHeuristicWeight());
+								if (currentNode.getXCoord() != i && currentNode.getYCoord() != j)
+								{
+									myMap.editNode(i, j)->setParent(&currentNode);
+								}
+								myMap.updateOpen(i, j);
+								
+							}
+						}
+						//push onto open list
+						//myMap.pushOpen(myMap.editNode(i, j));
+						//if (!myMap.getNode(i, j)->getClosed())
+						//{
+							
+						//}
+						if(myMap.getNode(i,j)->getClosed())
+						{
+							g_terrain.SetColor(i, j, DEBUG_COLOR_RED);
+						}
+
+						else if(myMap.getNode(i,j)->getOpen())
+						{
+							g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
+						}
+						
+
+					}
+				}
+			}
+
+
+			myMap.pushClosed(&currentNode);
+			
+
+			if(m_singleStep)
+			{
+				break;
+			}
+
+			else
+			{
+				currentNode = myMap.popOpenMin(this->GetHeuristicCalc());
+			}
+
+
+		}while(!myMap.getOpenList()->empty());
+
+
+		return false;
