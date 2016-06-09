@@ -59,7 +59,7 @@ public:
 	int getChebyshevDistance(const AStarNode& other)const;
 
 	
-	void calculateTotalCost(int i, const AStarNode& goal);
+	void calculateTotalCost(int i, const AStarNode& goal, float weight);
 
 	void clearNode();
 

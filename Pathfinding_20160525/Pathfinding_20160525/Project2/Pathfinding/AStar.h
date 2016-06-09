@@ -31,7 +31,7 @@ public:
 	void setColCount(int c);
 
 	void pushOpen(AStarNode* p);
-	AStarNode popOpenMin();
+	AStarNode popOpenMin(int k);
 	//AStarNode* popOpen(AStarNode* p);
 	void pushClosed(AStarNode* p);
 	AStarNode popClosed();
@@ -42,8 +42,8 @@ public:
 
 	const AStar& operator=(const AStar& rhs);
 
-	 void calculateTotalCost(AStarNode* current, int i);
-	 void calculateTotalCost(int x, int y, int i);
+	 void calculateTotalCost(AStarNode* current, int i, float weight);
+	 void calculateTotalCost(int x, int y, int i, float weight);
 
 	 void updateOpen(AStarNode* a);// , AStarOpenListFunctor* f);
 	 void updateOpen(int x, int y);// , AStarOpenListFunctor* f);
@@ -64,6 +64,7 @@ public:
 	 void clean();
 
 	 std::vector<AStarNode>*const editOpenList();
+	 std::vector<AStarNode>*const editClosedList();
 	 std::vector<AStarNode> const * const getOpenList() const;
 	 std::vector<AStarNode> const* const getClosedList() const;
 	 bool isValidNode(int x, int y) const;

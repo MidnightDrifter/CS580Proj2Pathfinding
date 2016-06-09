@@ -48,6 +48,7 @@ std::vector<AStarNode> const * const AStar::getClosedList() const
 void AStar::setStartingNode(int x, int y)  //Assumes grid has already been initialized
 {
 	map->at(x)->at(y)->setCostToGetToThisNode(0.f);
+	map->at(x)->at(y)->setTotalCost(0.f);
 }
 
 
@@ -238,15 +239,17 @@ void AStar::pushClosed(AStarNode* p)
 	closedList->push_back(*p);
 }
 
-AStarNode AStar::popOpenMin()
-{
-	//if()
+AStarNode AStar::popOpenMin(int k)
+{	//if()
 	auto i = std::min_element(openList->begin(), openList->end());
 	AStarNode temp = *i;
-	openList->erase(i);
+	temp.setTotalCost((*i).getTotalCost());
+	std::vector<AStarNode>::iterator x = std::min_element(openList->begin(), openList->end());
+	openList->erase(x);
 	
 	//openList->erase(std::min_element(openList->begin(), openList->end()));
 	temp.setOpen(false);
+	this->editNode(temp.getXCoord(), temp.getYCoord())->setOpen(false);
 	return temp;
 }
 
@@ -279,7 +282,7 @@ std::vector<AStarNode>*const AStar::editOpenList()
 void AStar::updateOpen(AStarNode* a)
 {
 	bool isNewElement = true;
-	if (a)
+	if (a  && !a->getClosed())
 	{
 		for (int i = 0; i < openList->size(); i++)
 		{
@@ -298,6 +301,7 @@ void AStar::updateOpen(AStarNode* a)
 	{
 		openList->push_back(*a);
 		a->setOpen(true);
+		this->editNode(a->getXCoord(), a->getYCoord())->setOpen(true);
 	}
 
 	}
@@ -333,48 +337,32 @@ void AStar::updateOpen(int x, int y)
 
 bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destination) const   //yeah double check this
 {
-	if (this->isValidNode(destination.getXCoord(), destination.getYCoord()))
-	{
-		//upper left  & upper right diags
-		if (destination.getXCoord() == current.getXCoord() - 1)
-		{
-			//upper left
-			if ((this->isValidNode(destination.getXCoord()-1, destination.getYCoord())&&(!this->getNode(destination.getXCoord() - 1, destination.getYCoord())->getWall())))
+	
+		
+			if (this->isValidNode(destination.getXCoord(), destination.getYCoord()) && !destination.getWall())
 			{
-				if (destination.getYCoord() == current.getYCoord() - 1)
+				//return true;
+
+				if (destination.getXCoord() == current.getXCoord() + 1 && destination.getYCoord() == current.getYCoord() + 1)  //bottom right
 				{
-					return (this->isValidNode(current.getXCoord()-1, current.getYCoord()-1) && (this->getNode(current.getXCoord() - 1, current.getYCoord() - 1)->getWall()));
+					return (this->getNode(current.getXCoord() + 1, current.getYCoord())->getWall() && this->getNode(current.getXCoord(), current.getYCoord() + 1));
 				}
 
-				else if (destination.getYCoord() == current.getYCoord() + 1)
+				else if (destination.getXCoord() == current.getXCoord() - 1 && destination.getYCoord() == current.getYCoord() + 1)  //top right
 				{
-					return (this->isValidNode(current.getXCoord() - 1, current.getYCoord() + 1) && (this->getNode(current.getXCoord() - 1, current.getYCoord() + 1)->getWall()));
+					return (this->getNode(current.getXCoord() - 1, current.getYCoord()) && this->getNode(current.getXCoord(), current.getYCoord() + 1));
 				}
-				else
-				{
-					return false;
 
-				}
-			}
-			else
-			{
-				return false;
-			}
-		}
-		//lower left & lower right diags
-		else if (destination.getXCoord() == current.getXCoord() + 1)
-		{
-			if ((this->isValidNode(destination.getXCoord() + 1, destination.getYCoord()) && !this->getNode(destination.getXCoord() + 1, destination.getYCoord())->getWall()))
-			{
-				if (destination.getYCoord() == current.getYCoord() - 1)
+				else if (destination.getXCoord() == current.getXCoord() + 1 && destination.getYCoord() == current.getYCoord() - 1) //bottom left
 				{
-					return (this->isValidNode(current.getXCoord() + 1, current.getYCoord() - 1) && this->getNode(current.getXCoord() + 1, current.getYCoord() - 1));
+					return (this->getNode(current.getXCoord() + 1, current.getYCoord()) && this->getNode(current.getXCoord(), current.getYCoord() - 1));
 				}
-				else if (destination.getYCoord() == current.getYCoord() + 1)
-				{
-					return (this->isValidNode(current.getXCoord() + 1, current.getYCoord() + 1) && this->getNode(current.getXCoord() + 1, current.getYCoord() + 1));
 
+				else if (destination.getXCoord() == current.getXCoord() - 1 && destination.getYCoord() == current.getYCoord() + 1) //top left
+				{
+					return (this->getNode(current.getXCoord(), current.getYCoord() + 1) && this->getNode(current.getXCoord() - 1, current.getYCoord()));
 				}
+
 				else
 				{
 					return false;
@@ -384,16 +372,7 @@ bool AStar::canMoveDiagonal(const AStarNode& current, const AStarNode& destinati
 			{
 				return false;
 			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-	else
-	{
-		return false;
-	}
+	
 }
 
 
@@ -401,7 +380,18 @@ bool AStar::canMoveHorizontal(const AStarNode& current, const AStarNode& destina
 {
 	if (this->isValidNode(destination.getXCoord(), destination.getYCoord()) && !destination.getWall())
 	{
-		return true;
+		if ( current.getYCoord() == destination.getYCoord())
+		{
+			return ((destination.getXCoord() == current.getXCoord() + 1)||(destination.getXCoord() == current.getXCoord()-1));
+		}
+		else if (current.getXCoord() == destination.getXCoord())
+		{
+			return ((destination.getYCoord() == current.getYCoord() + 1) || (destination.getYCoord() == current.getYCoord() - 1));
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	else
@@ -409,7 +399,10 @@ bool AStar::canMoveHorizontal(const AStarNode& current, const AStarNode& destina
 		return false;
 	}
 }
-
+std::vector<AStarNode>*const AStar::editClosedList()
+{
+	return closedList;
+}
 
 
 AStarNode const & AStar::getGoalNode() const
@@ -424,18 +417,19 @@ AStarNode AStar::popClosed()
 	AStarNode temp = *i;
 	closedList->erase(i);
 	temp.setClosed(false);
+	this->editNode(temp.getXCoord(), temp.getYCoord())->setClosed(true);
 	return temp;
 }
 
 
-void AStar::calculateTotalCost(AStarNode* current, int i)
+void AStar::calculateTotalCost(AStarNode* current, int i, float weight)
 {
-	current->calculateTotalCost(i, *goalNode);
+	current->calculateTotalCost(i, *goalNode, weight);
 }
 
-void AStar::calculateTotalCost(int x, int y, int i)
+void AStar::calculateTotalCost(int x, int y, int i, float weight)
 {
-	this->editNode(x, y)->calculateTotalCost(i, *goalNode);
+	this->editNode(x, y)->calculateTotalCost(i, *goalNode, weight);
 }
 	//AStarNode::AStarNode() : xCoord(-1), yCoord(-1), isWall(false), isOpen(false), isClosed(false), totalCost(std::numeric_limits<float>::max()), costToGetToThisNode(std::numeric_limits<float>::max()), parent(NULL) {}
 void AStar::clean()
