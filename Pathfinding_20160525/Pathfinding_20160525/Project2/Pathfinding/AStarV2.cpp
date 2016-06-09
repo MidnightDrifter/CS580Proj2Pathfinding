@@ -8,15 +8,53 @@ int AStarV2::HV_DISTANCE = 1;
 
 AStarV2::AStarV2() : goalRow(-1), goalCol(-1), map(), openList(), sizeOfOpenList(0), goalPath()
 {
+	for (int i = 0; i < SIZE_OF_MAP;i++)
+	{
+		for (int j = 0; j < SIZE_OF_MAP;j++)
+		{
+		map[i][j] = AStarNode(i,j);
+		
+		}
+	}
 
+	for (int k = 0; k < CAPACITY_OF_OPEN_LIST; k++)
+	{
+		openList[k] = AStarNode();
+	}
 }
 
 AStarV2::AStarV2(int r, int c) : goalRow(r), goalCol(c), map(), openList(), sizeOfOpenList(0), goalPath()
 {
+	for (int i = 0; i < SIZE_OF_MAP; i++)
+	{
+		for (int j = 0; j < SIZE_OF_MAP; j++)
+		{
+			map[i][j] = AStarNode(i, j);
 
+		}
+	}
+
+	for (int k = 0; k < CAPACITY_OF_OPEN_LIST; k++)
+	{
+		openList[k] = AStarNode();
+	}
 }
 
-AStarV2::AStarV2(const AStarNode& goal) : goalRow(goal.getXCoord()), goalCol(goal.getYCoord()), map(), openList(), sizeOfOpenList(), goalPath() {}
+AStarV2::AStarV2(const AStarNode& goal) : goalRow(goal.getXCoord()), goalCol(goal.getYCoord()), map(), openList(), sizeOfOpenList(), goalPath() {
+	for (int i = 0; i < SIZE_OF_MAP; i++)
+	{
+		for (int j = 0; j < SIZE_OF_MAP; j++)
+		{
+			map[i][j] = AStarNode(i, j);
+
+		}
+	}
+
+	for (int k = 0; k < CAPACITY_OF_OPEN_LIST; k++)
+	{
+		openList[k] = AStarNode();
+	}
+}
 
 
 int AStarV2::getGoalCol() const
@@ -44,7 +82,7 @@ bool AStarV2::isValidNode(int x, int y) const
 	 return map[i][j];
  }
 
- AStarNode& AStarV2::popOpenMin()
+ AStarNode AStarV2::popOpenMin()
  {
 	 int index = 0;
 	 for (int i = 0; i < sizeOfOpenList; i++)
@@ -57,7 +95,7 @@ bool AStarV2::isValidNode(int x, int y) const
 
 	 AStarNode temp(openList[index]);
 	 openList[index] = openList[sizeOfOpenList - 1];
-	 openList[sizeOfOpenList - 1].clearNode();
+	 openList[sizeOfOpenList - 1].deleteNode();
 	 sizeOfOpenList--;
 	 map[temp.getXCoord()][temp.getYCoord()].setOpen(false);
 	 return temp;
@@ -66,6 +104,12 @@ bool AStarV2::isValidNode(int x, int y) const
  const AStarNode& AStarV2::getGoalPath()
  {
 	 return goalPath;
+ }
+
+
+ AStarNode* AStarV2::getGoalNode()
+ {
+	 return &goalPath;
  }
 
  void AStarV2::pushClosed(int x, int y)
@@ -138,41 +182,42 @@ bool AStarV2::isValidNode(int x, int y) const
 		 return true;
 	 }
 
-	 for(int i=currentNode.getXCoord()-1; i<currentNode.getXCoord()+1; i++)
+	 for(int i=currentNode.getXCoord()-1; i<=currentNode.getXCoord()+1; i++)
 	 {
-		 for (int j = currentNode.getYCoord() - 1; j < currentNode.getYCoord() + 1; j++)
+		 for (int j = currentNode.getYCoord() - 1; j <= currentNode.getYCoord() + 1; j++)
 		 {
 			 bool update = false;
-			 if (this->isValidNode(i, j) && !(currentNode.getXCoord() != i  && currentNode.getYCoord() != j) && !g_terrain.IsWall(i, j))
+			 if (this->isValidNode(i, j) && !(currentNode.getXCoord() == i  && currentNode.getYCoord() == j) && !g_terrain.IsWall(i, j) && !this->editMap(i,j).getClosed())
 			 {
 				 if (i == currentNode.getXCoord() + 1 && j == currentNode.getYCoord() + 1 && !g_terrain.IsWall(currentNode.getXCoord(), j) && !g_terrain.IsWall(i, currentNode.getYCoord()))
 				 {
 					 //is legal diag
-					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode, hWeight, heuristic);
+					
 				 }
 
 				 else if (i == currentNode.getXCoord() - 1 && j == currentNode.getYCoord() + 1 && !g_terrain.IsWall(i, currentNode.getYCoord()) && !g_terrain.IsWall(currentNode.getXCoord(), j))
 				 {
 					 //is legal diag
-					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode, hWeight, heuristic);
 				 }
 
-				 else if (i == currentNode.getXCoord() - 1 && j == currentNode.getYCoord() - 1 && !g_terrain.IsWall(i, currentNode.getYCoord()) && g_terrain.IsWall(currentNode.getXCoord(), j))
+				 else if (i == currentNode.getXCoord() - 1 && j == currentNode.getYCoord() - 1 && !g_terrain.IsWall(i, currentNode.getYCoord()) && !g_terrain.IsWall(currentNode.getXCoord(), j))
 				 {
 					 //is legal diag
-					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode, hWeight, heuristic);
 				 }
 
 				 else if (i == currentNode.getXCoord() + 1 && j == currentNode.getYCoord() - 1 && !g_terrain.IsWall(i, currentNode.getYCoord()) && !g_terrain.IsWall(currentNode.getXCoord(), j))
 				 {
 					 //is legal diag
-					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode, hWeight, heuristic);
 				 }
 
-				 else if ((i == currentNode.getXCoord && (j == currentNode.getYCoord() - 1 || j == currentNode.getYCoord() + 1)) || (j == currentNode.getYCoord() && (i == currentNode.getXCoord() + 1 || i == currentNode.getYCoord() - 1)))
+				 else if (!g_terrain.IsWall(i,j) && (i == currentNode.getXCoord() && (j == currentNode.getYCoord() - 1 || j == currentNode.getYCoord() + 1)) || (j == currentNode.getYCoord() && (i == currentNode.getXCoord() + 1 || i == currentNode.getYCoord() - 1)))
 				 {
 					 //is legal horizontal-vertical
-					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + DIAG_DISTANCE, &currentNode);
+					 update = this->editMap(i, j).updateCostToGetToThisNode(currentNode.getCostToGetToThisNode() + HV_DISTANCE, &currentNode, hWeight, heuristic);
 				 }
 
 				 if (update)

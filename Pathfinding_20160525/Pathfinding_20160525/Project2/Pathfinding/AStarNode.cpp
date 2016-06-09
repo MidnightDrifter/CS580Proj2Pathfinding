@@ -28,6 +28,13 @@ void AStarNode::clearNode()
 	this->setParent(NULL);
 }
 
+void AStarNode::deleteNode()
+{
+	this->clearNode();
+	this->setXCoord(-1);
+	this->setYCoord(-1);
+}
+
 bool operator<(const AStarNode& lhs, const AStarNode& rhs) 
 {
 	return  lhs.totalCost < rhs.totalCost;//(abs(lhs.totalCost - rhs.totalCost)< EPSILON);
@@ -246,12 +253,13 @@ const AStarNode& AStarNode::operator=(const AStarNode& rhs)
 }
 
 
-bool AStarNode::updateCostToGetToThisNode(float newCost, AStarNode* newParent)  //Note:  this assumes that there will be few / no cases where a path with a lower cost will be found going through the same parent node
+bool AStarNode::updateCostToGetToThisNode(float newCost, AStarNode* newParent, float hWeight, int h)  //Note:  this assumes that there will be few / no cases where a path with a lower cost will be found going through the same parent node
 {
 	if (newCost < this->getCostToGetToThisNode())
 	{
-		this->setTotalCost(this->getTotalCost() - (this->getCostToGetToThisNode() - newCost));
+		//this->setTotalCost(this->getTotalCost() - (this->getCostToGetToThisNode() - newCost));
 		this->setCostToGetToThisNode(newCost);
+		this->calculateAndSetTotalCost(h, *newParent, hWeight);
 		this->setParent(newParent);
 		this->setOpen(true);
 		this->setClosed(false);

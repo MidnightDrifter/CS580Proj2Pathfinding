@@ -17,10 +17,11 @@ public:
 
 	int getGoalRow() const;
 	int getGoalCol() const;
+	AStarNode* getGoalNode();
 	bool isValidNode(int a, int b) const;
 	 AStarNode& editMap(int x, int y);
 	 const AStarNode& getMap(int x, int y);
-	 AStarNode& popOpenMin();
+	 AStarNode popOpenMin();
 	 const AStarNode& getGoalPath();
 
 	void pushClosed(int x, int y);

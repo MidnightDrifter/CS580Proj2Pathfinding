@@ -38,7 +38,7 @@ public:
 	//static void addToStartingCost(float f);
 	//static void subtractFromStartingCost(float f);
 
-	bool updateCostToGetToThisNode(float newCost, AStarNode* newParent);
+	bool updateCostToGetToThisNode(float newCost, AStarNode* newParent, float hWeight, int h);
 
 	friend bool operator<(const AStarNode& lhs, const AStarNode& rhs);
 
@@ -61,7 +61,8 @@ public:
 	
 	void calculateAndSetTotalCost(int i, const AStarNode& goal, float weight);
 
-	void clearNode();
+	void clearNode();  //keeps (x,y)
+	void deleteNode();  //deletes (x,y)
 
 	const AStarNode& operator=(const AStarNode& rhs);
 private:
