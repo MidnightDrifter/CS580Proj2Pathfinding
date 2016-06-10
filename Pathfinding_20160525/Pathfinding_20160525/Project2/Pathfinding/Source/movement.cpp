@@ -192,6 +192,7 @@ if(useAStar)
 		while (currentNode)
 		{
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(currentNode->getXCoord(), currentNode->getYCoord())));
+			currentNode = currentNode->getParent();
 		}
 
 		m_AStarV2.clearMap();

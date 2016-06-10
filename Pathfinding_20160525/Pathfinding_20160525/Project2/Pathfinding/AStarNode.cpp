@@ -238,8 +238,8 @@ void AStarNode::setParent(AStarNode* p)
 
 const AStarNode& AStarNode::operator=(const AStarNode& rhs) 
 {
-	if (!this || (this->getXCoord() != rhs.getXCoord() && this->getYCoord() != rhs.getYCoord()))  // && this->getWall() != rhs.getWall() && this->getOpen() != rhs.getOpen() && this->getClosed() != rhs.getClosed() ))
-	{
+	//if (!this || (this->getXCoord() != rhs.getXCoord() && this->getYCoord() != rhs.getYCoord()))  // && this->getWall() != rhs.getWall() && this->getOpen() != rhs.getOpen() && this->getClosed() != rhs.getClosed() ))
+	//{
 		this->setXCoord(rhs.getXCoord());
 		this->setYCoord(rhs.getYCoord());
 		this->setWall(rhs.getWall());
@@ -247,7 +247,8 @@ const AStarNode& AStarNode::operator=(const AStarNode& rhs)
 		this->setClosed(rhs.getClosed());
 		this->setTotalCost(rhs.getTotalCost());
 		this->setCostToGetToThisNode(rhs.getCostToGetToThisNode());
-	}
+		this->setParent(rhs.getParent());
+//	}
 
 	return *this;
 }
@@ -260,7 +261,7 @@ bool AStarNode::updateCostToGetToThisNode(float newCost, AStarNode* newParent, f
 		//this->setTotalCost(this->getTotalCost() - (this->getCostToGetToThisNode() - newCost));
 		this->setCostToGetToThisNode(newCost);
 		this->calculateAndSetTotalCost(h, *newParent, hWeight);
-		this->setParent(newParent);
+	//	this->setParent(newParent);
 		this->setOpen(true);
 		this->setClosed(false);
 

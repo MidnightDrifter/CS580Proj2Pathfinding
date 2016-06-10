@@ -109,7 +109,7 @@ bool AStarV2::isValidNode(int x, int y) const
 
  AStarNode* AStarV2::getGoalNode()
  {
-	 return &goalPath;
+	 return &map[goalRow][goalCol];
  }
 
  void AStarV2::pushClosed(int x, int y)
@@ -128,12 +128,14 @@ bool AStarV2::isValidNode(int x, int y) const
  {
 	 goalRow = n.getXCoord();
 	 goalCol = n.getYCoord();
+	// goalPath = n;
  }
 
  void AStarV2::setGoal(int x, int y)
  {
 	 goalRow = x;
 	 goalCol = y;
+	// goalPath = AStarNode(x, y);
  }
 
  void AStarV2::setGoalRow(int x)
@@ -179,6 +181,7 @@ bool AStarV2::isValidNode(int x, int y) const
 	 AStarNode currentNode = this->popOpenMin();
 	 if (currentNode.getXCoord() == this->getGoalRow() && currentNode.getYCoord() == this->getGoalCol())
 	 {
+		 this->setGoal(currentNode);
 		 return true;
 	 }
 
