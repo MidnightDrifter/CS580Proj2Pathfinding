@@ -21,7 +21,10 @@ public:
 	void clearMap();
 
 	bool findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY);
-		
+	
+	void pushOpen(int i, int j);
+	void pushClosed(int i, int j);
+	AStarNodev2* popOpenMin();
 
 private:
 	AStarNodev2* map[SIZE_OF_MAP][SIZE_OF_MAP];
