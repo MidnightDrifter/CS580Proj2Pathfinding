@@ -234,3 +234,5 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+/Pathfinding_20160525/Pathfinding_20160525/Project2/Pathfinding/AStarV3.cpp
+/Pathfinding_20160525/Pathfinding_20160525/Project2/Pathfinding/AStarNodev2.cpp
