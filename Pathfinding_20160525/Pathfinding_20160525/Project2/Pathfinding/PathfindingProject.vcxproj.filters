@@ -153,8 +153,12 @@
     <ClCompile Include="AStarV2.cpp">
       <Filter>GameObject\AStar</Filter>
     </ClCompile>
-    <ClCompile Include="AStarNodev2.cpp" />
-    <ClCompile Include="AStarV3.cpp" />
+    <ClCompile Include="AStarV3.cpp">
+      <Filter>GameObject\AStar</Filter>
+    </ClCompile>
+    <ClCompile Include="AStarNodev2.cpp">
+      <Filter>GameObject\AStar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\body.h">
@@ -284,8 +288,12 @@
     <ClInclude Include="AStarV2.h">
       <Filter>GameObject\AStar</Filter>
     </ClInclude>
-    <ClInclude Include="AStarNodev2.h" />
-    <ClInclude Include="AStarV3.h" />
+    <ClInclude Include="AStarV3.h">
+      <Filter>GameObject\AStar</Filter>
+    </ClInclude>
+    <ClInclude Include="AStarNodev2.h">
+      <Filter>GameObject\AStar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\DXUT\directx.ico">
