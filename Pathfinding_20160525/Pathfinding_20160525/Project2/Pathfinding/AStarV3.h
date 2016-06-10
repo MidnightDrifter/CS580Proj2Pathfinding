@@ -1,5 +1,8 @@
 #pragma once
 #include "AStarNodev2.h"
+#include "Source/singleton.h"
+#include "Source/global.h"
+#include "Source/terrain.h"
 #define SIZE_OF_MAP 40
 #define CAPACITY_OF_OPEN_LIST 150
 class AStarV3
@@ -21,7 +24,8 @@ public:
 	void clearMap();
 
 	bool findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY);
-	
+	bool isValidNode(int i, int j)const;
+
 	void pushOpen(int i, int j);
 	void pushClosed(int i, int j);
 	AStarNodev2* popOpenMin();

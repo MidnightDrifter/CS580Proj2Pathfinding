@@ -150,6 +150,11 @@ AStarNodev2* AStarV3::popOpenMin()
 }
 
 
+bool AStarV3::isValidNode(int x, int y) const
+{
+	return !(x < 0 || y < 0 || x >= SIZE_OF_MAP || y >= SIZE_OF_MAP);
+}
+
 
 bool AStarV3::findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY)
 {
@@ -175,13 +180,46 @@ bool AStarV3::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 	do
 	{
-		for (int i = currentNode->getX() - 1; i <= currentNode->getX()+1; i++)
+		int cX = currentNode->getX();
+		int cY = currentNode->getY();
+		for (int i = cX- 1; i <= cX+1; i++)
 		{
-			for (int j = currentNode->getY() - 1; j <= currentNode->getY() + 1; j++)
+			for (int j = cY - 1; j <= cY+ 1; j++)
 			{
 				//Loop through neighbors
+
+				if (this->isValidNode(i, j) && !(j == cY && i == cY) && !g_terrain.IsWall(i, j))
+				{
+					if (i == cX + 1 && j == cY + 1 && !g_terrain.IsWall(i, cY) && !g_terrain.IsWall(cX, j))
+					{
+						//diag
+					}
+
+					else if (i == cX + 1 && j == cY - 1 && !g_terrain.IsWall(i, cY) && !g_terrain.IsWall(cX, j))
+					{
+						//diag
+					}
+
+					else if (i == cX - 1 && j == cY + 1 && !g_terrain.IsWall(i, cY) && !g_terrain.IsWall(cX, j))
+					{
+						//diag
+					}
+
+					else if (i == cX - 1 && j == cY - 1 && !g_terrain.IsWall(i, cY) && !g_terrain.IsWall(cX, j))
+					{
+						//diag
+					}
+
+					else if ((i == cX && (j == cY + 1 || j == cY - 1)) || (j == cY && (i == cX + 1 || j == cX - 1)))
+					{
+						//horizontal
+					}
+				}
+
+
 			}
 		}
+		this->pushClosed(cX, cY);
 
 		if(isSingleStep)
 		{
