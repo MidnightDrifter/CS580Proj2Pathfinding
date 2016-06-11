@@ -28,12 +28,12 @@ public:
 
 	void pushOpen(int i, int j);
 	void pushClosed(int i, int j);
-	void popOpen(int i, int j);  //Pop a specified node off the open list
+	AStarNodev2* popOpen(int i, int j);  //Pop a specified node off the open list
 	AStarNodev2* popOpenMin();
 
 private:
 	AStarNodev2* map[SIZE_OF_MAP][SIZE_OF_MAP];
-	AStarNodev2 openList[CAPACITY_OF_OPEN_LIST];
+	AStarNodev2* openList[CAPACITY_OF_OPEN_LIST];
 	int goalRow;
 	int goalCol;
 	int openListSize;// = 0;

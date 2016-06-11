@@ -4,8 +4,23 @@
 
 float AStarV3::SQRT2 = sqrtf(2);
 
-AStarV3::AStarV3()
-{}
+AStarV3::AStarV3() : openListSize(0), goalRow(-1), goalCol(-1)
+{
+	for(int i=0; i<SIZE_OF_MAP;i++)
+	{
+		for (int j = 0; j < SIZE_OF_MAP; j++)
+		{
+			map[i][j]= new AStarNodev2();
+		}
+	}
+
+	for (int k = 0; k < CAPACITY_OF_OPEN_LIST;k++)
+	{
+		openList[k]= new AStarNodev2();
+	}
+
+
+}
 
 
 AStarV3::~AStarV3()
@@ -119,14 +134,14 @@ void AStarV3::clearOpenList()
 {
 	for (int i = 0; i < CAPACITY_OF_OPEN_LIST; i++)
 	{
-		openList[i].clearNode();
+		openList[i]->clearNode();
 	}
 }
 
 
 void AStarV3::pushOpen(int i, int j)
 {
-	openList[openListSize] = *map[i][j];
+	openList[openListSize] = (map[i][j]);
 	openListSize++;
 	map[i][j]->setOpen(true);
 }
@@ -136,19 +151,30 @@ void AStarV3::pushClosed(int i, int j)
 	map[i][j]->setClosed(true);
 }
 
-void AStarV3::popOpen(int i, int j)
+AStarNodev2* AStarV3::popOpen(int i, int j)
 {
 	//int index = 0;
+	AStarNodev2* temp=NULL;
 	for (int k = 0; k < openListSize; k++)
 	{
-		if (openList[k].getX() == i && openList[k].getY() == j)
+		if (openList[k]->getX() == i && openList[k]->getY() == j)
 		{
+			temp = openList[k];
 			openListSize--;
 			openList[k] = openList[openListSize];
-				openList[openListSize].clearNode();
+				openList[openListSize]->clearNode();
 				break;
 		}
 	}
+	if (temp)
+	{
+		temp->setOpen(false);
+		if (temp->getX() > 0)
+		{
+			this->editMap(temp->getX(), temp->getY())->setOpen(false);
+		}
+	}
+	return temp;
 }
 
 
@@ -156,23 +182,23 @@ AStarNodev2* AStarV3::popOpenMin()
 {
 	int index = 0;
 	for(int i=0; i<openListSize;i++)
-	{if(openList[i].getCost() < openList[index].getCost())
+	{if(openList[i]->getCost() < openList[index]->getCost())
 	{
 		index = i;
 	}
 	
 	}
-	AStarNodev2 temp(openList[index]);
+	AStarNodev2* temp =openList[index];
 	openListSize--;
 	openList[index] = openList[openListSize];
-	openList[openListSize - 1].clearNode();
-	return &temp;
+	openList[openListSize - 1]->clearNode();
+	return temp;
 }
 
 
 bool AStarV3::isValidNode(int x, int y) const
 {
-	return !(x < 0 || y < 0 || x >= SIZE_OF_MAP || y >= SIZE_OF_MAP);
+	return !(x < 0 || y < 0 || x >= g_terrain.GetWidth() || y >= g_terrain.GetWidth());
 }
 
 
@@ -247,22 +273,45 @@ bool AStarV3::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 					if (!this->editMap(i, j)->getOpen() && !this->editMap(i, j)->getClosed())
 					{
 						this->editMap(i, j)->setCost(c);
-						this->editMap(i, j)->setTotalCost(this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol()) + this->editMap(i, j)->getCost());
+						this->editMap(i, j)->setTotalCost(this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol()) + c);
+						this->editMap(i, j)->setParent(this->editMap(cX, cY));
 						this->pushOpen(i, j);
 					}
 
-					else if ((this->editMap(i, j)->getOpen() || this->editMap(i, j)->getClosed()) && this->editMap(i, j)->getTotalCost() > c)
-					{
-						this->editMap(i, j)->setCost(c);
-						this->editMap(i, j)->setTotalCost(this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol()) + this->editMap(i, j)->getCost());
-						this->editMap(i, j)->setClosed(false);
-
-						if(this->editMap(i,j)->getOpen())
+					else {
+						AStarNodev2* t = this->popOpen(i, j);
+						//Know that temp will be a default constructed node if it's not popped off of the open list, so can simply check for default values
+						if (t)  // on list, check cost
 						{
-							this->popOpen(i, j);
-						}
+							if ( t->getTotalCost() > (c + this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol())))  //New path is better, update node push it on
+							{
+								this->editMap(i, j)->setCost(c);
+								this->editMap(i, j)->setTotalCost(this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol()) + c);
+								this->editMap(i, j)->setClosed(false);
+								this->editMap(i, j)->setParent(this->editMap(cX, cY));
+								this->pushOpen(i, j);
 
-						this->pushOpen(i, j);
+							}
+
+							else   //Old path is better, push it back on
+							{
+								this->pushOpen(t->getX(), t->getY());
+							}
+
+						}
+						else //is on closed list
+						{
+							if ( this->editMap(i, j)->getTotalCost() > (c + this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol())))  //Node on closed list but new path through it is better, update and push it on
+							{
+								this->editMap(i, j)->setCost(c);
+								this->editMap(i, j)->setTotalCost(this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol()) + c);
+								this->editMap(i, j)->setClosed(false);
+								this->editMap(i, j)->setParent(this->editMap(cX, cY));
+								this->pushOpen(i, j);
+							}
+
+
+						}
 						
 					}
 
