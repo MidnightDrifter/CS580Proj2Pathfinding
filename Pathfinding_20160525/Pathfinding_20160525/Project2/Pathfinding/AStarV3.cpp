@@ -1,4 +1,8 @@
+#include "DXUT.h"
 #include "AStarV3.h"
+#undef max
+
+float AStarV3::SQRT2 = sqrtf(2);
 
 AStarV3::AStarV3()
 {}
@@ -132,6 +136,22 @@ void AStarV3::pushClosed(int i, int j)
 	map[i][j]->setClosed(true);
 }
 
+void AStarV3::popOpen(int i, int j)
+{
+	//int index = 0;
+	for (int k = 0; k < openListSize; k++)
+	{
+		if (openList[k].getX() == i && openList[k].getY() == j)
+		{
+			openListSize--;
+			openList[k] = openList[openListSize];
+				openList[openListSize].clearNode();
+				break;
+		}
+	}
+}
+
+
 AStarNodev2* AStarV3::popOpenMin()
 {
 	int index = 0;
@@ -187,33 +207,66 @@ bool AStarV3::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 			for (int j = cY - 1; j <= cY+ 1; j++)
 			{
 				//Loop through neighbors
+				
 
 				if (this->isValidNode(i, j) && !(j == cY && i == cY) && !g_terrain.IsWall(i, j))
 				{
+					float c = std::numeric_limits<float>::max();
 					if (i == cX + 1 && j == cY + 1 && !g_terrain.IsWall(i, cY) && !g_terrain.IsWall(cX, j))
 					{
 						//diag
+						c = currentNode->getCost() + SQRT2;
 					}
 
 					else if (i == cX + 1 && j == cY - 1 && !g_terrain.IsWall(i, cY) && !g_terrain.IsWall(cX, j))
 					{
 						//diag
+						c = currentNode->getCost() + SQRT2;
 					}
 
 					else if (i == cX - 1 && j == cY + 1 && !g_terrain.IsWall(i, cY) && !g_terrain.IsWall(cX, j))
 					{
 						//diag
+						c = currentNode->getCost() + SQRT2;
 					}
 
 					else if (i == cX - 1 && j == cY - 1 && !g_terrain.IsWall(i, cY) && !g_terrain.IsWall(cX, j))
 					{
 						//diag
+						c = currentNode->getCost() + SQRT2;
 					}
 
 					else if ((i == cX && (j == cY + 1 || j == cY - 1)) || (j == cY && (i == cX + 1 || j == cX - 1)))
 					{
 						//horizontal
+						c = currentNode->getCost() + 1;
 					}
+
+
+
+					if (!this->editMap(i, j)->getOpen() && !this->editMap(i, j)->getClosed())
+					{
+						this->editMap(i, j)->setCost(c);
+						this->editMap(i, j)->setTotalCost(this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol()) + this->editMap(i, j)->getCost());
+						this->pushOpen(i, j);
+					}
+
+					else if ((this->editMap(i, j)->getOpen() || this->editMap(i, j)->getClosed()) && this->editMap(i, j)->getTotalCost() > c)
+					{
+						this->editMap(i, j)->setCost(c);
+						this->editMap(i, j)->setTotalCost(this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol()) + this->editMap(i, j)->getCost());
+						this->editMap(i, j)->setClosed(false);
+
+						if(this->editMap(i,j)->getOpen())
+						{
+							this->popOpen(i, j);
+						}
+
+						this->pushOpen(i, j);
+						
+					}
+
+
 				}
 
 

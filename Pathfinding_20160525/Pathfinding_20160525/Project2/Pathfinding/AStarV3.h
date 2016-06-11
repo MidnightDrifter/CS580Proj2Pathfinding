@@ -24,10 +24,11 @@ public:
 	void clearMap();
 
 	bool findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY);
-	bool isValidNode(int i, int j)const;
+	bool isValidNode(int i, int j) const;
 
 	void pushOpen(int i, int j);
 	void pushClosed(int i, int j);
+	void popOpen(int i, int j);  //Pop a specified node off the open list
 	AStarNodev2* popOpenMin();
 
 private:
@@ -39,5 +40,5 @@ private:
 	static float SQRT2;
 	
 
-}
+};
 
