@@ -177,20 +177,25 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	bool useAStar = true;
 if(useAStar)
 {
-	AStarV3& myAStarv3 = this->editAStarV3();
+	AStarV3& myAStarV3 = this->editAStarV3();
 
-	bool pathFound = myAStarv3.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c);
+	bool pathFound = myAStarV3.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c);
+
 	if (pathFound)
 	{
-		AStarNodev2* n = myAStarv3.editMap(myAStarv3.getGoalRow(), myAStarv3.getGoalCol());
-		while (n)
-		{
-			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(n->getX(), n->getY())));
-			n = n->getParent();
+		AStarNodev2* goal = myAStarV3.editMap(myAStarV3.getGoalRow(), myAStarV3.getGoalCol());
 
+		while (goal)
+		{
+			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal->getX(), goal->getY())));
+			goal = goal->getParent();
 		}
-		myAStarv3.clearMap();
-		myAStarv3.clearOpenList();
+
+
+		myAStarV3.clearMap();
+		myAStarV3.clearOpenList();
+		//m_AStarV3.clearMap();
+		//m_AStarV3.clearOpenList();
 
 		if (this->GetSmoothPath() && this->GetRubberbandPath())
 		{
@@ -449,9 +454,12 @@ if(useAStar)
 
 		}
 
-		
+		return true;
+
 	}
-	return pathFound;
+
+	
+
 
 }
 	else

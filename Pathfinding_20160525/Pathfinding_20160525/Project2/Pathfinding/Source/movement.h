@@ -77,7 +77,6 @@ public:
 	const AStarV2& getAStarV2() const {return m_AStarV2; }
 	AStarV2& editAStarV2() { return m_AStarV2; }
 
-
 	const AStarV3& getAStarV3() const { return m_AStarV3; }
 	AStarV3& editAStarV3() { return m_AStarV3; }
 
@@ -116,4 +115,5 @@ protected:
 	D3DXVECTOR3* m_secondTempSmoothingVector;
 	AStarV2 m_AStarV2;
 	AStarV3 m_AStarV3;
+
 };

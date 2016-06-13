@@ -3,7 +3,6 @@
 #include "Source/singleton.h"
 #include "Source/global.h"
 #include "Source/terrain.h"
-
 #define SIZE_OF_MAP 40
 #define CAPACITY_OF_OPEN_LIST 150
 class AStarV3
@@ -25,16 +24,16 @@ public:
 	void clearMap();
 
 	bool findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY);
-	bool isValidNode(int i, int j, int mapX, int mapY)const;
+	bool isValidNode(int i, int j) const;
 
 	void pushOpen(int i, int j);
 	void pushClosed(int i, int j);
-	void clearOpenNode(int i, int j);
-	AStarNodev2 popOpenMin();
+	AStarNodev2* popOpen(int i, int j);  //Pop a specified node off the open list
+	AStarNodev2* popOpenMin();
 
 private:
 	AStarNodev2* map[SIZE_OF_MAP][SIZE_OF_MAP];
-	AStarNodev2 openList[CAPACITY_OF_OPEN_LIST];
+	AStarNodev2* openList[CAPACITY_OF_OPEN_LIST];
 	int goalRow;
 	int goalCol;
 	int openListSize;// = 0;
