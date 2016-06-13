@@ -1,5 +1,6 @@
 #pragma once
 #include <limits>
+
 class AStarNodev2
 {
 public:
