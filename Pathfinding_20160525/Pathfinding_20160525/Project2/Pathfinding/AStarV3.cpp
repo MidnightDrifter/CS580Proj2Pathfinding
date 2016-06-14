@@ -10,7 +10,8 @@ AStarV3::AStarV3() : openListSize(0), goalRow(-1), goalCol(-1)
 	{
 		for (int j = 0; j < SIZE_OF_MAP; j++)
 		{
-			map[i][j]= new AStarNodev2();
+			//map[i][j]= new AStarNodev2(((SIZE_OF_MAP-1)-i),j);
+			map[i][j] = new AStarNodev2(i, j);
 		}
 	}
 
@@ -136,6 +137,7 @@ void AStarV3::clearOpenList()
 	{
 		openList[i]->clearNode();
 	}
+	openListSize = 0;
 }
 
 
@@ -144,11 +146,13 @@ void AStarV3::pushOpen(int i, int j)
 	openList[openListSize] = (map[i][j]);
 	openListSize++;
 	map[i][j]->setOpen(true);
+	g_terrain.SetColor(i, j, DEBUG_COLOR_PURPLE);
 }
 
 void AStarV3::pushClosed(int i, int j)
 {
 	map[i][j]->setClosed(true);
+	g_terrain.SetColor(i, j, DEBUG_COLOR_RED);
 }
 
 AStarNodev2* AStarV3::popOpen(int i, int j)
