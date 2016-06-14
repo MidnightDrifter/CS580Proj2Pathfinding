@@ -20,20 +20,20 @@
 
 float Movement::DIAG_DISTANCE = sqrtf(2);
 int Movement::HV_DISTANCE = 1;
-Movement::Movement( GameObject& owner )
-: m_owner( &owner ),
-  m_speedWalk( 1.f / 5.7f ),
-  m_speedJog( 1.f / 2.3f ),
-  m_movementMode( MOVEMENT_SEEK_TARGET ),
-  m_smooth(false),
-  m_rubberband(false),
-  m_straightline(false),
-  m_singleStep(true),
-  m_extracredit(false),
-  m_aStarUsesAnalysis(false),
-  m_heuristicWeight(1.0f),
-  m_heuristicCalc(0),
-  m_fogOfWar(false),
+Movement::Movement(GameObject& owner)
+	: m_owner(&owner),
+	m_speedWalk(1.f / 5.7f),
+	m_speedJog(1.f / 2.3f),
+	m_movementMode(MOVEMENT_SEEK_TARGET),
+	m_smooth(false),
+	m_rubberband(false),
+	m_straightline(false),
+	m_singleStep(true),
+	m_extracredit(false),
+	m_aStarUsesAnalysis(false),
+	m_heuristicWeight(1.0f),
+	m_heuristicCalc(0),
+	m_fogOfWar(false),
 	m_AStarGrid(AStar(g_terrain.GetWidth(), g_terrain.GetWidth())),
 	m_tempVector(new D3DXVECTOR3()),
 	m_splineNodesList(new std::list<D3DXVECTOR3>),
@@ -41,7 +41,8 @@ Movement::Movement( GameObject& owner )
 	m_firstTempSmoothingVector(new D3DXVECTOR3()),
 	m_secondTempSmoothingVector(new D3DXVECTOR3()),
 	m_AStarV2(AStarV2()),
-	m_AStarV3(AStarV3())
+	m_AStarV3(AStarV3()),
+	m_AStarV4(AStarV4())
 	
 {
 	
@@ -177,23 +178,23 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	bool useAStar = true;
 if(useAStar)
 {
-	AStarV3& myAStarV3 = this->editAStarV3();
+	AStarV4& myAStarV4 = this->editAStarV4();
 
-	bool pathFound = myAStarV3.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c);
+	bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c);
 
 	if (pathFound)
 	{
-		AStarNodev2* goal = myAStarV3.editMap(myAStarV3.getGoalRow(), myAStarV3.getGoalCol());
+		AStarNodeV3 goal = myAStarV4.getMapNode(myAStarV4.getGoalRow(), myAStarV4.getGoalCol());
 
-		while (goal)
+		while (goal.getX() >0)
 		{
-			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal->getX(), goal->getY())));
-			goal = goal->getParent();
+			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal.getX(), goal->getY())));
+			goal= myAStarV4.getMapNode(goal.getParentX(),goal.getParentY());
 		}
 
 
-		myAStarV3.clearMap();
-		myAStarV3.clearOpenList();
+		myAStarV4.clearMap();
+		myAStarV4.clearOpenList();
 		//m_AStarV3.clearMap();
 		//m_AStarV3.clearOpenList();
 

@@ -12,6 +12,7 @@
 #include "../AStar.h"
 #include "../AStarV2.h"
 #include "../AStarV3.h"
+#include "../AStarV4.h"
 
 
 class GameObject;
@@ -81,6 +82,10 @@ public:
 	AStarV3& editAStarV3() { return m_AStarV3; }
 
 
+	const AStarV4& getAStarV4() const { return m_AStarV4; }
+	AStarV4& editAStarV4() { return m_AStarV4; }
+
+
 protected:
 
 	GameObject* m_owner;
@@ -115,5 +120,6 @@ protected:
 	D3DXVECTOR3* m_secondTempSmoothingVector;
 	AStarV2 m_AStarV2;
 	AStarV3 m_AStarV3;
+	AStarV4 m_AStarV4;
 
 };

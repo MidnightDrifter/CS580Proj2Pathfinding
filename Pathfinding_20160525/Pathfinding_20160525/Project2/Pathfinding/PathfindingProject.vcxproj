@@ -123,8 +123,10 @@
     <ClCompile Include="AStar.cpp" />
     <ClCompile Include="AStarNode.cpp" />
     <ClCompile Include="AStarNodev2.cpp" />
+    <ClCompile Include="AStarNodeV3.cpp" />
     <ClCompile Include="AStarV2.cpp" />
     <ClCompile Include="AStarV3.cpp" />
+    <ClCompile Include="AStarV4.cpp" />
     <ClCompile Include="Source\body.cpp" />
     <ClCompile Include="Source\gameobject.cpp" />
     <ClCompile Include="Source\movement.cpp" />
@@ -173,8 +175,10 @@
     <ClInclude Include="AStar.h" />
     <ClInclude Include="AStarNode.h" />
     <ClInclude Include="AStarNodev2.h" />
+    <ClInclude Include="AStarNodeV3.h" />
     <ClInclude Include="AStarV2.h" />
     <ClInclude Include="AStarV3.h" />
+    <ClInclude Include="AStarV4.h" />
     <ClInclude Include="Source\body.h" />
     <ClInclude Include="Source\gameobject.h" />
     <ClInclude Include="Source\movement.h" />
