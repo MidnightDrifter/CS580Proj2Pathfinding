@@ -12,6 +12,8 @@ public:
 
 	int getGoalRow() const;
 	int getGoalCol() const;
+	int getStartRow() const;
+	int getStartCol() const;
 	int getOpenListSize() const;
 	float calculateHeuristicCost(int h, float weight, int nodeX, int nodeY, int goalX, int goalY) const;
 	bool isValidNode(int i, int j);
@@ -21,6 +23,9 @@ public:
 	void setGoalRow(int x);
 	void setGoalCol(int x);
 	void setGoal(int x, int y);
+	void setStartRow(int x);
+	void setStartCol(int y);
+	void setStart(int x, int y);
 	void clearMap();
 	void clearOpenList();
 	void clear();
@@ -35,6 +40,10 @@ public:
 private:
 	int goalRow;
 	int goalCol;
+
+	int startRow;
+	int startCol;
+	
 	int sizeOfOpenList;
 	AStarNodeV3 map[SIZE_OF_MAP][SIZE_OF_MAP];
 	AStarNodeV3 openList[CAPACITY_OF_OPEN_LIST];

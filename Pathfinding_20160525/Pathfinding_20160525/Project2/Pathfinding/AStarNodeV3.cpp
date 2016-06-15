@@ -6,8 +6,8 @@
 
 
 AStarNodeV3::AStarNodeV3() : myX(-1), myY(-1), parentX(-1), parentY(-1), open(false), closed(false), cost(std::numeric_limits<float>::max()), totalCost(cost){}
-AStarNodeV3::AStarNodeV3(int x, int y) : myX(x), myY(y), parentX(-1), parentY(-1), open(false), closed(false), cost(std::numeric_limits<float>::max()), totalCost(cost) {}
-AStarNodeV3::AStarNodeV3(int x, int y, int a, int b) : myX(x), myY(y), parentX(a), parentY(b), open(false), closed(false), cost(std::numeric_limits<float>::max()), totalCost(max){}
+AStarNodeV3::AStarNodeV3(int x, int y) : myX(x), myY(y), parentX(-1), parentY(-1), open(false), closed(false), cost(std::numeric_limits<float>::max()-100), totalCost(cost) {}
+AStarNodeV3::AStarNodeV3(int x, int y, int a, int b) : myX(x), myY(y), parentX(a), parentY(b), open(false), closed(false), cost(std::numeric_limits<float>::max()-100), totalCost(std::numeric_limits<float>::max()-100){}
 AStarNodeV3::AStarNodeV3(int x, int y, bool o, bool c) : myX(x), myY(y), parentX(-1), parentY(-1), open(o), closed(c), cost(std::numeric_limits<float>::max()), totalCost(cost) {}
 AStarNodeV3::AStarNodeV3(int x, int y, bool o, bool c, float co, float tc) : myX(x), myY(y), parentX(-1), parentY(-1), open(o), closed(c), cost(co), totalCost(tc) {}
 AStarNodeV3::AStarNodeV3(const AStarNodeV3& rhs) :myX(rhs.getX()), myY(rhs.getY()), parentX(rhs.getParentX()), parentY(rhs.getParentY()), open(rhs.getOpen()), closed(rhs.getClosed()), cost(rhs.getCost()), totalCost(rhs.getTotalCost()) {}
@@ -60,14 +60,21 @@ void AStarNodeV3::setTotalCost(float x) { totalCost = x; }
 
 void AStarNodeV3::clear()
 {
-	this->setX(-1);
-	this->setY(-1);
+	//this->setX(-1);
+	//this->setY(-1);
 	this->setParentX(-1);
 	this->setParentY(-1);
 	this->setOpen(false);
 	this->setClosed(false);
-	this->setCost(std::numeric_limits<float>::max());
-	this->setTotalCost(std::numeric_limits<float>::max());
+	this->setCost(std::numeric_limits<float>::max()-100);
+	this->setTotalCost(std::numeric_limits<float>::max()-100);
+}
+
+void AStarNodeV3::del()  //removes (x,y) coords
+{
+	this->setX(-1);
+	this->setY(-1);
+	this->clear();
 }
 
 AStarNodeV3::~AStarNodeV3()

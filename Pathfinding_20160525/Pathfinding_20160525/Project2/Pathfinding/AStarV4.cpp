@@ -6,15 +6,15 @@
 #undef max
 
 
-static float SQRT2 = sqrtf(2);
+ float AStarV4::SQRT2 = sqrtf(2);
 
-AStarV4::AStarV4() : goalRow(-1), goalCol(-1), sizeOfOpenList(0), map(), openList()
+AStarV4::AStarV4() : goalRow(-1), goalCol(-1), startRow(-1),startCol(-1), sizeOfOpenList(0), map(), openList()
 {
 	for(int i=0; i<g_terrain.GetWidth(); i++)
 	{
 		for (int j = 0; j < g_terrain.GetWidth(); j++)
 		{
-			map[i][j] = AStarNodeV3();
+			map[i][j] = AStarNodeV3(i,j);
 		}
 	}
 
@@ -25,12 +25,10 @@ AStarV4::AStarV4() : goalRow(-1), goalCol(-1), sizeOfOpenList(0), map(), openLis
 }
 
 
-int AStarV4::getGoalRow() const
-{
-	return goalRow;
-}
-
+int AStarV4::getGoalRow() const{return goalRow;}
 int AStarV4::getGoalCol() const { return goalCol; }
+int AStarV4::getStartRow() const { return startRow; }
+int AStarV4::getStartCol() const { return startCol; }
 int AStarV4::getOpenListSize() const { return sizeOfOpenList; }
 
 float AStarV4::calculateHeuristicCost(int h, float weight, int nodeX, int nodeY, int goalX, int goalY) const
@@ -40,25 +38,25 @@ float AStarV4::calculateHeuristicCost(int h, float weight, int nodeX, int nodeY,
 		return 0.f;
 	}
 
-	else if (h == 1)
+	else if (h == 0)
 	{
 		//Euclidean
 		return weight*sqrtf(powf(nodeX - goalX, 2.f) + powf(nodeY - goalY, 2.f));
 	}
 
-	else if (h == 2)
+	else if (h == 1)
 	{
 		//Octile
 		return weight*(SQRT2*fmin(abs(nodeX - goalX), abs(nodeY - goalY))) + fmax(abs(nodeX - goalX), abs(nodeY - goalY)) - fmin(abs(nodeX - goalX), abs(nodeY - goalY));
 	}
 
-	else if (h == 3)
+	else if (h == 2)
 	{
 		//Chebyshev
 		return fmax(abs(nodeX - goalX), abs(nodeY - goalY))*weight;
 	}
 
-	else if (h == 4)
+	else if (h == 3)
 	{
 		//Manhattan
 		return weight*abs(nodeX - goalX) + abs(nodeY - goalY);
@@ -74,6 +72,11 @@ void AStarV4::setGoalRow(int x) { goalRow = x; }
 void AStarV4::setGoalCol(int x) { goalCol = x; }
 void AStarV4::setGoal(int x, int y) { goalRow = x; goalCol = y;}
 
+void AStarV4::setStartRow(int x) { startRow = x; }
+void AStarV4::setStartCol(int x) { startCol = x; }
+void AStarV4::setStart(int x, int y) { startRow = x; startCol = y; }
+
+
 void AStarV4::clearMap()
 {
 	for(int i=0; i<SIZE_OF_MAP;i++)
@@ -81,15 +84,17 @@ void AStarV4::clearMap()
 		for (int j = 0; j < SIZE_OF_MAP; j++)
 		{
 			map[i][j].clear();
+			
 		}
 	}
+	
 }
 
 void AStarV4::clearOpenList()
 {
 	for(int i=0;i<sizeOfOpenList;i++)
 	{
-		openList[i].clear();
+		openList[i].del();
 	}
 	sizeOfOpenList = 0;
 }
@@ -98,12 +103,16 @@ void AStarV4::clear()
 {
 	this->clearMap();
 	this->clearOpenList();
+	this->setGoalRow(-1);
+	this->setGoalCol(-1);
+	this->setStart(-1, -1);
 }
 
 void AStarV4::pushOpen(AStarNodeV3 n)
 {
 	openList[sizeOfOpenList] = n;
 	sizeOfOpenList++;
+	g_terrain.SetColor(n.getX(), n.getY(), DEBUG_COLOR_PURPLE);
 }
 
 AStarNodeV3 AStarV4::popOpenMin()
@@ -116,13 +125,14 @@ AStarNodeV3 AStarV4::popOpenMin()
 			index = i;
 		}
 
-		AStarNodeV3 temp(openList[index]);
-		sizeOfOpenList--;
-		openList[index] = openList[sizeOfOpenList];
-		openList[sizeOfOpenList].clear();
-		temp.setOpen(false);
-		return temp;
 	}
+	AStarNodeV3 temp(openList[index]);
+	sizeOfOpenList--;
+	openList[index] = openList[sizeOfOpenList];
+	openList[sizeOfOpenList].clear();
+	temp.setOpen(false);
+	this->getMapNode(temp.getX(), temp.getY()).setOpen(false);
+	return temp;
 }
 
 
@@ -152,7 +162,9 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 {
 	if (newRequest)
 	{
+		g_terrain.ResetColors();
 		this->setGoal(goalX, goalY);
+		this->setStart(startX, startY);
 		this->map[startX][startY].setCost(0.f);
 		this->map[startX][startY].setTotalCost(0.f);
 		this->pushOpen(map[startX][startY]);
@@ -184,36 +196,36 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 				if (this->isValidNode(i, j) && !(j == currY && i == currY) && !g_terrain.IsWall(i, j))
 				{
 					float hc = this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol());
-					float gc = 0.f;
+					float gc = std::numeric_limits<float>::max();
 					if (i == currX + 1 && j == currY + 1 && !g_terrain.IsWall(i, currY) && !g_terrain.IsWall(currX, j))
 					{
 						//diag
 
-						gc += map[i][j].getCost() + SQRT2;
+						gc = map[currX][currY].getCost() + SQRT2;
 					}
 
 					else if (i == currX + 1 && j == currY - 1 && !g_terrain.IsWall(i, currY) && !g_terrain.IsWall(currX, j))
 					{
 						//diag
-						gc += map[i][j].getCost() + SQRT2;
+						gc = map[currX][currY].getCost() + SQRT2;
 					}
 
 					else if (i == currX - 1 && j == currY + 1 && !g_terrain.IsWall(i, currY) && !g_terrain.IsWall(currX, j))
 					{
 						//diag
-						gc += map[i][j].getCost() + SQRT2;
+						gc = map[currX][currY].getCost() + SQRT2;
 					}
 
 					else if (i == currX - 1 && j == currY - 1 && !g_terrain.IsWall(i, currY) && !g_terrain.IsWall(currX, j))
 					{
 						//diag
-						gc += map[i][j].getCost() + SQRT2;
+						gc = map[currX][currY].getCost() + SQRT2;
 					}
 
-					else if ((i == currX && (j == currY + 1 || j == currY - 1)) || (j == currY && (i == currX + 1 || j == currX - 1)))
+					else if ((i == currX && (j == currY + 1 || j == currY - 1)) || (j == currY && (i == currX + 1 || i == currX - 1)))
 					{
 						//horizontal
-						gc += map[i][j].getCost() + 1;
+						gc = map[currX][currY].getCost() + 1;
 					}
 
 
@@ -254,7 +266,8 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 				}
 			}
 		}
-
+		map[currX][currY].setClosed(true);
+		g_terrain.SetColor(currX, currY, DEBUG_COLOR_RED);
 		if(isSingleStep)
 		{
 			break;

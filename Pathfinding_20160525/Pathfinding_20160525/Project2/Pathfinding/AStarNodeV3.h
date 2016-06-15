@@ -29,6 +29,7 @@ public:
 	void setCost(float c);
 	void setTotalCost(float c);
 	void clear();
+	void del();  //same as clear, but gets rid of (x,y) coords as well
 
 
 private:
