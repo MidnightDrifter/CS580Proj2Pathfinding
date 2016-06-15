@@ -197,6 +197,7 @@ if(useAStar)
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal.getX(), goal.getY())));
 			goal= myAStarV4.getMapNode(goal.getParentX(),goal.getParentY());
 		}
+		m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(myAStarV4.getStartRow(), myAStarV4.getStartCol())));
 
 		myAStarV4.clear();
 		//myAStarV4.clearMap();

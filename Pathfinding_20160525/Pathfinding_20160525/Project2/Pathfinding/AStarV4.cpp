@@ -193,30 +193,30 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 				//Loop through neighbors
 
 
-				if (this->isValidNode(i, j) && !(j == currY && i == currY) && !g_terrain.IsWall(i, j))
+				if (this->isValidNode(i, j) && !(j == currY && i == currX) && !g_terrain.IsWall( i, j))
 				{
 					float hc = this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol());
 					float gc = std::numeric_limits<float>::max();
-					if (i == currX + 1 && j == currY + 1 && !g_terrain.IsWall(i, currY) && !g_terrain.IsWall(currX, j))
+					if (i == currX + 1 && j == currY + 1 && !g_terrain.IsWall(i,currY) && !g_terrain.IsWall( currX,  j))
 					{
 						//diag
 
 						gc = map[currX][currY].getCost() + SQRT2;
 					}
 
-					else if (i == currX + 1 && j == currY - 1 && !g_terrain.IsWall(i, currY) && !g_terrain.IsWall(currX, j))
+					else if (i == currX + 1 && j == currY - 1 && !g_terrain.IsWall( i, currY) && !g_terrain.IsWall(currX,  j))
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
 					}
 
-					else if (i == currX - 1 && j == currY + 1 && !g_terrain.IsWall(i, currY) && !g_terrain.IsWall(currX, j))
+					else if (i == currX - 1 && j == currY + 1 && !g_terrain.IsWall( i,  currY) && !g_terrain.IsWall( currX,  j))
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
 					}
 
-					else if (i == currX - 1 && j == currY - 1 && !g_terrain.IsWall(i, currY) && !g_terrain.IsWall(currX, j))
+					else if (i == currX - 1 && j == currY - 1 && !g_terrain.IsWall( i, currY) && !g_terrain.IsWall( currX,  j))
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
