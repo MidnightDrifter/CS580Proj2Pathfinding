@@ -91,4 +91,6 @@ protected:
 	float ClosestWall(int row, int col);
 	float RearCoverValue( int row, int col );
 	bool LineIntersect( float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4 );
+
+	bool isValidNode(int r, int c);  //SH implemented helper method - test if node coords are within 0 - (mapSize-1) range
 };

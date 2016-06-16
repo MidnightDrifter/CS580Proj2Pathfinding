@@ -273,17 +273,156 @@ float Terrain::ClosestWall( int row, int col )
 	//TODO: Helper function for the Terrain Analysis project (you'll likely need it).
 
 	//Return the distance to the closest wall or side of the map.
+	bool foundMin = false;
+	int upperX, upperY, lowerX, lowerY;// , currX, currY;
+
+	upperX = row + 1;
+	upperY = col + 1;
+	lowerX = row - 1;
+	lowerY = col - 1;
+
+	//Map is 40x40, max distance is diagonal from one corner to other, so sqrt(40^2 + 40^2)  == sqrt(1600 *2) == 40sqrt(2)
+	//56 and change
+	//Can set max arbitrarily to 57
+
+	float minDist = 57.f;
+
+	if (upperX >= g_terrain.GetWidth())
+	{
+		upperX = g_terrain.GetWidth() - 1;
+	}
+
+	 if(lowerX < 0)
+	{
+		lowerX = 0;
+	}
+
+	if (upperY >= g_terrain.GetWidth())
+	{
+		upperY = g_terrain.GetWidth() - 1;
+	}
+
+	 if(lowerY<0)
+	 {
+		 lowerY = 0;
+	 }
+
+
+	 do
+	 {
+		 for (int i = lowerX; i <= upperX; i++)
+		 {
+			 for (int j = lowerY; j <= lowerY; j++)
+			 {
+				 if (i > g_terrain.GetWidth() - 1)
+				 {
+					 i = g_terrain.GetWidth() - 1;
+				 }
+
+				 if (j > g_terrain.GetWidth() - 1)
+				 {
+					 j = g_terrain.GetWidth() - 1;
+				 }
+
+				 if (j < 0)
+				 {
+					 j = 0;
+				 }
+
+				 if(i<0)
+				 {
+					 i = 0;
+				 }
+
+				 if (sqrt((pow(row - i, 2) + pow(col - j, 2))) < minDist)
+				 {
+					 minDist = sqrt((pow(row - i, 2) + pow(col - j, 2)));
+					 foundMin = true;
+				 }
+
+			
+				
+
+
+			 }
+		 }
+
+
+		 if (foundMin)
+		 {
+			 return minDist;
+		 }
+
+		 else
+		 {
+			 ++upperX;
+			 ++upperY;
+			 --lowerX;
+			 --lowerY;
+
+		 }
+
+	 } while (upperX < g_terrain.GetWidth()-1 || upperY < g_terrain.GetWidth()-1 || lowerX >= 1 || lowerY >= 1);
 
 	return 0.0f;	//REPLACE THIS
 }
 
+bool Terrain::isValidNode(int r, int c)  //Helper function to test node validity--within 0 - mapSize-1 range
+{
+	return !(r < 0 || c < 0 || r >= g_terrain.GetWidth() || c >= g_terrain.GetWidth());
+}
+
+
 float Terrain::RearCoverValue( int row, int col )
 {
+	bool wallList[8];
+	int start = 0;
+	for(int i=row-1; i<=row+1;i++)
+	{
+		for (int j = col - 1; j <= col + 1; j++)
+		{
+			if (!(i == row &&j == col))
+			{
+				wallList[start] = (this->isValidNode(i, j) && g_terrain.IsWall(i, j));
+			}
+		}
+	}
+
+	//Order of list:   (-1,-1), (-1,0), (-1,+1), (0,-1), (0,+1), (+1,-1), (+1,0), (+1,+1)
+	start = 0;		//	diag.	car.	diag.	  car.	   car.    diag.   car.		diag.
+					// NW		N		NE		   W		E		SW		S		  SE
+	//
+	//
+
+	if ((wallList[0] && wallList[3] && wallList[4])||(wallList[0]&&wallList[3]&&wallList[6]) || (wallList[0] && wallList[4] && wallList[6]) || (wallList[3] || wallList[4] || wallList[6]))
+	{
+		return 1.f;
+	}
+
+	else
+	{
+		int walls[5] = { 0,0,0,0,0 };  //Array to store number of each wall type
+		//cardinal, diag, non-adj cardinal, adj cardinal, adj diag
+
+		if (wallList[0])
+		{
+			walls[1]++;
+
+		}
+
+		if (wallList[1])
+		{
+			walls[0]++;
+		}
+
+	}
+
+
 	//TODO: Implement this for the Terrain Analysis project.
 
 	//Note: A cardinal wall is a wall to the East, West, North, or South of (row, col).
 	//Note: The sides of the map are considered walls.
-	//Being surrounded by 0 cardinal and 0 diagonal walls -> return 0.0f.
+	//Being surrounded by 0 cardinal and 0 diagonal walls -> return 0.0f. 
 	//Being surrounded by 0 cardinal walls and 1 or more diagonal walls -> return 0.05f.
 	//Being surrounded by 1 cardinal wall and any number of diagonal walls -> return 0.10f.
 	//Being surrounded by 2 non-adjacent cardinal walls and less than 2 diagonal walls -> return 0.20f.
