@@ -404,15 +404,97 @@ float Terrain::RearCoverValue( int row, int col )
 		int walls[5] = { 0,0,0,0,0 };  //Array to store number of each wall type
 		//cardinal, diag, non-adj cardinal, adj cardinal, adj diag
 
+		//Cardinal walls
+		if (wallList[1])
+		{
+			walls[0]++;
+			//Check for adj cardinal wall  (-1,0)
+			//North wall, so check:  (-2,0), (-1,-1), and (-1, +1) -- last two I already have:  wallList[0] & wallList[2]
+			//IS card adj wall
+			if (wallList[0] || wallList[2] || (!this->isValidNode(row - 2, col)) || (g_terrain.IsWall(row - 2, col)))
+			{
+				walls[3]++;
+			}
+
+			else  //Not card adj wall
+			{
+				walls[2]++;
+			}
+		}
+
+		if (wallList[3])
+			{
+				walls[0]++;
+				//Check for adj cardinal wall (0,-1)
+				//West wall, so check:  (-1, -1), (+1, -1), (0, -2)    Already have first 2:  wallList[0] & wallList[5]
+
+				if (wallList[0] || wallList[5] || (!this->isValidNode(row, col - 2)) || g_terrain.IsWall(row, col - 2))
+				{
+					walls[3]++;
+				}
+
+				else
+				{
+					walls[2]++;
+				}
+			}
+
+		if (wallList[4])   //East wall  (0,+1)
+			{
+				walls[0]++;
+				//East wall so check:  (0,+2), (-1,+1), and (+1, +1)   Last 2 are:  wallList[7] & wallList[2]
+
+
+				if (wallList[7] || wallList[2] || (!this->isValidNode(row, col + 2)) || g_terrain.IsWall(row, col + 2))
+				{
+					walls[3]++;
+				}
+				else
+				{
+					walls[2]++;
+				}
+			}
+
+		if (wallList[6])  //South wall (+1,0)
+			{
+				walls[0]++;
+
+				//South wall so check:  (+2,0), (+1,-1), (+1,+1)
+				if (wallList[7] || wallList[5] || (!this->isValidNode(row + 2, col)) || g_terrain.IsWall(row + 2, col))
+				{
+					walls[3]++;
+				}
+
+				else
+				{
+					walls[2]++;
+				}
+			}
+
+		//Diag walls
+
 		if (wallList[0])
 		{
 			walls[1]++;
 
 		}
 
-		if (wallList[1])
+
+		if (wallList[2])
 		{
-			walls[0]++;
+			walls[1]++;
+		}
+
+		if (wallList[5])
+		{
+			walls[1]++;
+		}
+
+		if (wallList[7])
+		{
+			walls[1]++;
+		}
+
 		}
 
 	}
