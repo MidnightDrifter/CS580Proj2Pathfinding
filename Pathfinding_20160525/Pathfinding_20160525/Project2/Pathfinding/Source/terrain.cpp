@@ -268,6 +268,20 @@ void Terrain::IncTerrainAnalysis( void )
 	Analyze();
 }
 
+bool Terrain::isWallNode(int i, int j)
+{
+	if (this->isValidNode(i, j))
+	{
+		return (g_terrain.IsWall(i, j));
+	}
+
+	else
+	{
+		return true;
+	}
+}
+
+
 float Terrain::ClosestWall( int row, int col )
 {
 	//TODO: Helper function for the Terrain Analysis project (you'll likely need it).
@@ -401,8 +415,8 @@ float Terrain::RearCoverValue( int row, int col )
 
 	else
 	{
-		int walls[5] = { 0,0,0,0,0 };  //Array to store number of each wall type
-		//cardinal, diag, non-adj cardinal, adj cardinal, adj diag
+		int walls[6] = { 0,0,0,0,0,0 };  //Array to store number of each wall type
+		//cardinal, diag, non-adj cardinal, adj cardinal, adj diag, adj diag not between card walls
 
 		//Cardinal walls
 		if (wallList[1])
@@ -476,6 +490,24 @@ float Terrain::RearCoverValue( int row, int col )
 		if (wallList[0])
 		{
 			walls[1]++;
+			//NW wall, (-1,-1)
+			//check for adj
+			//check for cardinal walls next to it, so:  (0,-1), (-2,-1), (-1,0), and (-1,-2)-- have 2 already:  wallList[1] and wallList[3]
+			if (wallList[1] || wallList[3] || this->isWallNode(row-2, col-1) || this->isWallNode(row-1, col-2))  //IS adj diag wall
+			{
+				walls[4]++;
+
+				//check for not in-between cardinal walls--if 2+ cardinal walls, then it IS between cardinal walls--don't increment
+				if (!((wallList[1] && wallList[3]) || (wallList[1] && this->isWallNode(row-2, col-1)) ||(wallList[3]&&this->isWallNode(row-2, col-1))||(wallList[1]&&this->isWallNode(row-1, col-2)) || (wallList[3]&&this->isWallNode(row-1,col-2)) || (this->isWallNode(row-1, col-2) && this->isWallNode(row-2, col-1))))
+				{
+					
+					walls[5]++;
+				}
+
+
+			}
+
+
 
 		}
 
@@ -483,16 +515,56 @@ float Terrain::RearCoverValue( int row, int col )
 		if (wallList[2])
 		{
 			walls[1]++;
+			//NE wall, (-1, +1)
+			//check for cardinal walls next to it, so:  (0, +1), (-1, 0), (-2, +1), (-1, +2) --- already have 1st 2, wallList[4] and wallList[1]
+
+			if (wallList[4] || wallList[1] || this->isWallNode(row - 2, col + 1) || this->isWallNode(row - 1, col + 2))
+			{
+				walls[4]++;
+				if (!((wallList[4] && wallList[1]) || (wallList[4] && this->isWallNode(row - 2, col + 1)) || (wallList[1] && this->isWallNode(row - 2, col + 1)) || (wallList[4] && this->isWallNode(row - 1, col + 2)) || (wallList[1] && this->isWallNode(row - 1, col + 2)) || (this->isWallNode(row - 1, col + 2) && this->isWallNode(row - 2, col + 2))))
+				{
+					walls[5]++;
+				}
+			}
+
+
+
 		}
 
 		if (wallList[5])
 		{
 			walls[1]++;
+
+			//SW wall (+1, +1)
+			//check for cardinal walls next to it, so:  (0, +1), (+1, 0), (+1, +2), and (+2, +1) -- first two are wallList[4] and wallList[6]
+
+			if (wallList[4] || wallList[6] || this->isWallNode(row + 1, col + 2) || this->isWallNode(row + 2, col + 1))
+			{
+				walls[4]++;
+				if (!((wallList[4] && wallList[6]) || (wallList[4] && this->isWallNode(row+1, col+2)) || (wallList[6] && this->isWallNode(row+1, col+2)) ||(wallList[4] && this->isWallNode(row+2, col+1)) ||(wallList[6] && this->isWallNode(row+2, col+1)) || (this->isWallNode(row+1, col+2) && this->isWallNode(row+2, col+1)) ))
+				{
+					walls[5]++;
+				}
+			}
+
 		}
 
 		if (wallList[7])
 		{
+
 			walls[1]++;
+			//SE wall(+1, -1)
+			//check for cardinal walls next to it, so:  (0,-1), (+1, 0), (+2, -1), and (+1, -2):  first two are wallList[3] and wallList[6]
+			if (wallList[3] || wallList[6] || this->isWallNode(row + 2, col - 1) || this->isWallNode(row + 1, col - 2))
+			{
+				walls[4]++;
+				if (!((wallList[3] && wallList[6]) || (wallList[3] && this->isWallNode(row + 2, col - 1)) || (wallList[6] && this->isWallNode(row + 2, col - 1)) || (wallList[3] && this->isWallNode(row + 1, col - 2)) || (wallList[6] && this->isWallNode(row + 1, col - 2)) || (this->isWallNode(row + 2, col - 1) && this->isWallNode(row + 1, col - 2))))
+				{
+					walls[5]++;
+				}
+			
+			}
+			
 		}
 
 		}
