@@ -437,53 +437,53 @@ float Terrain::RearCoverValue( int row, int col )
 		}
 
 		if (wallList[3])
+		{
+			walls[0]++;
+			//Check for adj cardinal wall (0,-1)
+			//West wall, so check:  (-1, -1), (+1, -1), (0, -2)    Already have first 2:  wallList[0] & wallList[5]
+
+			if (wallList[0] || wallList[5] || (!this->isValidNode(row, col - 2)) || g_terrain.IsWall(row, col - 2))
 			{
-				walls[0]++;
-				//Check for adj cardinal wall (0,-1)
-				//West wall, so check:  (-1, -1), (+1, -1), (0, -2)    Already have first 2:  wallList[0] & wallList[5]
-
-				if (wallList[0] || wallList[5] || (!this->isValidNode(row, col - 2)) || g_terrain.IsWall(row, col - 2))
-				{
-					walls[3]++;
-				}
-
-				else
-				{
-					walls[2]++;
-				}
+				walls[3]++;
 			}
+
+			else
+			{
+				walls[2]++;
+			}
+		}
 
 		if (wallList[4])   //East wall  (0,+1)
+		{
+			walls[0]++;
+			//East wall so check:  (0,+2), (-1,+1), and (+1, +1)   Last 2 are:  wallList[7] & wallList[2]
+
+
+			if (wallList[7] || wallList[2] || (!this->isValidNode(row, col + 2)) || g_terrain.IsWall(row, col + 2))
 			{
-				walls[0]++;
-				//East wall so check:  (0,+2), (-1,+1), and (+1, +1)   Last 2 are:  wallList[7] & wallList[2]
-
-
-				if (wallList[7] || wallList[2] || (!this->isValidNode(row, col + 2)) || g_terrain.IsWall(row, col + 2))
-				{
-					walls[3]++;
-				}
-				else
-				{
-					walls[2]++;
-				}
+				walls[3]++;
 			}
+			else
+			{
+				walls[2]++;
+			}
+		}
 
 		if (wallList[6])  //South wall (+1,0)
+		{
+			walls[0]++;
+
+			//South wall so check:  (+2,0), (+1,-1), (+1,+1)
+			if (wallList[7] || wallList[5] || (!this->isValidNode(row + 2, col)) || g_terrain.IsWall(row + 2, col))
 			{
-				walls[0]++;
-
-				//South wall so check:  (+2,0), (+1,-1), (+1,+1)
-				if (wallList[7] || wallList[5] || (!this->isValidNode(row + 2, col)) || g_terrain.IsWall(row + 2, col))
-				{
-					walls[3]++;
-				}
-
-				else
-				{
-					walls[2]++;
-				}
+				walls[3]++;
 			}
+
+			else
+			{
+				walls[2]++;
+			}
+		}
 
 		//Diag walls
 
@@ -493,14 +493,14 @@ float Terrain::RearCoverValue( int row, int col )
 			//NW wall, (-1,-1)
 			//check for adj
 			//check for cardinal walls next to it, so:  (0,-1), (-2,-1), (-1,0), and (-1,-2)-- have 2 already:  wallList[1] and wallList[3]
-			if (wallList[1] || wallList[3] || this->isWallNode(row-2, col-1) || this->isWallNode(row-1, col-2))  //IS adj diag wall
+			if (wallList[1] || wallList[3] || this->isWallNode(row - 2, col - 1) || this->isWallNode(row - 1, col - 2))  //IS adj diag wall
 			{
 				walls[4]++;
 
 				//check for not in-between cardinal walls--if 2+ cardinal walls, then it IS between cardinal walls--don't increment
-				if (!((wallList[1] && wallList[3]) || (wallList[1] && this->isWallNode(row-2, col-1)) ||(wallList[3]&&this->isWallNode(row-2, col-1))||(wallList[1]&&this->isWallNode(row-1, col-2)) || (wallList[3]&&this->isWallNode(row-1,col-2)) || (this->isWallNode(row-1, col-2) && this->isWallNode(row-2, col-1))))
+				if (!((wallList[1] && wallList[3]) || (wallList[1] && this->isWallNode(row - 2, col - 1)) || (wallList[3] && this->isWallNode(row - 2, col - 1)) || (wallList[1] && this->isWallNode(row - 1, col - 2)) || (wallList[3] && this->isWallNode(row - 1, col - 2)) || (this->isWallNode(row - 1, col - 2) && this->isWallNode(row - 2, col - 1))))
 				{
-					
+
 					walls[5]++;
 				}
 
@@ -541,7 +541,7 @@ float Terrain::RearCoverValue( int row, int col )
 			if (wallList[4] || wallList[6] || this->isWallNode(row + 1, col + 2) || this->isWallNode(row + 2, col + 1))
 			{
 				walls[4]++;
-				if (!((wallList[4] && wallList[6]) || (wallList[4] && this->isWallNode(row+1, col+2)) || (wallList[6] && this->isWallNode(row+1, col+2)) ||(wallList[4] && this->isWallNode(row+2, col+1)) ||(wallList[6] && this->isWallNode(row+2, col+1)) || (this->isWallNode(row+1, col+2) && this->isWallNode(row+2, col+1)) ))
+				if (!((wallList[4] && wallList[6]) || (wallList[4] && this->isWallNode(row + 1, col + 2)) || (wallList[6] && this->isWallNode(row + 1, col + 2)) || (wallList[4] && this->isWallNode(row + 2, col + 1)) || (wallList[6] && this->isWallNode(row + 2, col + 1)) || (this->isWallNode(row + 1, col + 2) && this->isWallNode(row + 2, col + 1))))
 				{
 					walls[5]++;
 				}
@@ -562,35 +562,88 @@ float Terrain::RearCoverValue( int row, int col )
 				{
 					walls[5]++;
 				}
-			
+
 			}
-			
-		}
 
 		}
 
+
+
+
+
+		//cardinal, diag, non-adj cardinal, adj cardinal, adj diag, adj diag not between card walls
+
+		if (walls[5] >= 2)// && walls[3] >= 2)
+		{
+			if (walls[3] >= 2)
+			{
+				return 0.60f;
+			}
+			else if (walls[3] >= 1)
+			{
+				return 0.40f;
+			}
+
+			else
+			{
+				return 0.25f;
+			}
+		}
+
+		else if (walls[2] >= 2)
+		{
+			if (walls[2] >= 2)
+			{
+				return 0.25f;
+			}
+
+			else
+			{
+				return 0.20f;
+			}
+		}
+
+		if (walls[0] == 1 && walls[1] > 0)
+		{
+			return 0.10f;
+		}
+
+		else
+		{
+			if (walls[1] > 0)
+			{
+				return 0.05f;
+			}
+
+			else
+			{
+				return 0.0f;
+			}
+		}
+
+
+
+		//TODO: Implement this for the Terrain Analysis project.
+
+		//Note: A cardinal wall is a wall to the East, West, North, or South of (row, col).
+		//Note: The sides of the map are considered walls.
+		//Being surrounded by 0 cardinal and 0 diagonal walls -> return 0.0f. 
+		//Being surrounded by 0 cardinal walls and 1 or more diagonal walls -> return 0.05f.
+		//Being surrounded by 1 cardinal wall and any number of diagonal walls -> return 0.10f.
+		//Being surrounded by 2 non-adjacent cardinal walls and less than 2 diagonal walls -> return 0.20f.
+		//Being surrounded by 2 non-adjacent cardinal walls and 2 or more diagonal walls -> return 0.25f.
+		//Being surrounded by 2 adjacent cardinal walls and no adjacent diagonal walls (disregard between cardinal walls) -> return 0.25f.
+		//Being surrounded by 2 adjacent cardinal walls and 1 adjacent diagonal wall (not between cardinal walls) -> return 0.40f.
+		//Being surrounded by 2 adjacent cardinal walls and 2 adjacent diagonal walls (not between cardinal walls) -> return 0.60f.
+		//Being surrounded by 3 of more cardinal walls -> return 1.0f.
+
+
+		//WRITE YOUR CODE HERE
+
+
+
+		return 0.0f;	//REPLACE THIS
 	}
-
-
-	//TODO: Implement this for the Terrain Analysis project.
-
-	//Note: A cardinal wall is a wall to the East, West, North, or South of (row, col).
-	//Note: The sides of the map are considered walls.
-	//Being surrounded by 0 cardinal and 0 diagonal walls -> return 0.0f. 
-	//Being surrounded by 0 cardinal walls and 1 or more diagonal walls -> return 0.05f.
-	//Being surrounded by 1 cardinal wall and any number of diagonal walls -> return 0.10f.
-	//Being surrounded by 2 non-adjacent cardinal walls and less than 2 diagonal walls -> return 0.20f.
-	//Being surrounded by 2 non-adjacent cardinal walls and 2 or more diagonal walls -> return 0.25f.
-	//Being surrounded by 2 adjacent cardinal walls and no adjacent diagonal walls (disregard between cardinal walls) -> return 0.25f.
-	//Being surrounded by 2 adjacent cardinal walls and 1 adjacent diagonal wall (not between cardinal walls) -> return 0.40f.
-	//Being surrounded by 2 adjacent cardinal walls and 2 adjacent diagonal walls (not between cardinal walls) -> return 0.60f.
-	//Being surrounded by 3 of more cardinal walls -> return 1.0f.
-
-	
-	//WRITE YOUR CODE HERE
-
-
-	return 0.0f;	//REPLACE THIS
 }
 
 void Terrain::AnalyzeOpennessClosestWall( void )
@@ -601,6 +654,15 @@ void Terrain::AnalyzeOpennessClosestWall( void )
 	//the value 1/(d*d), where d is the distance to the closest wall in 
 	//row/column grid space.
 	//Edges of the map count as walls!
+
+	for(int i=0;i<g_terrain.GetWidth();i++)
+	{
+		for (int j = 0; j < g_terrain.GetWidth(); j++)
+		{
+			m_terrainInfluenceMap[i][j] = 1.f / powf(this->ClosestWall(i, j), 2);
+		}
+	}
+
 
 	//WRITE YOUR CODE HERE
 
@@ -671,6 +733,51 @@ void Terrain::AnalyzeVisibleToPlayer( void )
 
 	//WRITE YOUR CODE HERE
 
+
+	
+	for (int i = 0; i < g_terrain.GetWidth(); i++)
+	{
+		for (int j = 0; j < g_terrain.GetWidth(); j++)
+		{
+			//float valueToStore = 0.f;
+			int num1Neighbors = 0;
+
+			if (this->IsClearPath(m_rPlayer, m_cPlayer, i, j))
+			{
+				m_terrainInfluenceMap[i][j] = 1.f;
+			}
+
+			else
+			{
+				for (int x = i - 1; x <= i + 1; x++)
+				{
+					for (int y = j + 1; y <= j; y++)
+					{
+						if (this->isValidNode(x, y) && m_terrainInfluenceMap[x][y] == 1.f)
+						{
+							//m_terrain
+							num1Neighbors++;
+							x = i + 2;
+							y = j + 2;
+						}
+					}
+				}
+			}
+
+			if (num1Neighbors > 0)
+			{
+				m_terrainInfluenceMap[i][j] = 0.5f;
+			}
+
+			else
+			{
+				m_terrainInfluenceMap[i][j] = 0.f;
+			}
+		}
+
+	}
+
+	
 }
 
 void Terrain::AnalyzeSearch( void )
@@ -707,6 +814,9 @@ void Terrain::ClearTerrainAnalysis( void )
 
 bool Terrain::IsClearPath( int r0, int c0, int r1, int c1 )
 {
+
+
+
 	//TODO: Implement this for the Terrain Analysis project.
 
 	//Two grid squares (r0,c0) and (r1,c1) are visible to each other 
@@ -718,6 +828,35 @@ bool Terrain::IsClearPath( int r0, int c0, int r1, int c1 )
 
 
 	//WRITE YOUR CODE HERE
+
+
+
+
+#define EPSILON 0.001f
+	
+	for(int i=0;i<g_terrain.GetWidth();i++)
+	{
+		for (int j = 0; j < g_terrain.GetWidth(); j++)
+		{
+			if (g_terrain.IsWall(i, j))// && (this->LineIntersect(r0,c0, r1,c1,))
+			{
+				float topLeftX = i - 0.5f - EPSILON;
+				float topLeftY = j - 0.5f - EPSILON;
+				float topRightX = i + 0.5f+ EPSILON;
+				float topRightY = j - 0.5f - EPSILON;
+				float botLeftX = i -0.5f - EPSILON;
+				float botLeftY = j + 0.5f + EPSILON;
+				float botRightX = i +0.5f + EPSILON;
+				float botRightY = j + 0.5f + EPSILON;
+
+				if (this->LineIntersect(r0, c0, r1, c1, topLeftX, topLeftY, topRightX, topRightY) || this->LineIntersect(r0, c0, r1, c1, topLeftX, topLeftY, botLeftX, botLeftY) || this->LineIntersect(r0, c0, r1, c1, topRightX, topRightY, botRightX, botRightY) || this->LineIntersect(r0, c0, r1, c1, botLeftX, botLeftY, botRightX, botRightY))
+				{
+					return false;
+				}
+				
+			}
+		}
+	}
 
 
 	return true;	//REPLACE THIS
