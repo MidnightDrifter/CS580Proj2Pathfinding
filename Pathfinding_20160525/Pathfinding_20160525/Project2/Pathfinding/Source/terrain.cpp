@@ -282,7 +282,7 @@ bool Terrain::isWallNode(int i, int j)
 }
 
 
-float Terrain::ClosestWall( int row, int col )
+float Terrain::ClosestWall( int row, int col )   //DONE- test it
 {
 	//TODO: Helper function for the Terrain Analysis project (you'll likely need it).
 
@@ -646,7 +646,7 @@ float Terrain::RearCoverValue( int row, int col )
 	}
 }
 
-void Terrain::AnalyzeOpennessClosestWall( void )
+void Terrain::AnalyzeOpennessClosestWall( void )   //DONE- test it
 {
 	//TODO: Implement this for the Terrain Analysis project.
 
@@ -668,7 +668,7 @@ void Terrain::AnalyzeOpennessClosestWall( void )
 
 }
 
-void Terrain::AnalyzeOpennessRearCover( void )
+void Terrain::AnalyzeOpennessRearCover( void )  
 {
 	//Note: You don't need to change this function, but you do need to
 	//      write the RearCoverValue function.
@@ -705,19 +705,28 @@ void Terrain::AnalyzeVisibility( void )
 
 }
 
-void Terrain::AnalyzeRearCoverWithHighVisibility( void )
+void Terrain::AnalyzeRearCoverWithHighVisibility( void )   //DONE- test it
 {
 	//TODO: Implement this for the Terrain Analysis project.
 
 	//Multiply the results from the AnalyzeOpennessRearCover function
 	//and the AnalyzeVisibility function.
+	
+	this->AnalyzeVisibility();
 
+	for(int i=0;i<g_terrain.GetWidth();i++)
+	{
+		for (int j = 0; j < g_terrain.GetWidth(); j++)
+		{
+			m_terrainInfluenceMap[i][j] *= this->RearCoverValue(i, j);
+		}
+	}
 
 	//WRITE YOUR CODE HERE
 
 }
 
-void Terrain::AnalyzeVisibleToPlayer( void )
+void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 {
 	//TODO: Implement this for the Terrain Analysis project.
 
@@ -732,7 +741,7 @@ void Terrain::AnalyzeVisibleToPlayer( void )
 
 
 	//WRITE YOUR CODE HERE
-
+	//DONE
 
 	
 	for (int i = 0; i < g_terrain.GetWidth(); i++)
@@ -812,7 +821,7 @@ void Terrain::ClearTerrainAnalysis( void )
 	}
 }
 
-bool Terrain::IsClearPath( int r0, int c0, int r1, int c1 )
+bool Terrain::IsClearPath( int r0, int c0, int r1, int c1 )  //DONE- test it
 {
 
 
@@ -828,6 +837,7 @@ bool Terrain::IsClearPath( int r0, int c0, int r1, int c1 )
 
 
 	//WRITE YOUR CODE HERE
+	
 
 
 
