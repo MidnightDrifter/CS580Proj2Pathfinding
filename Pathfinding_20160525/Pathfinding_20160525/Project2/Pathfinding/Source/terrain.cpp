@@ -836,14 +836,26 @@ void Terrain::AnalyzeSearch( void )
 	//their centerpoints doesn't intersect the four boundary lines
 	//of every walled grid square. Put this code in IsClearPath().
 
+
+
+	//WRITE YOUR CODE HERE
+
+
 	//DOT PRODUCT THING:  Dot product of vecA & vecB = magnitude(A) * magnitude(B) * cos(angle between A&B)
 	//angle will be ~180
 	//cos(180) = -1
 	//Tiny moves on a 2D plane, playerDir = (x,z), ignore y
 	//Therefore, the vectors to use for 180deg vision are the two vectors perpindicular to (x,z) ->   (-z,x) and (z,-x)
+	
+
+	int leftRayX = -1 * m_dirPlayer.z;
+	int leftRayY = m_dirPlayer.x;
+	int rightRayX = m_dirPlayer.z;
+	int rightRayY = -1 * m_dirPlayer.x;
 
 
-	//WRITE YOUR CODE HERE
+
+
 
 }
 
