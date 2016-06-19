@@ -387,7 +387,7 @@ bool Terrain::isValidNode(int r, int c)  //Helper function to test node validity
 }
 
 
-float Terrain::RearCoverValue( int row, int col )
+float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 {
 	bool wallList[8];
 	int start = 0;
@@ -688,7 +688,7 @@ void Terrain::AnalyzeOpennessRearCover( void )
 	}
 }
 
-void Terrain::AnalyzeVisibility( void )
+void Terrain::AnalyzeVisibility( void )  //DONE- test it
 {
 	//TODO: Implement this for the Terrain Analysis project.
 
@@ -702,6 +702,37 @@ void Terrain::AnalyzeVisibility( void )
 
 
 	//WRITE YOUR CODE HERE
+
+
+	for(int i=0; i<g_terrain.GetWidth();i++)
+	{
+		for (int j = 0; j < g_terrain.GetWidth(); j++)
+		{
+
+			int visibleSquares = 0;
+			if (!g_terrain.IsWall(i, j))
+			{
+				for (int x = 0; x < g_terrain.GetWidth(); x++)
+				{
+					for (int y = 0; y < g_terrain.GetWidth(); y++)
+					{
+
+						if (this->IsClearPath(i, j, x, y))
+						{
+							visibleSquares++;
+						}
+
+					}
+				}
+			}
+
+			m_terrainInfluenceMap[i][j] = fmaxf(visibleSquares / 160.f, 1.f);
+			
+
+
+		}
+	}
+
 
 }
 
@@ -741,7 +772,7 @@ void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 
 
 	//WRITE YOUR CODE HERE
-	//DONE
+	
 
 	
 	for (int i = 0; i < g_terrain.GetWidth(); i++)
@@ -804,6 +835,12 @@ void Terrain::AnalyzeSearch( void )
 	//Two grid squares are visible to each other if a line between 
 	//their centerpoints doesn't intersect the four boundary lines
 	//of every walled grid square. Put this code in IsClearPath().
+
+	//DOT PRODUCT THING:  Dot product of vecA & vecB = magnitude(A) * magnitude(B) * cos(angle between A&B)
+	//angle will be ~180
+	//cos(180) = -1
+	//Tiny moves on a 2D plane, playerDir = (x,z), ignore y
+	//Therefore, the vectors to use for 180deg vision are the two vectors perpindicular to (x,z) ->   (-z,x) and (z,-x)
 
 
 	//WRITE YOUR CODE HERE
