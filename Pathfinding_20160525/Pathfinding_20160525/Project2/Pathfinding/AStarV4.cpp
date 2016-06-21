@@ -68,6 +68,11 @@ bool AStarV4::isValidNode(int x, int y)
 	return !(x < 0 || y < 0 || x >= g_terrain.GetWidth() || y >= g_terrain.GetWidth());
 }
 
+int AStarV4::getSizeOfOpenList() const
+{
+	return sizeOfOpenList;
+}
+
 void AStarV4::setGoalRow(int x) { goalRow = x; }
 void AStarV4::setGoalCol(int x) { goalCol = x; }
 void AStarV4::setGoal(int x, int y) { goalRow = x; goalCol = y;}
@@ -79,9 +84,9 @@ void AStarV4::setStart(int x, int y) { startRow = x; startCol = y; }
 
 void AStarV4::clearMap()
 {
-	for(int i=0; i<SIZE_OF_MAP;i++)
+	for(int i=0; i<g_terrain.GetWidth();i++)
 	{
-		for (int j = 0; j < SIZE_OF_MAP; j++)
+		for (int j = 0; j < g_terrain.GetWidth(); j++)
 		{
 			map[i][j].clear();
 			
@@ -160,21 +165,37 @@ AStarNodeV3 AStarV4::getMapNode(int i, int j)
 
 bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY)
 {
+//	bool isFirstPass = false;
 	if (newRequest)
 	{
+		this->clear();
 		g_terrain.ResetColors();
 		this->setGoal(goalX, goalY);
 		this->setStart(startX, startY);
 		this->map[startX][startY].setCost(0.f);
 		this->map[startX][startY].setTotalCost(0.f);
 		this->pushOpen(map[startX][startY]);
+	//	isFirstPass = true;
+		
+
+	/*	if (((goalRow == startRow + 1) || (goalRow == startRow - 1) || goalRow == startRow) && (goalCol == startCol + 1 || goalCol == startCol - 1 || goalCol == startCol) && !(goalRow == startRow && goalCol == startCol))
+		{
+			this->map[goalRow][goalCol].setParentX(startRow);
+			this->map[goalRow][goalCol].setParentY(startCol);
+			return true;
+		}*/
 
 	}
+
+
+	//if(((goalRow == startRow+1) ||(goalRow ==startRow-1) || goalRow==startRow ) && (goalCol == startCol+1 || goalCol==startCol-1 || goalCol==startCol) )
 
 
 
 	do
 	{
+		
+
 		AStarNodeV3 n = this->popOpenMin();
 		int currX = n.getX();
 		int currY = n.getY();
@@ -229,7 +250,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 					}
 
 
-					if (!map[i][j].getOpen() && !map[i][j].getClosed())  //Not on either list, just push onto OL
+					if (!map[i][j].getOpen() && !map[i][j].getClosed() && gc < std::numeric_limits<float>::max())  //Not on either list, just push onto OL
 					{
 						map[i][j].setOpen(true);
 						map[i][j].setParentX(currX);
@@ -268,12 +289,15 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 		}
 		map[currX][currY].setClosed(true);
 		g_terrain.SetColor(currX, currY, DEBUG_COLOR_RED);
+
 		if(isSingleStep)
 		{
 			break;
 		}
 
 	} while (sizeOfOpenList > 0);
+
+
 
 	return false;
 

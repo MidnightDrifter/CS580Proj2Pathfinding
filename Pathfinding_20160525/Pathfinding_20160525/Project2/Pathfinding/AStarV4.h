@@ -20,6 +20,8 @@ public:
 	bool findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY);
 	AStarNodeV3 getMapNode(int i, int j);
 	
+	int getSizeOfOpenList() const;
+
 	void setGoalRow(int x);
 	void setGoalCol(int x);
 	void setGoal(int x, int y);

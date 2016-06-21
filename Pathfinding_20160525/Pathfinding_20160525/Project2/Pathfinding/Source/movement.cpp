@@ -176,23 +176,36 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 	g_terrain.GetRowColumn(&cur, &curR, &curC);
 
 	bool useAStar = true;
-if(useAStar)
-{
-	AStarV4& myAStarV4 = this->editAStarV4();
-
-
-	if (newRequest)
+	if (useAStar)
 	{
-		m_waypointList.clear();
-	}
+		AStarV4& myAStarV4 = this->editAStarV4();
 
-	bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c);
 
-	if (pathFound)
+		if (newRequest)
+		{
+			m_waypointList.clear();
+		}
+
+		bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c);
+
+		if (!pathFound && !this->GetSingleStep())
+		{
+			//Isn't single step and no path is found, no path exists
+			return false;
+		}
+
+		else if (!pathFound && myAStarV4.getSizeOfOpenList() == 0)
+		{
+			return false;
+		}
+
+	else if (pathFound)
 	{
 		AStarNodeV3 goal = myAStarV4.getMapNode(myAStarV4.getGoalRow(), myAStarV4.getGoalCol());
+		
 
-		while (!(goal.getParentX() == myAStarV4.getStartRow() && goal.getParentY() == myAStarV4.getStartCol()))
+
+		while (!(goal.getX() == myAStarV4.getStartRow() && goal.getY() == myAStarV4.getStartCol()))
 		{
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal.getX(), goal.getY())));
 			goal= myAStarV4.getMapNode(goal.getParentX(),goal.getParentY());
