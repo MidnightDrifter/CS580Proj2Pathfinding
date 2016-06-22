@@ -43,7 +43,7 @@ public:
 	D3DXVECTOR3 GetCoordinates( int r, int c );
 	bool GetRowColumn( D3DXVECTOR3* pos, int* r, int* c );
 	inline bool IsWall( int r, int c )		{ return( m_terrain[r][c] == TILE_WALL ); }
-
+	   
 	bool IsClearPath( int r0, int c0, int r1, int c1 );
 
 	void SetColor( int r, int c, DebugDrawingColor color );
