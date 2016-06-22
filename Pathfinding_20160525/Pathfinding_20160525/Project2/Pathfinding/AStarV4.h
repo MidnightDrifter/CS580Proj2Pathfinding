@@ -1,6 +1,7 @@
 #pragma once
 #include "AStarNodeV3.h"
 #include <math.h>
+#include <list>
 #define SIZE_OF_MAP 40
 #define CAPACITY_OF_OPEN_LIST 256
 class AStarV4
@@ -21,6 +22,7 @@ public:
 	AStarNodeV3 getMapNode(int i, int j);
 	
 	int getSizeOfOpenList() const;
+	std::list<AStarNodeV3>& getRubberbandList();
 
 	void setGoalRow(int x);
 	void setGoalCol(int x);
@@ -36,6 +38,8 @@ public:
 	AStarNodeV3 popOpenMin();
 	void removeNodeOpen(int x, int y);
 
+	void rubberband();
+
 
 
 
@@ -49,7 +53,7 @@ private:
 	int sizeOfOpenList;
 	AStarNodeV3 map[SIZE_OF_MAP][SIZE_OF_MAP];
 	AStarNodeV3 openList[CAPACITY_OF_OPEN_LIST];
-
+	std::list<AStarNodeV3> rubberbandList;
 	static float SQRT2;
 
 };

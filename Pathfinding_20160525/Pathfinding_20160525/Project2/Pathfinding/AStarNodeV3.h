@@ -31,6 +31,8 @@ public:
 	void clear();
 	void del();  //same as clear, but gets rid of (x,y) coords as well
 
+	bool operator==(const AStarNodeV3& r);
+
 
 private:
 	int myX;

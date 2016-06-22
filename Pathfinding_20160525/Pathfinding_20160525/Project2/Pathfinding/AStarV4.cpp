@@ -8,7 +8,7 @@
 
  float AStarV4::SQRT2 = sqrtf(2);
 
-AStarV4::AStarV4() : goalRow(-1), goalCol(-1), startRow(-1),startCol(-1), sizeOfOpenList(0), map(), openList()
+AStarV4::AStarV4() : goalRow(-1), goalCol(-1), startRow(-1),startCol(-1), sizeOfOpenList(0), map(), openList(), rubberbandList()
 {
 	for(int i=0; i<g_terrain.GetWidth(); i++)
 	{
@@ -30,7 +30,7 @@ int AStarV4::getGoalCol() const { return goalCol; }
 int AStarV4::getStartRow() const { return startRow; }
 int AStarV4::getStartCol() const { return startCol; }
 int AStarV4::getOpenListSize() const { return sizeOfOpenList; }
-
+std::list<AStarNodeV3>& AStarV4::getRubberbandList() { return rubberbandList; }
 float AStarV4::calculateHeuristicCost(int h, float weight, int nodeX, int nodeY, int goalX, int goalY) const
 {
 	if (nodeX == goalX && nodeY == goalY)
@@ -111,6 +111,11 @@ void AStarV4::clear()
 	this->setGoalRow(-1);
 	this->setGoalCol(-1);
 	this->setStart(-1, -1);
+
+	
+		this->rubberbandList.clear();
+	
+
 }
 
 void AStarV4::pushOpen(AStarNodeV3 n)
@@ -303,6 +308,97 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 }
 
+
+
+void AStarV4::rubberband()
+{
+	AStarNodeV3 goal = map[goalRow][goalCol];
+	while (!(goal.getX() == startRow && goal.getY() == startCol))
+	{
+		rubberbandList.push_front(goal);
+		goal = this->getMapNode(goal.getParentX(), goal.getParentY());
+	}
+	rubberbandList.push_front(map[startRow][startCol]);
+
+	if (rubberbandList.size() >= 3)
+	{
+		std::list<AStarNodeV3>::iterator it = rubberbandList.begin();
+		std::list<AStarNodeV3>::iterator stop = rubberbandList.end();
+		--stop;
+		--stop;
+		AStarNodeV3 a, b, c;
+		bool startOver = true;
+
+		do
+		{
+			if (startOver)
+			{
+				a = *it;
+				++it;
+				//m_waypointList.pop_front();
+				if (it != rubberbandList.end())
+				{
+					b = *it;
+				}
+				++it;
+				//m_waypointList.pop_front();
+				if (it != rubberbandList.end())
+				{
+					c = *it;
+				}
+				startOver = false;
+			}
+
+			bool bb = true;
+			for (int i = min(a.getX(), c.getX()); i <= (a.getX() > c.getX() ? a.getX() : c.getX()); ++i)
+			{
+				for (int j = min(a.getY(), c.getY()); j <= (a.getY() > c.getY() ? a.getY() : c.getY()); j++)
+				{
+					if (g_terrain.IsWall(i, j))
+					{
+						bb = false;
+						break;
+					}
+				}
+			}
+
+			if (bb)
+			{
+				//	m_waypointList.push_front(c);
+				//	m_waypointList.push_back(a);
+				rubberbandList.remove(b);
+				it = rubberbandList.begin();
+				startOver = true;
+			}
+			else
+			{
+				a = b;
+				b = c;
+				++it;
+				if (it != rubberbandList.end())
+				{
+					c = *it;
+				}
+			}
+
+
+
+
+
+
+		} while (it != rubberbandList.end());//  && it != stop);
+
+		
+
+	}
+
+	else
+	{
+		//return false;
+	}
+
+
+}
 
 
 

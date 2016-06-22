@@ -12,6 +12,7 @@ AStarNodeV3::AStarNodeV3(int x, int y, bool o, bool c) : myX(x), myY(y), parentX
 AStarNodeV3::AStarNodeV3(int x, int y, bool o, bool c, float co, float tc) : myX(x), myY(y), parentX(-1), parentY(-1), open(o), closed(c), cost(co), totalCost(tc) {}
 AStarNodeV3::AStarNodeV3(const AStarNodeV3& rhs) :myX(rhs.getX()), myY(rhs.getY()), parentX(rhs.getParentX()), parentY(rhs.getParentY()), open(rhs.getOpen()), closed(rhs.getClosed()), cost(rhs.getCost()), totalCost(rhs.getTotalCost()) {}
 
+bool AStarNodeV3::operator==(const AStarNodeV3& r) { return (this->getX() == r.getX() && this->getY() == r.getY()); }
 
 const AStarNodeV3& AStarNodeV3::operator=(const AStarNodeV3& r)
 {

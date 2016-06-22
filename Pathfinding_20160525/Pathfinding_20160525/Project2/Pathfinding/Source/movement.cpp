@@ -167,9 +167,9 @@ bool Movement::ComputePathWithTiming( int r, int c, bool newRequest )
 	return foundPath;
 }
 
-bool Movement::ComputePath( int r, int c, bool newRequest )
+bool Movement::ComputePath(int r, int c, bool newRequest)
 {
-	m_goal = g_terrain.GetCoordinates( r, c );
+	m_goal = g_terrain.GetCoordinates(r, c);
 	m_movementMode = MOVEMENT_WAYPOINT_LIST;
 
 	int curR, curC;
@@ -186,7 +186,7 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 				if (g_terrain.IsWall(i, j))
 				{
 					straightLineExists = false;
-					j = g_terrain.GetWidth()+1;
+					j = g_terrain.GetWidth() + 1;
 					i = j;
 				}
 			}
@@ -230,136 +230,113 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 			return false;
 		}
 
-	else if (pathFound)
-	{
-		AStarNodeV3 goal = myAStarV4.getMapNode(myAStarV4.getGoalRow(), myAStarV4.getGoalCol());
-		
-
-
-		while (!(goal.getX() == myAStarV4.getStartRow() && goal.getY() == myAStarV4.getStartCol()))
+		else if (pathFound)
 		{
-			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal.getX(), goal.getY())));
-			goal= myAStarV4.getMapNode(goal.getParentX(),goal.getParentY());
-		}
-		m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(myAStarV4.getStartRow(), myAStarV4.getStartCol())));
-
-		myAStarV4.clear();
-		//myAStarV4.clearMap();
-		//myAStarV4.clearOpenList();
-		//m_AStarV3.clearMap();
-		//m_AStarV3.clearOpenList();
-
-		if (this->GetSmoothPath() && this->GetRubberbandPath()  && m_waypointList.size() >=3)
-		{
+			AStarNodeV3 goal = myAStarV4.getMapNode(myAStarV4.getGoalRow(), myAStarV4.getGoalCol());
 
 
+			if (this->GetRubberbandPath())
+			{
+				myAStarV4.rubberband();
+				std::list<AStarNodeV3>::iterator st = myAStarV4.getRubberbandList().begin();
 
-			//Do rubberbanding on A* path
-		
-				//std::list<D3DXVECTOR3>* rubberbandList = this->editRubberbandList();
-				//Want to break 2 elements from the last element, so
+				while (st != myAStarV4.getRubberbandList().end())
+				{
+					m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates((*st).getX(), (*st).getY())));
+					++st;
 
-				//End now points to the element we want to stop at
+				}
+
+			}
+
+			else {
+				while (!(goal.getX() == myAStarV4.getStartRow() && goal.getY() == myAStarV4.getStartCol()))
+				{
+					m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal.getX(), goal.getY())));
+					goal = myAStarV4.getMapNode(goal.getParentX(), goal.getParentY());
+				}
 
 
-				std::list<D3DXVECTOR3>::iterator it1 = m_waypointList.begin();
-				D3DXVECTOR3 a, b, c;
-				bool startOver = true;
+				m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(myAStarV4.getStartRow(), myAStarV4.getStartCol())));
+			
+			}
+			myAStarV4.clear();
+			//myAStarV4.clearMap();
+			//myAStarV4.clearOpenList();
+			//m_AStarV3.clearMap();
+			//m_AStarV3.clearOpenList();
+
+			if (this->GetSmoothPath() && this->GetRubberbandPath() && m_waypointList.size() >= 3)
+			{
+
+
+
+
+				std::list<D3DXVECTOR3>::iterator first = m_waypointList.begin();
+				std::list<D3DXVECTOR3>::iterator second = m_waypointList.begin();
+				second++;
+				std::list<D3DXVECTOR3>::iterator end = m_waypointList.end();
+				--end;
 
 				do
 				{
-					if (startOver)
+					if (sqrtf(pow(((*first).x - (*second).x), 2) + pow(((*first).z - (*second).z), 2)) > 1.5f)
 					{
-						D3DXVECTOR3 a = *it1;
-						++it1;
-						//m_waypointList.pop_front();
-						D3DXVECTOR3 b = *it1;
-						++it1;
-						//m_waypointList.pop_front();
-						D3DXVECTOR3 c = *it1;
-						startOver = false;
+						m_waypointList.insert(second, D3DXVECTOR3(((*first).x + (*second).x) / 2.f, 0.f, ((*first).z + (*second).z) / 2.f));
+						--second;
 					}
 
-					bool bb = true;
-					for (int i = min(a.x, c.x); i <= max(a.x, a.y); ++i)
-					{
-						for (int j = min(a.z, c.z); j <= max(a.z, c.z); j++)
-						{
-							if (g_terrain.IsWall(i, j))
-							{
-								bb = false;
-								break;
-							}
-						}
-					}
-
-					if (bb)
-					{
-						//	m_waypointList.push_front(c);
-						//	m_waypointList.push_back(a);
-						m_waypointList.remove(b);
-						it1 = m_waypointList.begin();
-						startOver = true;
-					}
 					else
 					{
-						a = b;
-						b = c;
-						++it1;
-						c = *it1;
+						++first;
+						++second;
 					}
+				} while (second != end);
 
 
 
+				//std::list<D3DXVECTOR3>* smoothingList = this->editSplineNodesList();
+				//D3DXVECTOR3* first = this->editFirstTempSmoothingVector();
+				//D3DXVECTOR3* second = this->editSecondTempSmoothingVector();
 
+				//if (m_waypointList.size() >= 3)
+				//{
+				//	*first = m_waypointList.front();
+				//	m_waypointList.pop_front();
+				//	*second = m_waypointList.front();
+				//	m_waypointList.pop_front();
 
+				//	do {
+				//		if (sqrtf(pow((first->x - second->x), 2) + pow((first->y - second->y), 2)) > 1.5f)
+				//		{
+				//			m_waypointList.push_front(*second);
+				//			//m_waypointList.push_front(D3DXVECTOR3((first->x + second->x) / 2.f, (first->y + second->y) / 2.f, (first->z + second->z) / 2.f));
+				//			//*second = m_waypointList.front();
+				//			(second->x) = ((first->x + second->x) / 2.f);
+				//			(second->y) = ((first->y + second->y) / 2.f);
+				//			(second->z) = ((first->z + second->z) / 2.f);
 
-				} while (it1 != m_waypointList.end() && m_waypointList.size()>=3);
+				//		}
 
-				
+				//		else
+				//		{
+				//			smoothingList->push_back(*first);
+				//			smoothingList->push_back(*second);
+				//			*first = *second;
+				//			*second = m_waypointList.front();
+				//			m_waypointList.pop_front();
+				//		}
 
+				//	} while (m_waypointList.size() >= 1);
 
-				std::list<D3DXVECTOR3>* smoothingList = this->editSplineNodesList();
-				D3DXVECTOR3* first = this->editFirstTempSmoothingVector();
-				D3DXVECTOR3* second = this->editSecondTempSmoothingVector();
+				//	m_waypointList.merge(*smoothingList);
 
-				if (m_waypointList.size() >= 3)
-				{
-					*first = m_waypointList.front();
-					m_waypointList.pop_front();
-					*second = m_waypointList.front();
-					m_waypointList.pop_front();
+				//	smoothingList->erase(smoothingList->begin(), smoothingList->end());
 
-					do {
-						if (sqrtf(pow((first->x - second->x), 2) + pow((first->y - second->y), 2)) > 1.5f)
-						{
-							m_waypointList.push_front(*second);
-							//m_waypointList.push_front(D3DXVECTOR3((first->x + second->x) / 2.f, (first->y + second->y) / 2.f, (first->z + second->z) / 2.f));
-							//*second = m_waypointList.front();
-							(second->x) = ((first->x + second->x) / 2.f);
-							(second->y) = ((first->y + second->y) / 2.f);
-							(second->z) = ((first->z + second->z) / 2.f);
+				if(m_waypointList.size() <3)
+				{ }
 
-						}
-
-						else
-						{
-							smoothingList->push_back(*first);
-							smoothingList->push_back(*second);
-							*first = *second;
-							*second = m_waypointList.front();
-							m_waypointList.pop_front();
-						}
-
-					} while (m_waypointList.size() >= 1);
-
-					m_waypointList.merge(*smoothingList);
-
-					smoothingList->erase(smoothingList->begin(), smoothingList->end());
-				}
-			
-
-				if (m_waypointList.size() == 3)
+				else if (m_waypointList.size() == 3)
 				{
 					D3DXVECTOR3* temp = this->getTempVector();
 					std::vector<D3DXVECTOR3>* splineVector = this->editSplineNodesVector();
@@ -394,259 +371,190 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 						}
 					}
 
+
+				}
+
+				else {
+					m_waypointList.begin();
+					int waypointListSize = m_waypointList.size();
+					D3DXVECTOR3* temp = this->getTempVector();
+					//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
+					std::vector< D3DXVECTOR3>* splineVector = this->editSplineNodesVector();
+					//splineList->resize()
+					splineVector->resize(1 + (4 * (waypointListSize - 1)));
+					int k = 0;
+					for (int j = 0; j < waypointListSize - 1; j += 1)
+					{
+						splineVector->at(k) = m_waypointList.front();
+						m_waypointList.pop_front();
+						k += 4;
+					}
+					splineVector->at((4 * (waypointListSize - 1))) = m_waypointList.front();
+					m_waypointList.pop_front();
+
+					int splineVectorSize = splineVector->size();
+
+					for (int i = 0; i < splineVectorSize - 4; i += 4)
+					{
+						if (i == 0)
+						{
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
+							splineVector->at(i + 1) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.5f);
+							splineVector->at(i + 2) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
+							splineVector->at(i + 3) = *temp;
+						}
+
+						else if (i == (splineVector->size() - 5))
+						{
+
+							D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.25f);
+							splineVector->at(splineVectorSize - 4) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.5f);
+							splineVector->at(splineVectorSize - 3) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.75f);
+							splineVector->at(splineVectorSize - 2) = *temp;
+
+						}
+						else
+						{
+
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
+							splineVector->at(i + 1) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.5f);
+							splineVector->at(i + 2) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
+							splineVector->at(i + 3) = *temp;
+						}
+
+					}
+
 					for (auto i = splineVector->begin(); i != splineVector->end(); i++)
 					{
 						m_waypointList.push_back(*(i));
 					}
 
+
 					splineVector->erase(splineVector->begin(), splineVector->end());
+
 				}
 
-				else{
-				std::list<D3DXVECTOR3>::iterator it = m_waypointList.begin();
-				int waypointListSize = m_waypointList.size();
-				D3DXVECTOR3* temp = this->getTempVector();
-				//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
-				std::vector<D3DXVECTOR3>* splineVector = this->editSplineNodesVector();
-				//splineList->resize()
-				splineVector->resize(1 + (4 * waypointListSize));
-				int k = 0;
-				for (int j = 0; j < waypointListSize; j += 1)
+			}
+
+
+			else if (this->GetSmoothPath())
+			{
+				if (m_waypointList.size() < 3)
 				{
-					splineVector->at(k) = m_waypointList.front();
+					//do nothing
+				}
+
+				else if (m_waypointList.size() == 3)
+				{
+					D3DXVECTOR3* temp = this->getTempVector();
+					std::vector<D3DXVECTOR3>* splineVector = this->editSplineNodesVector();
+					splineVector->resize(11);
+					splineVector->at(0) = m_waypointList.front();
 					m_waypointList.pop_front();
-					k += 4;
-				}
-				int splineVectorSize = splineVector->size();
-
-				for (int i = 0; i < splineVectorSize; i += 4)
-				{
-					if (i == 0)
-					{
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
-						splineVector->at(i + 1) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.5f);
-						splineVector->at(i + 2) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
-						splineVector->at(i + 3) = *temp;
-					}
-
-					else if (i == (splineVector->size() - 9))
-					{
-
-						D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.25f);
-						splineVector->at(splineVectorSize - 4) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.5f);
-						splineVector->at(splineVectorSize - 3) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.75f);
-						splineVector->at(splineVectorSize - 2) = *temp;
-
-					}
-					else
-					{
-
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
-						splineVector->at(i + 1) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.5f);
-						splineVector->at(i + 2) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
-						splineVector->at(i + 3) = *temp;
-					}
-
-				}
-
-
-				for (auto i = splineVector->begin(); i != splineVector->end(); i++)
-				{
-					m_waypointList.push_back(*(i));
-				}
-
-				splineVector->erase(splineVector->begin(), splineVector->end());
-				}
-			
-		}
-
-
-		else if (this->GetSmoothPath())
-		{
-			if (m_waypointList.size() < 3)
-			{
-				//do nothing
-			}
-
-			else if (m_waypointList.size() == 3)
-			{
-				D3DXVECTOR3* temp = this->getTempVector();
-				std::vector<D3DXVECTOR3>* splineVector = this->editSplineNodesVector();
-				splineVector->resize(11);
-				splineVector->at(0) = m_waypointList.front();
-				m_waypointList.pop_front();
-				splineVector->at(5) = m_waypointList.front();
-				m_waypointList.pop_front();
-				splineVector->at(10) = m_waypointList.front();
-				m_waypointList.pop_front();
-
-				for (int i = 0; i <5; i += 4)
-				{
-					if (i == 0)
-					{
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
-						splineVector->at(i + 1) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.55f);
-						splineVector->at(i + 2) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
-						splineVector->at(i + 3) = *temp;
-					}
-
-					else
-					{
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i-4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 4)), 0.25f);
-						splineVector->at(i + 1) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 4)), 0.5f);
-						splineVector->at(i + 2) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 4)), 0.75f);
-						splineVector->at(i + 3) = *temp;
-					}
-				}
-
-
-			}
-
-			else {
-				m_waypointList.begin();
-				int waypointListSize = m_waypointList.size();
-				D3DXVECTOR3* temp = this->getTempVector();
-				//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
-				std::vector< D3DXVECTOR3>* splineVector = this->editSplineNodesVector();
-				//splineList->resize()
-				splineVector->resize(1 + (4 * (waypointListSize - 1)));
-				int k = 0;
-				for (int j = 0; j < waypointListSize - 1; j += 1)
-				{
-					splineVector->at(k) = m_waypointList.front();
+					splineVector->at(5) = m_waypointList.front();
 					m_waypointList.pop_front();
-					k += 4;
-				}
-				splineVector->at((4 * (waypointListSize - 1))) = m_waypointList.front();
-				m_waypointList.pop_front();
+					splineVector->at(10) = m_waypointList.front();
+					m_waypointList.pop_front();
 
-				int splineVectorSize = splineVector->size();
-
-				for (int i = 0; i < splineVectorSize - 4; i += 4)
-				{
-					if (i == 0)
+					for (int i = 0; i < 5; i += 4)
 					{
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
-						splineVector->at(i + 1) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.5f);
-						splineVector->at(i + 2) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
-						splineVector->at(i + 3) = *temp;
+						if (i == 0)
+						{
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
+							splineVector->at(i + 1) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.55f);
+							splineVector->at(i + 2) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
+							splineVector->at(i + 3) = *temp;
+						}
+
+						else
+						{
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 4)), 0.25f);
+							splineVector->at(i + 1) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 4)), 0.5f);
+							splineVector->at(i + 2) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 4)), 0.75f);
+							splineVector->at(i + 3) = *temp;
+						}
 					}
 
-					else if (i == (splineVector->size() - 5))
-					{
-
-						D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.25f);
-						splineVector->at(splineVectorSize - 4) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.5f);
-						splineVector->at(splineVectorSize - 3) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.75f);
-						splineVector->at(splineVectorSize - 2) = *temp;
-
-					}
-					else
-					{
-
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
-						splineVector->at(i + 1) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.5f);
-						splineVector->at(i + 2) = *temp;
-						D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
-						splineVector->at(i + 3) = *temp;
-					}
 
 				}
 
-				for (auto i = splineVector->begin(); i != splineVector->end(); i++)
-				{
-					m_waypointList.push_back(*(i));
+				else {
+					m_waypointList.begin();
+					int waypointListSize = m_waypointList.size();
+					D3DXVECTOR3* temp = this->getTempVector();
+					//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
+					std::vector< D3DXVECTOR3>* splineVector = this->editSplineNodesVector();
+					//splineList->resize()
+					splineVector->resize(1 + (4 * (waypointListSize - 1)));
+					int k = 0;
+					for (int j = 0; j < waypointListSize - 1; j += 1)
+					{
+						splineVector->at(k) = m_waypointList.front();
+						m_waypointList.pop_front();
+						k += 4;
+					}
+					splineVector->at((4 * (waypointListSize - 1))) = m_waypointList.front();
+					m_waypointList.pop_front();
+
+					int splineVectorSize = splineVector->size();
+
+					for (int i = 0; i < splineVectorSize - 4; i += 4)
+					{
+						if (i == 0)
+						{
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
+							splineVector->at(i + 1) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.5f);
+							splineVector->at(i + 2) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
+							splineVector->at(i + 3) = *temp;
+						}
+
+						else if (i == (splineVector->size() - 5))
+						{
+
+							D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.25f);
+							splineVector->at(splineVectorSize - 4) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.5f);
+							splineVector->at(splineVectorSize - 3) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(splineVectorSize - 9)), &(splineVector->at(splineVectorSize - 5)), &(splineVector->at(splineVectorSize - 1)), &(splineVector->at(splineVectorSize - 1)), 0.75f);
+							splineVector->at(splineVectorSize - 2) = *temp;
+
+						}
+						else
+						{
+
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.25f);
+							splineVector->at(i + 1) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.5f);
+							splineVector->at(i + 2) = *temp;
+							D3DXVec3CatmullRom(temp, &(splineVector->at(i - 4)), &(splineVector->at(i)), &(splineVector->at(i + 4)), &(splineVector->at(i + 8)), 0.75f);
+							splineVector->at(i + 3) = *temp;
+						}
+
+					}
+
+					for (auto i = splineVector->begin(); i != splineVector->end(); i++)
+					{
+						m_waypointList.push_back(*(i));
+					}
+
+
+					splineVector->erase(splineVector->begin(), splineVector->end());
+
 				}
-
-
-				splineVector->erase(splineVector->begin(), splineVector->end());
-
 			}
-		}
-		else if (this->GetRubberbandPath())
-		{
-			if (m_waypointList.size() >= 3)
 
-			{
-				//std::list<D3DXVECTOR3>* rubberbandList = this->editRubberbandList();
-			//Want to break 2 elements from the last element, so
-				
-				//End now points to the element we want to stop at
-
-
-				std::list<D3DXVECTOR3>::iterator it = m_waypointList.begin();
-				D3DXVECTOR3 a, b, c;
-				bool startOver = true;
-			
-				do
-				{
-					if (startOver)
-					{
-						D3DXVECTOR3 a = *it;
-						++it;
-						//m_waypointList.pop_front();
-						D3DXVECTOR3 b = *it;
-						++it;
-						//m_waypointList.pop_front();
-						D3DXVECTOR3 c = *it;
-						startOver = false;
-					}
-				
-							bool bb = true;
-							for (int i = min(a.x, c.x); i <= max(a.x, a.y); ++i)
-							{
-								for (int j = min(a.z, c.z); j <= max(a.z, c.z); j++)
-								{
-									if (g_terrain.IsWall(i, j))
-									{
-										bb = false;
-										break;
-									}
-								}
-							}
-
-							if (bb)
-							{
-								//	m_waypointList.push_front(c);
-								//	m_waypointList.push_back(a);
-								m_waypointList.remove(b);
-								it = m_waypointList.begin();
-								startOver = true;
-							}
-							else
-							{
-								a = b;
-								b = c;
-								++it;
-								c = *it;
-							}
-
-				
-
-						
-
-
-				}while (it !=m_waypointList.end());
-
-
-
-			
-			}
 			//if (m_waypointList.size() >= 3)
 			//{
 			//	std::list<D3DXVECTOR3>::iterator it = m_waypointList.end();
@@ -696,62 +604,63 @@ bool Movement::ComputePath( int r, int c, bool newRequest )
 
 
 			//}
+
+			return true;
+
+
+
+
+
+
 		}
-		return true;
-
 	}
-
-	
-
-
-}
-	else
-	{	
-		//Randomly meander toward goal (might get stuck at wall)
-		//int curR, curC;
-		//D3DXVECTOR3 cur = m_owner->GetBody().GetPos();
-		//g_terrain.GetRowColumn( &cur, &curR, &curC );
-
-		m_waypointList.clear();
-		m_waypointList.push_back( cur );
-
-		int countdown = 100;
-		while( curR != r || curC != c )
+		else
 		{
-			if( countdown-- < 0 ) { break; }
+			//Randomly meander toward goal (might get stuck at wall)
+			//int curR, curC;
+			//D3DXVECTOR3 cur = m_owner->GetBody().GetPos();
+			//g_terrain.GetRowColumn( &cur, &curR, &curC );
 
-			if( curC == c || (curR != r && rand()%2 == 0) )
-			{	//Go in row direction
-				int last = curR;
-				if( curR < r ) { curR++; }
-				else { curR--; }
+			m_waypointList.clear();
+			m_waypointList.push_back(cur);
 
-				if( g_terrain.IsWall( curR, curC ) )
-				{
-					curR = last;
-					continue;
+			int countdown = 100;
+			while (curR != r || curC != c)
+			{
+				if (countdown-- < 0) { break; }
+
+				if (curC == c || (curR != r && rand() % 2 == 0))
+				{	//Go in row direction
+					int last = curR;
+					if (curR < r) { curR++; }
+					else { curR--; }
+
+					if (g_terrain.IsWall(curR, curC))
+					{
+						curR = last;
+						continue;
+					}
 				}
-			}
-			else
-			{	//Go in column direction
-				int last = curC;
-				if( curC < c ) { curC++; }
-				else { curC--; }
+				else
+				{	//Go in column direction
+					int last = curC;
+					if (curC < c) { curC++; }
+					else { curC--; }
 
-				if( g_terrain.IsWall( curR, curC ) )
-				{
-					curC = last;
-					continue;
+					if (g_terrain.IsWall(curR, curC))
+					{
+						curC = last;
+						continue;
+					}
 				}
-			}
 
-			D3DXVECTOR3 spot = g_terrain.GetCoordinates( curR, curC );
-			m_waypointList.push_back( spot );
-			g_terrain.SetColor( curR, curC, DEBUG_COLOR_YELLOW );
+				D3DXVECTOR3 spot = g_terrain.GetCoordinates(curR, curC);
+				m_waypointList.push_back(spot);
+				g_terrain.SetColor(curR, curC, DEBUG_COLOR_YELLOW);
+			}
+			return true;
 		}
-		return true;
 	}
-}
 
 void Movement::DrawDebugVisualization( IDirect3DDevice9* pd3dDevice, D3DXMATRIX* pViewProj )
 {
