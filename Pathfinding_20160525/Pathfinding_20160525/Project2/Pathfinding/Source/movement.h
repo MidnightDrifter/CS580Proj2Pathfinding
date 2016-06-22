@@ -85,6 +85,8 @@ public:
 	const AStarV4& getAStarV4() const { return m_AStarV4; }
 	AStarV4& editAStarV4() { return m_AStarV4; }
 
+	std::list<D3DXVECTOR3>* editRubberbandList() { return m_rubberBandList; }
+
 
 protected:
 
@@ -113,6 +115,7 @@ protected:
 
 	AStar m_AStarGrid;
 	
+	std::list<D3DXVECTOR3>* m_rubberBandList;
 	std::list<D3DXVECTOR3>* m_splineNodesList;
 	D3DXVECTOR3* m_tempVector;
 	std::vector<D3DXVECTOR3>* m_splineNodesVector;
