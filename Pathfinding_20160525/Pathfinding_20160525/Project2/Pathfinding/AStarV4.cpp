@@ -169,7 +169,7 @@ AStarNodeV3 AStarV4::getMapNode(int i, int j)
 
 
 
-bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY)
+bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY, bool useAnalysis)
 {
 //	bool isFirstPass = false;
 	if (newRequest)
@@ -230,30 +230,56 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 						//diag
 
 						gc = map[currX][currY].getCost() + SQRT2;
+
+						if (useAnalysis)
+						{
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
+						}
+
 					}
 
 					else if (i == currX + 1 && j == currY - 1 && !g_terrain.IsWall( i, currY) && !g_terrain.IsWall(currX,  j))
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
+
+						if (useAnalysis)
+						{
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
+						}
 					}
 
 					else if (i == currX - 1 && j == currY + 1 && !g_terrain.IsWall( i,  currY) && !g_terrain.IsWall( currX,  j))
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
+
+						if (useAnalysis)
+						{
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
+						}
 					}
 
 					else if (i == currX - 1 && j == currY - 1 && !g_terrain.IsWall( i, currY) && !g_terrain.IsWall( currX,  j))
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
+
+						if (useAnalysis)
+						{
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
+						}
 					}
 
 					else if ((i == currX && (j == currY + 1 || j == currY - 1)) || (j == currY && (i == currX + 1 || i == currX - 1)))
 					{
 						//horizontal
 						gc = map[currX][currY].getCost() + 1;
+
+						if (useAnalysis)
+						{
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
+						}
 					}
 
 

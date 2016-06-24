@@ -217,7 +217,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			m_waypointList.clear();
 		}
 
-		bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c);
+		bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c, this->GetAnalysis());
 
 		if (!pathFound && !this->GetSingleStep())
 		{
