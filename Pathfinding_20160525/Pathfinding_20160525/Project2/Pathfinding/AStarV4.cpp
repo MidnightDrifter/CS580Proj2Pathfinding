@@ -113,7 +113,8 @@ void AStarV4::clear()
 	this->setStart(-1, -1);
 
 	
-		this->rubberbandList.clear();
+	this->rubberbandList.clear();
+	g_terrain.ResetColors();
 	
 
 }
@@ -122,7 +123,7 @@ void AStarV4::pushOpen(AStarNodeV3 n)
 {
 	openList[sizeOfOpenList] = n;
 	sizeOfOpenList++;
-	g_terrain.SetColor(n.getX(), n.getY(), DEBUG_COLOR_PURPLE);
+	g_terrain.SetColor(n.getX(), n.getY(), DEBUG_COLOR_BLUE);
 }
 
 AStarNodeV3 AStarV4::popOpenMin()
@@ -173,13 +174,14 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 //	bool isFirstPass = false;
 	if (newRequest)
 	{
-		this->clear();
-		g_terrain.ResetColors();
+		//this->clear();
+		//g_terrain.ResetColors();
 		this->setGoal(goalX, goalY);
 		this->setStart(startX, startY);
 		this->map[startX][startY].setCost(0.f);
 		this->map[startX][startY].setTotalCost(0.f);
 		this->pushOpen(map[startX][startY]);
+	}
 	//	isFirstPass = true;
 		
 
@@ -190,7 +192,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 			return true;
 		}*/
 
-	}
+	
 
 
 	//if(((goalRow == startRow+1) ||(goalRow ==startRow-1) || goalRow==startRow ) && (goalCol == startCol+1 || goalCol==startCol-1 || goalCol==startCol) )
@@ -293,7 +295,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 			}
 		}
 		map[currX][currY].setClosed(true);
-		g_terrain.SetColor(currX, currY, DEBUG_COLOR_RED);
+		g_terrain.SetColor(currX, currY, DEBUG_COLOR_YELLOW);
 
 		if(isSingleStep)
 		{
