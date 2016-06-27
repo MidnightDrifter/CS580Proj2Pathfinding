@@ -29,6 +29,9 @@
     <Filter Include="GameObject\AStar">
       <UniqueIdentifier>{6c0d15df-3601-43bb-87ac-2d372d302e62}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\TerrainGeneration">
+      <UniqueIdentifier>{090ea5fe-77e2-48a1-ad33-210838344309}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\body.cpp">
@@ -161,6 +164,10 @@
     </ClCompile>
     <ClCompile Include="AStarNodeV3.cpp" />
     <ClCompile Include="AStarV4.cpp" />
+    <ClCompile Include="TerrainNode.cpp">
+      <Filter>GameObject\TerrainGeneration</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainInfoMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\body.h">
@@ -298,6 +305,10 @@
     </ClInclude>
     <ClInclude Include="AStarNodeV3.h" />
     <ClInclude Include="AStarV4.h" />
+    <ClInclude Include="TerrainNode.h">
+      <Filter>GameObject\TerrainGeneration</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainInfoMap.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\DXUT\directx.ico">

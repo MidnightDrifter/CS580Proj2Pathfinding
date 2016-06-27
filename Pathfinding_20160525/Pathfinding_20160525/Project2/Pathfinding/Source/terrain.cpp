@@ -348,7 +348,7 @@ float Terrain::ClosestWall( int row, int col )   //DONE- test it
 					 i = 0;
 				 }
 
-				 if (sqrt((pow(row - i, 2) + pow(col - j, 2))) < minDist)
+				 if (g_terrain.IsWall(i,j) && !(i==row && j==col) && sqrt((pow(row - i, 2) + pow(col - j, 2))) < minDist)
 				 {
 					 minDist = sqrt((pow(row - i, 2) + pow(col - j, 2)));
 					 foundMin = true;

@@ -181,7 +181,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 		bool straightLineExists = true;
 		for (int i = min(r, curR); i <= max(r, curR); i++)
 		{
-			for (int j = min(curC, c); j = max(curC, c); j++)
+			for (int j = min(curC, c); j <= max(curC, c); j++)
 			{
 				if (g_terrain.IsWall(i, j))
 				{
@@ -217,17 +217,19 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			m_waypointList.clear();
 		}
 
-		bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c);
+		bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c, this->GetAnalysis());
 
 		if (!pathFound && !this->GetSingleStep())
 		{
 			//Isn't single step and no path is found, no path exists
-			return false;
+			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
+			return true;
 		}
 
 		else if (!pathFound && myAStarV4.getSizeOfOpenList() == 0)
 		{
-			return false;
+			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
+			return true;
 		}
 
 		else if (pathFound)

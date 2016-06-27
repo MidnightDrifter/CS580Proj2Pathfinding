@@ -18,7 +18,7 @@ public:
 	int getOpenListSize() const;
 	float calculateHeuristicCost(int h, float weight, int nodeX, int nodeY, int goalX, int goalY) const;
 	bool isValidNode(int i, int j);
-	bool findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY);
+	bool findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY, bool useAnalysis);
 	AStarNodeV3 getMapNode(int i, int j);
 	
 	int getSizeOfOpenList() const;

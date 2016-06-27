@@ -170,6 +170,8 @@
     <ClCompile Include="Source\triggersystem.cpp" />
     <ClCompile Include="Source\MultiAnimation.cpp" />
     <ClCompile Include="Source\MultiAnimationLib.cpp" />
+    <ClCompile Include="TerrainInfoMap.cpp" />
+    <ClCompile Include="TerrainNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AStar.h" />
@@ -219,6 +221,8 @@
     <ClInclude Include="Source\statemch.h" />
     <ClInclude Include="Source\triggersystem.h" />
     <ClInclude Include="Source\MultiAnimation.h" />
+    <ClInclude Include="TerrainInfoMap.h" />
+    <ClInclude Include="TerrainNode.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\DXUT\directx.ico" />

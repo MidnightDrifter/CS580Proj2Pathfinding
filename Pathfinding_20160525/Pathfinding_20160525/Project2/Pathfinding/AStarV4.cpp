@@ -122,7 +122,7 @@ void AStarV4::pushOpen(AStarNodeV3 n)
 {
 	openList[sizeOfOpenList] = n;
 	sizeOfOpenList++;
-	g_terrain.SetColor(n.getX(), n.getY(), DEBUG_COLOR_PURPLE);
+	g_terrain.SetColor(n.getX(), n.getY(), DEBUG_COLOR_BLUE);
 }
 
 AStarNodeV3 AStarV4::popOpenMin()
@@ -168,7 +168,7 @@ AStarNodeV3 AStarV4::getMapNode(int i, int j)
 
 
 
-bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY)
+bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY, bool useAnalysis)
 {
 //	bool isFirstPass = false;
 	if (newRequest)
@@ -222,36 +222,67 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 				if (this->isValidNode(i, j) && !(j == currY && i == currX) && !g_terrain.IsWall( i, j))
 				{
 					float hc = this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol());
+					
 					float gc = std::numeric_limits<float>::max();
 					if (i == currX + 1 && j == currY + 1 && !g_terrain.IsWall(i,currY) && !g_terrain.IsWall( currX,  j))
 					{
 						//diag
 
 						gc = map[currX][currY].getCost() + SQRT2;
+
+						if (useAnalysis)
+						{
+							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+						}
+
 					}
 
 					else if (i == currX + 1 && j == currY - 1 && !g_terrain.IsWall( i, currY) && !g_terrain.IsWall(currX,  j))
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
+
+						if (useAnalysis)
+						{
+							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+						}
+
 					}
 
 					else if (i == currX - 1 && j == currY + 1 && !g_terrain.IsWall( i,  currY) && !g_terrain.IsWall( currX,  j))
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
+
+						if (useAnalysis)
+						{
+							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+						}
+
 					}
 
 					else if (i == currX - 1 && j == currY - 1 && !g_terrain.IsWall( i, currY) && !g_terrain.IsWall( currX,  j))
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
+
+						if (useAnalysis)
+						{
+							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+						}
+
 					}
 
 					else if ((i == currX && (j == currY + 1 || j == currY - 1)) || (j == currY && (i == currX + 1 || i == currX - 1)))
 					{
 						//horizontal
 						gc = map[currX][currY].getCost() + 1;
+
+						if (useAnalysis)
+						{
+							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+						}
+
 					}
 
 
@@ -293,7 +324,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 			}
 		}
 		map[currX][currY].setClosed(true);
-		g_terrain.SetColor(currX, currY, DEBUG_COLOR_RED);
+		g_terrain.SetColor(currX, currY, DEBUG_COLOR_YELLOW);
 
 		if(isSingleStep)
 		{
