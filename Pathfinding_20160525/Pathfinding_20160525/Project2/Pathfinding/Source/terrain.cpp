@@ -298,8 +298,9 @@ float Terrain::ClosestWall( int row, int col )   //DONE- test it
 	//Map is 40x40, max distance is diagonal from one corner to other, so sqrt(40^2 + 40^2)  == sqrt(1600 *2) == 40sqrt(2)
 	//56 and change
 	//Can set max arbitrarily to 57
+	//Will just set arbitrarily high regardless
 
-	float minDist = 57.f;
+	float minDist = 100000.f;
 
 	if (upperX >= g_terrain.GetWidth())
 	{
@@ -329,35 +330,38 @@ float Terrain::ClosestWall( int row, int col )   //DONE- test it
 			 for (int j = lowerY; j <= lowerY; j++)
 			 {
 				 if (i > g_terrain.GetWidth() - 1)
-				 {
-					 i = g_terrain.GetWidth() - 1;
-				 }
+					 {
+						 i = g_terrain.GetWidth() - 1;
+					 }
 
-				 if (j > g_terrain.GetWidth() - 1)
-				 {
-					 j = g_terrain.GetWidth() - 1;
-				 }
+					 if (j > g_terrain.GetWidth() - 1)
+					 {
+						 j = g_terrain.GetWidth() - 1;
+					 }
 
-				 if (j < 0)
-				 {
-					 j = 0;
-				 }
+					 if (j < 0)
+					 {
+						 j = 0;
+					 }
 
-				 if(i<0)
-				 {
-					 i = 0;
-				 }
-
-				 if (g_terrain.IsWall(i,j) && !(i==row && j==col) && sqrt((pow(row - i, 2) + pow(col - j, 2))) < minDist)
-				 {
-					 minDist = sqrt((pow(row - i, 2) + pow(col - j, 2)));
-					 foundMin = true;
-				 }
-
-			
-				
+					 if (i < 0)
+					 {
+						 i = 0;
+					 }
 
 
+
+					 if (g_terrain.IsWall(i, j) && !(i == row && j == col) && sqrt((pow(row - i, 2) + pow(col - j, 2))) < minDist)
+					 {
+						 minDist = sqrt((pow(row - i, 2) + pow(col - j, 2)));
+						 foundMin = true;
+					 }
+
+
+
+
+
+				 
 			 }
 		 }
 
@@ -659,7 +663,13 @@ void Terrain::AnalyzeOpennessClosestWall( void )   //DONE- test it
 	{
 		for (int j = 0; j < g_terrain.GetWidth(); j++)
 		{
-			m_terrainInfluenceMap[i][j] = 1.f / powf(this->ClosestWall(i, j), 2);
+			if(i==2&&j==1)
+			{
+				int bob = 0;
+			}
+			
+			//m_terrainInfluenceMap[i][j] = 1.f / powf(this->ClosestWall(i, j), 2);
+			this->SetInfluenceMapValue(i, j, 1.f / powf(this->ClosestWall(i, j), 2));
 		}
 	}
 
@@ -726,8 +736,8 @@ void Terrain::AnalyzeVisibility( void )  //DONE- test it
 				}
 			}
 
-			m_terrainInfluenceMap[i][j] = fmaxf(visibleSquares / 160.f, 1.f);
-			
+			//m_terrainInfluenceMap[i][j] = fmaxf(visibleSquares / 160.f, 1.f);
+			this->SetInfluenceMapValue(i,j, fmaxf(visibleSquares / 160.f, 1.f));
 
 
 		}
@@ -784,7 +794,8 @@ void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 
 			if (this->IsClearPath(m_rPlayer, m_cPlayer, i, j))
 			{
-				m_terrainInfluenceMap[i][j] = 1.f;
+				//m_terrainInfluenceMap[i][j] = 1.f;
+				this->SetInfluenceMapValue(i, j, 1.f);
 			}
 
 			else
@@ -793,7 +804,7 @@ void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 				{
 					for (int y = j + 1; y <= j; y++)
 					{
-						if (this->isValidNode(x, y) && m_terrainInfluenceMap[x][y] == 1.f)
+						if (this->isValidNode(x, y) && this->GetInfluenceMapValue(x,y) == 1.f)
 						{
 							//m_terrain
 							num1Neighbors++;
@@ -806,12 +817,14 @@ void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 
 			if (num1Neighbors > 0)
 			{
-				m_terrainInfluenceMap[i][j] = 0.5f;
+				//m_terrainInfluenceMap[i][j] = 0.5f;
+				this->SetInfluenceMapValue(i, j, 0.5f);
 			}
 
 			else
 			{
-				m_terrainInfluenceMap[i][j] = 0.f;
+				//m_terrainInfluenceMap[i][j] = 0.f;
+				this->SetInfluenceMapValue(i, j, 0.f);
 			}
 		}
 

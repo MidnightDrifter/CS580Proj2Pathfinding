@@ -222,12 +222,14 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 		if (!pathFound && !this->GetSingleStep())
 		{
 			//Isn't single step and no path is found, no path exists
+			myAStarV4.clear();
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
 			return true;
 		}
 
 		else if (!pathFound && myAStarV4.getSizeOfOpenList() == 0)
 		{
+			myAStarV4.clear();
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
 			return true;
 		}

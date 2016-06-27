@@ -113,7 +113,8 @@ void AStarV4::clear()
 	this->setStart(-1, -1);
 
 	
-		this->rubberbandList.clear();
+	this->rubberbandList.clear();
+	g_terrain.ResetColors();
 	
 
 }
@@ -173,13 +174,14 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 //	bool isFirstPass = false;
 	if (newRequest)
 	{
-		this->clear();
-		g_terrain.ResetColors();
+		//this->clear();
+		//g_terrain.ResetColors();
 		this->setGoal(goalX, goalY);
 		this->setStart(startX, startY);
 		this->map[startX][startY].setCost(0.f);
 		this->map[startX][startY].setTotalCost(0.f);
 		this->pushOpen(map[startX][startY]);
+	}
 	//	isFirstPass = true;
 		
 
@@ -190,7 +192,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 			return true;
 		}*/
 
-	}
+	
 
 
 	//if(((goalRow == startRow+1) ||(goalRow ==startRow-1) || goalRow==startRow ) && (goalCol == startCol+1 || goalCol==startCol-1 || goalCol==startCol) )
@@ -222,7 +224,6 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 				if (this->isValidNode(i, j) && !(j == currY && i == currX) && !g_terrain.IsWall( i, j))
 				{
 					float hc = this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol());
-					
 					float gc = std::numeric_limits<float>::max();
 					if (i == currX + 1 && j == currY + 1 && !g_terrain.IsWall(i,currY) && !g_terrain.IsWall( currX,  j))
 					{
@@ -232,7 +233,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 						if (useAnalysis)
 						{
-							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
 						}
 
 					}
@@ -244,9 +245,8 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 						if (useAnalysis)
 						{
-							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
 						}
-
 					}
 
 					else if (i == currX - 1 && j == currY + 1 && !g_terrain.IsWall( i,  currY) && !g_terrain.IsWall( currX,  j))
@@ -256,9 +256,8 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 						if (useAnalysis)
 						{
-							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
 						}
-
 					}
 
 					else if (i == currX - 1 && j == currY - 1 && !g_terrain.IsWall( i, currY) && !g_terrain.IsWall( currX,  j))
@@ -268,9 +267,8 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 						if (useAnalysis)
 						{
-							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
 						}
-
 					}
 
 					else if ((i == currX && (j == currY + 1 || j == currY - 1)) || (j == currY && (i == currX + 1 || i == currX - 1)))
@@ -280,9 +278,8 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 						if (useAnalysis)
 						{
-							gc += (20 * g_terrain.GetInfluenceMapValue(i, j));
+							gc += 20.f* g_terrain.GetInfluenceMapValue(i, j); //Maybe change to curX & curY?
 						}
-
 					}
 
 
