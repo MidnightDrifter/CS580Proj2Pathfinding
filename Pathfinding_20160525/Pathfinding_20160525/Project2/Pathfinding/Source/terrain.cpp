@@ -327,7 +327,7 @@ float Terrain::ClosestWall( int row, int col )   //DONE- test it
 	 {
 		 for (int i = lowerX; i <= upperX; i++)
 		 {
-			 for (int j = lowerY; j <= lowerY; j++)
+			 for (int j = lowerY; j <= upperY; j++)
 			 {
 				 if (i > g_terrain.GetWidth() - 1)
 					 {
@@ -351,9 +351,9 @@ float Terrain::ClosestWall( int row, int col )   //DONE- test it
 
 
 
-					 if (g_terrain.IsWall(i, j) && !(i == row && j == col) && sqrt((pow(row - i, 2) + pow(col - j, 2))) < minDist)
+					 if (g_terrain.IsWall(i, j) && !(i == row && j == col) && sqrtf((powf(row - i, 2) + powf(col - j, 2))) < minDist)
 					 {
-						 minDist = sqrt((pow(row - i, 2) + pow(col - j, 2)));
+						 minDist = sqrtf((powf(row - i, 2) + powf(col - j, 2)));
 						 foundMin = true;
 					 }
 
@@ -401,7 +401,8 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 		{
 			if (!(i == row &&j == col))
 			{
-				wallList[start] = (this->isValidNode(i, j) && g_terrain.IsWall(i, j));
+				wallList[start] = (this->isWallNode(i,j));
+				start++;
 			}
 		}
 	}
@@ -412,7 +413,7 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 	//
 	//
 
-	if ((wallList[0] && wallList[3] && wallList[4])||(wallList[0]&&wallList[3]&&wallList[6]) || (wallList[0] && wallList[4] && wallList[6]) || (wallList[3] || wallList[4] || wallList[6]))
+	if ((wallList[0] && wallList[3] && wallList[4])||(wallList[0]&&wallList[3]&&wallList[6]) || (wallList[0] && wallList[4] && wallList[6]) || (wallList[3] && wallList[4] && wallList[6]))
 	{
 		return 1.f;
 	}
@@ -446,7 +447,7 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 			//Check for adj cardinal wall (0,-1)
 			//West wall, so check:  (-1, -1), (+1, -1), (0, -2)    Already have first 2:  wallList[0] & wallList[5]
 
-			if (wallList[0] || wallList[5] || (!this->isValidNode(row, col - 2)) || g_terrain.IsWall(row, col - 2))
+			if (wallList[0] || wallList[5] || (this->isWallNode(row, col-2)))
 			{
 				walls[3]++;
 			}
@@ -463,7 +464,7 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 			//East wall so check:  (0,+2), (-1,+1), and (+1, +1)   Last 2 are:  wallList[7] & wallList[2]
 
 
-			if (wallList[7] || wallList[2] || (!this->isValidNode(row, col + 2)) || g_terrain.IsWall(row, col + 2))
+			if (wallList[7] || wallList[2] || (this->isWallNode(row, col+2)))
 			{
 				walls[3]++;
 			}
@@ -478,7 +479,7 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 			walls[0]++;
 
 			//South wall so check:  (+2,0), (+1,-1), (+1,+1)
-			if (wallList[7] || wallList[5] || (!this->isValidNode(row + 2, col)) || g_terrain.IsWall(row + 2, col))
+			if (wallList[7] || wallList[5] || this->isWallNode(row+2, col))
 			{
 				walls[3]++;
 			}
@@ -904,7 +905,7 @@ bool Terrain::IsClearPath( int r0, int c0, int r1, int c1 )  //DONE- test it
 
 
 
-#define EPSILON 0.001f
+#define EPSILON 0.01f
 	
 	for(int i=0;i<g_terrain.GetWidth();i++)
 	{
