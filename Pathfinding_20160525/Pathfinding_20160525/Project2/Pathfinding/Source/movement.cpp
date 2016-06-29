@@ -41,8 +41,8 @@ Movement::Movement(GameObject& owner)
 	m_splineNodesVector(new std::vector<D3DXVECTOR3>),
 	m_firstTempSmoothingVector(new D3DXVECTOR3()),
 	m_secondTempSmoothingVector(new D3DXVECTOR3()),
-	m_AStarV2(AStarV2()),
-	m_AStarV3(AStarV3()),
+	//m_AStarV2(AStarV2()),
+	//m_AStarV3(AStarV3()),
 	m_AStarV4(AStarV4())
 	
 {
@@ -57,7 +57,16 @@ Movement::Movement(GameObject& owner)
 
 Movement::~Movement( void )
 {
-
+	m_rubberBandList->clear();
+	delete m_rubberBandList;
+	m_splineNodesList->clear();
+	delete m_splineNodesList;
+	m_splineNodesVector->clear();
+	delete m_splineNodesVector;
+	delete m_firstTempSmoothingVector;
+	delete m_secondTempSmoothingVector;
+	delete m_tempVector;
+	//m_waypointList.clear();
 }
 
 void Movement::Animate( double dTimeDelta )
@@ -224,6 +233,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			//Isn't single step and no path is found, no path exists
 			myAStarV4.clear();
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
+
 			return true;
 		}
 
@@ -231,6 +241,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 		{
 			myAStarV4.clear();
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
+			//m_waypointList.clear();
 			return true;
 		}
 
@@ -242,14 +253,31 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			if (this->GetRubberbandPath())
 			{
 				myAStarV4.rubberband();
-				std::list<AStarNodeV3>::iterator st = myAStarV4.getRubberbandList().begin();
-
-				while (st != myAStarV4.getRubberbandList().end())
+				if (myAStarV4.getRubberbandList().size() >= 3)
 				{
-					m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates((*st).getX(), (*st).getY())));
-					++st;
+					std::list<AStarNodeV3>::iterator st = myAStarV4.getRubberbandList().begin();
 
+					while (st != myAStarV4.getRubberbandList().end())
+					{
+						m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates((*st).getX(), (*st).getY())));
+						++st;
+
+					}
 				}
+
+				else
+				{
+					while (!(goal.getX() == myAStarV4.getStartRow() && goal.getY() == myAStarV4.getStartCol()))
+					{
+						m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal.getX(), goal.getY())));
+						goal = myAStarV4.getMapNode(goal.getParentX(), goal.getParentY());
+					}
+
+
+					m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(myAStarV4.getStartRow(), myAStarV4.getStartCol())));
+				}
+
+
 
 			}
 
@@ -280,11 +308,11 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 				std::list<D3DXVECTOR3>::iterator second = m_waypointList.begin();
 				second++;
 				std::list<D3DXVECTOR3>::iterator end = m_waypointList.end();
-				--end;
+				
 
 				do
 				{
-					if (sqrtf(pow(((*first).x - (*second).x), 2) + pow(((*first).z - (*second).z), 2)) > 1.5f)
+					if (first !=end && second != end && sqrtf(pow(((*first).x - (*second).x), 2) + pow(((*first).z - (*second).z), 2)) > 1.5f )
 					{
 						m_waypointList.insert(second, D3DXVECTOR3(((*first).x + (*second).x) / 2.f, 0.f, ((*first).z + (*second).z) / 2.f));
 						--second;
@@ -295,7 +323,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 						++first;
 						++second;
 					}
-				} while (second != end);
+				} while (second != end && first !=end);
 
 
 
@@ -338,18 +366,20 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 				//	smoothingList->erase(smoothingList->begin(), smoothingList->end());
 
 				if(m_waypointList.size() <3)
-				{ }
+				{
+					//int bob = 0;
+				}
 
 				else if (m_waypointList.size() == 3)
 				{
 					D3DXVECTOR3* temp = this->getTempVector();
 					std::vector<D3DXVECTOR3>* splineVector = this->editSplineNodesVector();
-					splineVector->resize(11);
+					splineVector->resize(9);
 					splineVector->at(0) = m_waypointList.front();
 					m_waypointList.pop_front();
-					splineVector->at(5) = m_waypointList.front();
+					splineVector->at(4) = m_waypointList.front();
 					m_waypointList.pop_front();
-					splineVector->at(10) = m_waypointList.front();
+					splineVector->at(8) = m_waypointList.front();
 					m_waypointList.pop_front();
 
 					for (int i = 0; i < 5; i += 4)
@@ -375,11 +405,18 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 						}
 					}
 
+					for (auto i = splineVector->begin(); i != splineVector->end(); i++)
+					{
+						m_waypointList.push_back(*(i));
+					}
+
+
+					splineVector->erase(splineVector->begin(), splineVector->end());
 
 				}
 
 				else {
-					m_waypointList.begin();
+					//m_waypointList.begin();
 					int waypointListSize = m_waypointList.size();
 					D3DXVECTOR3* temp = this->getTempVector();
 					//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
@@ -447,23 +484,24 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			}
 
 
-			else if (this->GetSmoothPath())
+			else if (this->GetSmoothPath() && m_waypointList.size() >=3)
 			{
 				if (m_waypointList.size() < 3)
 				{
 					//do nothing
+					int bob = 0;
 				}
 
 				else if (m_waypointList.size() == 3)
 				{
 					D3DXVECTOR3* temp = this->getTempVector();
 					std::vector<D3DXVECTOR3>* splineVector = this->editSplineNodesVector();
-					splineVector->resize(11);
+					splineVector->resize(9);
 					splineVector->at(0) = m_waypointList.front();
 					m_waypointList.pop_front();
-					splineVector->at(5) = m_waypointList.front();
+					splineVector->at(4) = m_waypointList.front();
 					m_waypointList.pop_front();
-					splineVector->at(10) = m_waypointList.front();
+					splineVector->at(8) = m_waypointList.front();
 					m_waypointList.pop_front();
 
 					for (int i = 0; i < 5; i += 4)
@@ -489,11 +527,17 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 						}
 					}
 
+					for (auto i = splineVector->begin(); i != splineVector->end(); i++)
+					{
+						m_waypointList.push_back(*(i));
+					}
 
+
+					splineVector->erase(splineVector->begin(), splineVector->end());
 				}
 
 				else {
-					m_waypointList.begin();
+				//	m_waypointList.begin();
 					int waypointListSize = m_waypointList.size();
 					D3DXVECTOR3* temp = this->getTempVector();
 					//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
@@ -604,11 +648,15 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 
 			//	} while (m_waypointList.size() >= 3);
 
+			else if (m_waypointList.size() < 3)
+			{
+				m_waypointList.clear();
+				m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates(r, c)));
 
-
-
+			}
 			//}
-
+			myAStarV4.clear();
+			//m_waypointList.clear();
 			return true;
 
 

@@ -367,8 +367,9 @@ void AStarV4::rubberband()
 				if (it != rubberbandList.end())
 				{
 					b = *it;
+					++it;
 				}
-				++it;
+
 				//m_waypointList.pop_front();
 				if (it != rubberbandList.end())
 				{
@@ -376,8 +377,9 @@ void AStarV4::rubberband()
 				}
 				startOver = false;
 			}
-
-			bool bb = true;
+			if (it != rubberbandList.end())
+			{
+				bool bb = true;
 			for (int i = min(a.getX(), c.getX()); i <= (a.getX() > c.getX() ? a.getX() : c.getX()); ++i)
 			{
 				for (int j = min(a.getY(), c.getY()); j <= (a.getY() > c.getY() ? a.getY() : c.getY()); j++)
@@ -410,7 +412,7 @@ void AStarV4::rubberband()
 			}
 
 
-
+		}
 
 
 
@@ -432,4 +434,7 @@ void AStarV4::rubberband()
 
 AStarV4::~AStarV4()
 {
+	delete[] map;
+	delete[] openList;
+	rubberbandList.clear();
 }

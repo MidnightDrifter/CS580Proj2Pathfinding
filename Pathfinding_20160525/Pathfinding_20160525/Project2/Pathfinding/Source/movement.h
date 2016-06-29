@@ -66,7 +66,7 @@ public:
     void SetFogOfWar( bool enable )                         { m_fogOfWar = enable; }
     bool GetFogOfWar() const                                { return m_fogOfWar; }
 
-	AStar& editAStar() { return m_AStarGrid; }
+	//AStar& editAStar() { return m_AStarGrid; }
 	std::list<D3DXVECTOR3>* editSplineNodesList() { return m_splineNodesList; }
 	std::vector<D3DXVECTOR3>* editSplineNodesVector() { return m_splineNodesVector; }
 	D3DXVECTOR3* getTempVector() { return m_tempVector; }
@@ -75,11 +75,11 @@ public:
 	D3DXVECTOR3* editSecondTempSmoothingVector() { return m_secondTempSmoothingVector; }
 
 
-	const AStarV2& getAStarV2() const {return m_AStarV2; }
-	AStarV2& editAStarV2() { return m_AStarV2; }
+	//const AStarV2& getAStarV2() const {return m_AStarV2; }
+	//AStarV2& editAStarV2() { return m_AStarV2; }
 
-	const AStarV3& getAStarV3() const { return m_AStarV3; }
-	AStarV3& editAStarV3() { return m_AStarV3; }
+	//const AStarV3& getAStarV3() const { return m_AStarV3; }
+	//AStarV3& editAStarV3() { return m_AStarV3; }
 
 
 	const AStarV4& getAStarV4() const { return m_AStarV4; }
@@ -121,8 +121,8 @@ protected:
 	std::vector<D3DXVECTOR3>* m_splineNodesVector;
 	D3DXVECTOR3* m_firstTempSmoothingVector;
 	D3DXVECTOR3* m_secondTempSmoothingVector;
-	AStarV2 m_AStarV2;
-	AStarV3 m_AStarV3;
+	//AStarV2 m_AStarV2;
+	//AStarV3 m_AStarV3;
 	AStarV4 m_AStarV4;
 
 };

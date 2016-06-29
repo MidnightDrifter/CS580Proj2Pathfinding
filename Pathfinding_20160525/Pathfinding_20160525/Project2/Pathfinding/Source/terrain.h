@@ -94,4 +94,5 @@ protected:
 
 	bool isValidNode(int r, int c);  //SH implemented helper method - test if node coords are within 0 - (mapSize-1) range
 	bool isWallNode(int r, int c);  //SH implemented helper method - returns if it'ts a valid node AND a wall
+	int numSurroundingWalls(int r, int c); //SH implemented helper method - returns # of surrounding nodes that are walls--does NOT count edges as walls
 };

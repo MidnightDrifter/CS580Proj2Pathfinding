@@ -1,4 +1,4 @@
-Set vs_version=2013    :: 2012 or 2013 or 2015
+Set vs_version=2015    :: 2012 or 2013 or 2015
 
 goto case_%vs_version%              
 :case_2012
