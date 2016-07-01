@@ -455,12 +455,12 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 			//if(numAdjWalls==0)
 			if(wallList[3] || wallList[4])
 			{
-				walls[2]++;
+				walls[3]++;
 			}
 
 			else  //Card adj wall
 			{
-				walls[3]++;// = numAdjWalls;
+				walls[2]++;// = numAdjWalls;
 			}
 		}
 
@@ -468,8 +468,8 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 		{
 			walls[0]++;
 			//Check for adj cardinal wall (0,-1)
-			//East wall, so check:  (-1, -1), (+1, -1), (0, -2)    Already have first 2:  wallList[0] & wallList[5]
-			int numAdjWalls = this->numSurroundingWalls(row, col-1);
+			///East wall, so check:  (-1, -1), (+1, -1), (0, -2)    Already have first 2:  wallList[0] & wallList[5]
+			//int numAdjWalls = this->numSurroundingWalls(row, col-1);
 			//if (wallList[0] || wallList[5] || (this->isWallNode(row, col-2)))
 			//if (numAdjWalls == 0)
 			if(wallList[1]||wallList[6])
@@ -506,11 +506,11 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 		if (wallList[6])  //North wall (+1,0)
 		{
 			walls[0]++;
-			int numAdjWalls = this->numSurroundingWalls(row + 1, col);
+			//int numAdjWalls = this->numSurroundingWalls(row + 1, col);
 			//North wall so check:  (+2,0), (+1,-1), (+1,+1)
 			//if (wallList[7] || wallList[5] || this->isWallNode(row+2, col))
 			//if (numAdjWalls == 0)
-			if(wallList[1]||wallList[6])
+			if(wallList[3]||wallList[4])
 			{
 				walls[3]++;
 			}
@@ -532,13 +532,15 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 			//check for cardinal walls next to it, so:  (0,-1), (-2,-1), (-1,0), and (-1,-2)-- have 2 already:  wallList[1] and wallList[3]
 			//if (wallList[1] || wallList[3] || this->isWallNode(row - 2, col - 1) || this->isWallNode(row - 1, col - 2))  //IS adj diag wall
 			int n = this->numSurroundingWalls(row - 1, col - 1);
-			if(n>0)
+			//if(n>0)
+			if(wallList[1]||wallList[3])
 			{
 				walls[4]++;
 
 				//check for not in-between cardinal walls--if 2+ cardinal walls, then it IS between cardinal walls--don't increment
 				//if (!((wallList[1] && wallList[3]) || (wallList[1] && this->isWallNode(row - 2, col - 1)) || (wallList[3] && this->isWallNode(row - 2, col - 1)) || (wallList[1] && this->isWallNode(row - 1, col - 2)) || (wallList[3] && this->isWallNode(row - 1, col - 2)) || (this->isWallNode(row - 1, col - 2) && this->isWallNode(row - 2, col - 1))))
-				if(n<2)
+				//if(n<2)
+				if(!(wallList[1]&&wallList[3]))
 				{
 
 					walls[5]++;
@@ -559,11 +561,13 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 			//check for cardinal walls next to it, so:  (0, +1), (-1, 0), (-2, +1), (-1, +2) --- already have 1st 2, wallList[4] and wallList[1]
 			int n = this->numSurroundingWalls(row - 1, col + 1);
 			//if (wallList[4] || wallList[1] || this->isWallNode(row - 2, col + 1) || this->isWallNode(row - 1, col + 2))
-			if(n>0)
+			//if(n>0)
+			if(wallList[4]||wallList[1])
 			{
 				walls[4]++;
 				//if (!((wallList[4] && wallList[1]) || (wallList[4] && this->isWallNode(row - 2, col + 1)) || (wallList[1] && this->isWallNode(row - 2, col + 1)) || (wallList[4] && this->isWallNode(row - 1, col + 2)) || (wallList[1] && this->isWallNode(row - 1, col + 2)) || (this->isWallNode(row - 1, col + 2) && this->isWallNode(row - 2, col + 1))))
-				if(n<2)
+				//if(n<2)
+				if(!(wallList[4]&&wallList[1]))
 				{
 					walls[5]++;
 				}
@@ -581,12 +585,14 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 			//check for cardinal walls next to it, so:  (0, +1), (+1, 0), (+1, +2), and (+2, +1) -- first two are wallList[4] and wallList[6]
 
 			//if (wallList[4] || wallList[6] || this->isWallNode(row + 1, col + 2) || this->isWallNode(row + 2, col + 1))
-			int n = this->numSurroundingWalls(row + 1, col + 1);
-			if(n>0)
+			//int n = this->numSurroundingWalls(row + 1, col + 1);
+			//if(n>0)
+			if(wallList[4]||wallList[6])
 			{
 				walls[4]++;
 				//if (!((wallList[4] && wallList[6]) || (wallList[4] && this->isWallNode(row + 1, col + 2)) || (wallList[6] && this->isWallNode(row + 1, col + 2)) || (wallList[4] && this->isWallNode(row + 2, col + 1)) || (wallList[6] && this->isWallNode(row + 2, col + 1)) || (this->isWallNode(row + 1, col + 2) && this->isWallNode(row + 2, col + 1))))
-				if(n<2)
+				//if(n<2)
+				if(!(wallList[4]&&wallList[6]))
 				{
 					walls[5]++;
 				}
@@ -601,12 +607,15 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 			//NW wall(+1, -1)
 			//check for cardinal walls next to it, so:  (0,-1), (+1, 0), (+2, -1), and (+1, -2):  first two are wallList[3] and wallList[6]
 			//if (wallList[3] || wallList[6] || this->isWallNode(row + 2, col - 1) || this->isWallNode(row + 1, col - 2))
-			int n = this->numSurroundingWalls(row + 1, col - 1);
-			if(n>0)
+			//int n = this->numSurroundingWalls(row + 1, col - 1);
+			
+			//if(n>0)
+			if(wallList[3] || wallList[6])
 			{
 				walls[4]++;
 				//if (!((wallList[3] && wallList[6]) || (wallList[3] && this->isWallNode(row + 2, col - 1)) || (wallList[6] && this->isWallNode(row + 2, col - 1)) || (wallList[3] && this->isWallNode(row + 1, col - 2)) || (wallList[6] && this->isWallNode(row + 1, col - 2)) || (this->isWallNode(row + 2, col - 1) && this->isWallNode(row + 1, col - 2))))
-				if(n<2)
+				//if(n<2)
+				if(!(wallList[3] && wallList[6]))
 				{
 					walls[5]++;
 				}
@@ -889,7 +898,7 @@ void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 
 	//WRITE YOUR CODE HERE
 	
-
+	
 	
 	for (int i = 0; i < g_terrain.GetWidth(); i++)
 	{
@@ -897,7 +906,6 @@ void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 		{
 			//float valueToStore = 0.f;
 			int num1Neighbors = 0;
-
 			if (this->IsClearPath(m_rPlayer, m_cPlayer, i, j))
 			{
 				//m_terrainInfluenceMap[i][j] = 1.f;
@@ -908,7 +916,7 @@ void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 			{
 				for (int x = i - 1; x <= i + 1; x++)
 				{
-					for (int y = j + 1; y <= j; y++)
+					for (int y = j + 1; y <= j+1; y++)
 					{
 						if (this->isValidNode(x, y) && this->GetInfluenceMapValue(x,y) == 1.f)
 						{
@@ -1010,7 +1018,7 @@ bool Terrain::IsClearPath( int r0, int c0, int r1, int c1 )  //DONE- test it - t
 
 
 
-#define EPSILON 0.01f
+#define EPSILON 0.0001f
 	
 	for(int i=0;i<g_terrain.GetWidth();i++)
 	{

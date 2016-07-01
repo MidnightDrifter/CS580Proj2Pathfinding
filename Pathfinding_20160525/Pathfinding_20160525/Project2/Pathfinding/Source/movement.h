@@ -9,9 +9,9 @@
  */
 
 #pragma once
-#include "../AStar.h"
-#include "../AStarV2.h"
-#include "../AStarV3.h"
+//#include "../AStar.h"
+//#include "../AStarV2.h"
+//#include "../AStarV3.h"
 #include "../AStarV4.h"
 
 
@@ -113,7 +113,7 @@ protected:
 
 	bool ComputePath( int r, int c, bool newRequest );
 
-	AStar m_AStarGrid;
+	//AStar m_AStarGrid;
 	
 	std::list<D3DXVECTOR3>* m_rubberBandList;
 	std::list<D3DXVECTOR3>* m_splineNodesList;
