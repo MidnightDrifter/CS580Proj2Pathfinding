@@ -8,13 +8,14 @@
 
  float AStarV4::SQRT2 = sqrtf(2);
 
-AStarV4::AStarV4() : goalRow(-1), goalCol(-1), startRow(-1),startCol(-1), sizeOfOpenList(0), map(), openList(), rubberbandList()
+AStarV4::AStarV4() : goalRow(-1), goalCol(-1), startRow(-1),startCol(-1), sizeOfOpenList(0), map(), openList(), rubberbandList(), fogOfWarMap()
 {
 	for(int i=0; i<g_terrain.GetWidth(); i++)
 	{
 		for (int j = 0; j < g_terrain.GetWidth(); j++)
 		{
 			map[i][j] = AStarNodeV3(i,j);
+			fogOfWarMap[i][j] = -1.f;
 		}
 	}
 
@@ -89,6 +90,7 @@ void AStarV4::clearMap()
 		for (int j = 0; j < g_terrain.GetWidth(); j++)
 		{
 			map[i][j].clear();
+			fogOfWarMap[i][j] = -1.f;
 			
 		}
 	}
@@ -169,7 +171,7 @@ AStarNodeV3 AStarV4::getMapNode(int i, int j)
 
 
 
-bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY, bool useAnalysis)
+bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY, bool useAnalysis, bool fogOfWar)
 {
 //	bool isFirstPass = false;
 	if (newRequest)
@@ -181,7 +183,25 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 		this->map[startX][startY].setCost(0.f);
 		this->map[startX][startY].setTotalCost(0.f);
 		this->pushOpen(map[startX][startY]);
+
+
+		if (fogOfWar)
+		{
+			g_terrain.InitFogOfWar();
+			for (int aaa = 0; aaa < g_terrain.GetWidth(); aaa++)
+			{
+				for (int bbb = 0; bbb < g_terrain.GetWidth(); bbb++)
+				{
+					fogOfWarMap[aaa][bbb] = g_terrain.GetInfluenceMapValue(aaa, bbb);
+				}
+			}
+		}
+
+
 	}
+
+	
+
 	//	isFirstPass = true;
 		
 
@@ -201,7 +221,21 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 	do
 	{
-		
+		if(fogOfWar)
+		{
+			g_terrain.AnalyzeVisibleToPlayer();
+
+			for (int a = 0; a < g_terrain.GetWidth(); a++)
+			{
+				for (int b = 0; b < g_terrain.GetWidth(); b++)
+				{
+					if (g_terrain.GetInfluenceMapValue(a,b) >0 && fogOfWarMap[a][b] == TILE_WALL_INVISIBLE)
+					{
+						fogOfWarMap[a][b] == TILE_WALL;
+					}
+				}
+			}
+		}
 
 		AStarNodeV3 n = this->popOpenMin();
 		int currX = n.getX();
@@ -213,6 +247,9 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 			return true;
 		}
 
+	
+
+
 
 		for (int i = currX - 1; i <= currX + 1; i++)
 		{
@@ -220,12 +257,38 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 			{
 				//Loop through neighbors
 
-
-				if (this->isValidNode(i, j) && !(j == currY && i == currX) && !g_terrain.IsWall( i, j))
+				bool isWall=true;
+				bool isValidNode = this->isValidNode(i, j);
+				if(isValidNode)
 				{
+					if (fogOfWar)
+					{
+						isWall = g_terrain.isWallPlusInvisible(i,j);
+					}
+
+					else
+					{
+						isWall = g_terrain.IsWall(i, j);
+					}
+				}
+
+
+				if (isValidNode && !(j == currY && i == currX) && !isWall)
+				{
+					bool isNotWall = false;
+					if (fogOfWar)
+					{
+						isNotWall = !g_terrain.isWallPlusInvisible(i, currY) && !g_terrain.isWallPlusInvisible(currX, j);
+					}
+
+					else
+					{
+						isNotWall = !g_terrain.IsWall(i, currY) && !g_terrain.IsWall(currX, j);
+					}
+
 					float hc = this->calculateHeuristicCost(heuristic, hWeight, i, j, this->getGoalRow(), this->getGoalCol());
 					float gc = std::numeric_limits<float>::max();
-					if (i == currX + 1 && j == currY + 1 && !g_terrain.IsWall(i,currY) && !g_terrain.IsWall( currX,  j))
+					if (i == currX + 1 && j == currY + 1 && isNotWall)
 					{
 						//diag
 
@@ -238,7 +301,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 					}
 
-					else if (i == currX + 1 && j == currY - 1 && !g_terrain.IsWall( i, currY) && !g_terrain.IsWall(currX,  j))
+					else if (i == currX + 1 && j == currY - 1 && isNotWall)
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
@@ -249,7 +312,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 						}
 					}
 
-					else if (i == currX - 1 && j == currY + 1 && !g_terrain.IsWall( i,  currY) && !g_terrain.IsWall( currX,  j))
+					else if (i == currX - 1 && j == currY + 1 && isNotWall)
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
@@ -260,7 +323,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 						}
 					}
 
-					else if (i == currX - 1 && j == currY - 1 && !g_terrain.IsWall( i, currY) && !g_terrain.IsWall( currX,  j))
+					else if (i == currX - 1 && j == currY - 1 && isNotWall)
 					{
 						//diag
 						gc = map[currX][currY].getCost() + SQRT2;
@@ -336,7 +399,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 
 }
 
-
+//bool AStarV4::findPathFOW(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX)
 
 void AStarV4::rubberband()
 {

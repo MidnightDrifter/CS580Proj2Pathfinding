@@ -13,10 +13,10 @@ class TerrainNode
 	enum RESOURCE_INFO {
 		
 		NO_RESOURCE = -1,
-		MINERALS,
-		GOLD,
-		FOOD,
-		SCIENCE
+		MINERALS,   //Minerals - red
+		GOLD,  //yellow
+		FOOD, //green
+		SCIENCE  //blue
 	};
 
 

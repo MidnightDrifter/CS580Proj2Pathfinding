@@ -18,7 +18,7 @@ public:
 	int getOpenListSize() const;
 	float calculateHeuristicCost(int h, float weight, int nodeX, int nodeY, int goalX, int goalY) const;
 	bool isValidNode(int i, int j);
-	bool findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY, bool useAnalysis);
+	bool findPath(bool newRequest, bool isSingleStep, int heuristic, float hWeight, int startX, int startY, int goalX, int goalY, bool useAnalysis, bool fogOfWar);
 	AStarNodeV3 getMapNode(int i, int j);
 	
 	int getSizeOfOpenList() const;
@@ -52,6 +52,7 @@ private:
 	
 	int sizeOfOpenList;
 	AStarNodeV3 map[SIZE_OF_MAP][SIZE_OF_MAP];
+	float fogOfWarMap[SIZE_OF_MAP][SIZE_OF_MAP];  //Keeps track of if a tile has / hasn't been seen
 	AStarNodeV3 openList[CAPACITY_OF_OPEN_LIST];
 	std::list<AStarNodeV3> rubberbandList;
 	static float SQRT2;

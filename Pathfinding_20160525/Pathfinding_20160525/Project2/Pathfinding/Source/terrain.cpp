@@ -861,7 +861,7 @@ void Terrain::AnalyzeVisibility( void )  //DONE- test it - test SUCCESSFUL
 
 }
 
-void Terrain::AnalyzeRearCoverWithHighVisibility( void )   //DONE- test it
+void Terrain::AnalyzeRearCoverWithHighVisibility( void )   //DONE- test it - Successful
 {
 	//TODO: Implement this for the Terrain Analysis project.
 

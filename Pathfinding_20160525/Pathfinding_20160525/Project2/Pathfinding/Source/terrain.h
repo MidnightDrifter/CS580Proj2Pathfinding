@@ -43,6 +43,9 @@ public:
 	D3DXVECTOR3 GetCoordinates( int r, int c );
 	bool GetRowColumn( D3DXVECTOR3* pos, int* r, int* c );
 	inline bool IsWall( int r, int c )		{ return( m_terrain[r][c] == TILE_WALL ); }
+
+	inline bool isWallPlusInvisible(int r, int c) { return (m_terrainInfluenceMap[r][c] == TILE_WALL); } //SH implemented helper method - returns true if wall, false if invis wall or free node
+
 	   
 	bool IsClearPath( int r0, int c0, int r1, int c1 );
 
@@ -62,6 +65,9 @@ public:
 
     void InitFogOfWar();
     void ClearFogOfWar();
+
+
+	void AnalyzeVisibleToPlayer(void);
 
 protected:
 
@@ -84,7 +90,7 @@ protected:
 	void AnalyzeOpennessRearCover( void );
 	void AnalyzeVisibility( void );
 	void AnalyzeRearCoverWithHighVisibility( void );
-	void AnalyzeVisibleToPlayer( void );
+	//void AnalyzeVisibleToPlayer( void );
 	void AnalyzeSearch( void );
 	void ClearTerrainAnalysis( void );
 
@@ -95,4 +101,5 @@ protected:
 	bool isValidNode(int r, int c);  //SH implemented helper method - test if node coords are within 0 - (mapSize-1) range
 	bool isWallNode(int r, int c);  //SH implemented helper method - returns if it'ts a valid node AND a wall
 	int numSurroundingWalls(int r, int c); //SH implemented helper method - returns # of surrounding nodes that are walls--does NOT count edges as walls
+	
 };
