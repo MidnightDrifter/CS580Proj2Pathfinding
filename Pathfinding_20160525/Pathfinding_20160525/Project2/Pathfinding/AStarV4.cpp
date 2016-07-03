@@ -116,7 +116,7 @@ void AStarV4::clear()
 
 	
 	this->rubberbandList.clear();
-	g_terrain.ResetColors();
+	//g_terrain.ResetColors();
 	
 
 }
@@ -177,7 +177,7 @@ bool AStarV4::findPath(bool newRequest, bool isSingleStep, int heuristic, float 
 	if (newRequest)
 	{
 		//this->clear();
-		//g_terrain.ResetColors();
+		g_terrain.ResetColors();
 		this->setGoal(goalX, goalY);
 		this->setStart(startX, startY);
 		this->map[startX][startY].setCost(0.f);

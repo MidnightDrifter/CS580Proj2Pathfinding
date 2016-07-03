@@ -34,7 +34,7 @@ Movement::Movement(GameObject& owner)
 	m_heuristicWeight(1.0f),
 	m_heuristicCalc(0),
 	m_fogOfWar(false),
-	m_AStarGrid(AStar(g_terrain.GetWidth(), g_terrain.GetWidth())),
+//	m_AStarGrid(AStar(g_terrain.GetWidth(), g_terrain.GetWidth())),
 	m_rubberBandList(new std::list<D3DXVECTOR3>()),
 	m_tempVector(new D3DXVECTOR3()),
 	m_splineNodesList(new std::list<D3DXVECTOR3>),
@@ -206,6 +206,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 		{
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(r, c)));
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
+			this->editAStarV4().clear();
 			return true;
 		}
 
@@ -226,7 +227,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			m_waypointList.clear();
 		}
 
-		bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c, this->GetAnalysis());
+		bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c, this->GetAnalysis(), this->GetFogOfWar());
 
 		if (!pathFound && !this->GetSingleStep())
 		{
@@ -252,35 +253,58 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 
 			if (this->GetRubberbandPath())
 			{
-				myAStarV4.rubberband();
-				if (myAStarV4.getRubberbandList().size() >= 3)
+				bool straightLineExists = true;
+				for (int i = min(r, curR); i <= max(r, curR); i++)
 				{
-					std::list<AStarNodeV3>::iterator st = myAStarV4.getRubberbandList().begin();
-
-					while (st != myAStarV4.getRubberbandList().end())
+					for (int j = min(curC, c); j <= max(curC, c); j++)
 					{
-						m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates((*st).getX(), (*st).getY())));
-						++st;
-
+						if (g_terrain.IsWall(i, j))
+						{
+							straightLineExists = false;
+							j = g_terrain.GetWidth() + 1;
+							i = j;
+						}
 					}
+				}
+
+
+				if (straightLineExists)
+				{
+					m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(r, c)));
+					m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
 				}
 
 				else
 				{
-					while (!(goal.getX() == myAStarV4.getStartRow() && goal.getY() == myAStarV4.getStartCol()))
+					myAStarV4.rubberband();
+					if (myAStarV4.getRubberbandList().size() >= 3)
 					{
-						m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal.getX(), goal.getY())));
-						goal = myAStarV4.getMapNode(goal.getParentX(), goal.getParentY());
+						std::list<AStarNodeV3>::iterator st = myAStarV4.getRubberbandList().begin();
+
+						while (st != myAStarV4.getRubberbandList().end())
+						{
+							m_waypointList.push_back(D3DXVECTOR3(g_terrain.GetCoordinates((*st).getX(), (*st).getY())));
+							++st;
+
+						}
+					}
+
+					else
+					{
+						while (!(goal.getX() == myAStarV4.getStartRow() && goal.getY() == myAStarV4.getStartCol()))
+						{
+							m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(goal.getX(), goal.getY())));
+							goal = myAStarV4.getMapNode(goal.getParentX(), goal.getParentY());
+						}
+
+
+						m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(myAStarV4.getStartRow(), myAStarV4.getStartCol())));
 					}
 
 
-					m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(myAStarV4.getStartRow(), myAStarV4.getStartCol())));
+
 				}
-
-
-
 			}
-
 			else {
 				while (!(goal.getX() == myAStarV4.getStartRow() && goal.getY() == myAStarV4.getStartCol()))
 				{
@@ -290,14 +314,14 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 
 
 				m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(myAStarV4.getStartRow(), myAStarV4.getStartCol())));
-			
+
 			}
 			myAStarV4.clear();
 			//myAStarV4.clearMap();
 			//myAStarV4.clearOpenList();
 			//m_AStarV3.clearMap();
 			//m_AStarV3.clearOpenList();
-
+			}
 			if (this->GetSmoothPath() && this->GetRubberbandPath() && m_waypointList.size() >= 3)
 			{
 
@@ -665,7 +689,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 
 
 		}
-	}
+	
 		else
 		{
 			//Randomly meander toward goal (might get stuck at wall)

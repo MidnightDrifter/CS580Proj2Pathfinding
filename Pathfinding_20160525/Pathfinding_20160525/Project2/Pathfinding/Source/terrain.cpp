@@ -302,25 +302,25 @@ float Terrain::ClosestWall( int row, int col )   //DONE- test it - test SUCCESSF
 
 	float minDist = 100000.f;
 
-	if (upperX >= g_terrain.GetWidth())
-	{
-		upperX = g_terrain.GetWidth() - 1;
-	}
+	//if (upperX >= g_terrain.GetWidth())
+	//{
+	//	upperX = g_terrain.GetWidth() - 1;
+	//}
 
-	 if(lowerX < 0)
-	{
-		lowerX = 0;
-	}
+	// if(lowerX < 0)
+	//{
+	//	lowerX = 0;
+	//}
 
-	if (upperY >= g_terrain.GetWidth())
-	{
-		upperY = g_terrain.GetWidth() - 1;
-	}
+	//if (upperY >= g_terrain.GetWidth())
+	//{
+	//	upperY = g_terrain.GetWidth() - 1;
+	//}
 
-	 if(lowerY<0)
-	 {
-		 lowerY = 0;
-	 }
+	// if(lowerY<0)
+	// {
+	//	 lowerY = 0;
+	// }
 
 
 	 do
@@ -329,7 +329,7 @@ float Terrain::ClosestWall( int row, int col )   //DONE- test it - test SUCCESSF
 		 {
 			 for (int j = lowerY; j <= upperY; j++)
 			 {
-				 if (i > g_terrain.GetWidth() - 1)
+				 /*if (i > g_terrain.GetWidth() - 1)
 					 {
 						 i = g_terrain.GetWidth() - 1;
 					 }
@@ -347,11 +347,11 @@ float Terrain::ClosestWall( int row, int col )   //DONE- test it - test SUCCESSF
 					 if (i < 0)
 					 {
 						 i = 0;
-					 }
+					 }*/
 
 
 
-					 if (g_terrain.IsWall(i, j) && !(i == row && j == col) && sqrtf((powf(row - i, 2) + powf(col - j, 2))) < minDist)
+					 if (this->isValidNode(i,j) && g_terrain.IsWall(i, j) && !(i == row && j == col) && sqrtf((powf(row - i, 2) + powf(col - j, 2))) < minDist)
 					 {
 						 minDist = sqrtf((powf(row - i, 2) + powf(col - j, 2)));
 						 foundMin = true;
@@ -778,11 +778,9 @@ void Terrain::AnalyzeOpennessClosestWall( void )   //DONE- test it - test SUCCES
 	{
 		for (int j = 0; j < g_terrain.GetWidth(); j++)
 		{
-			if(i==2&&j==1)
-			{
-				int bob = 0;
-			}
 			
+			
+
 			//m_terrainInfluenceMap[i][j] = 1.f / powf(this->ClosestWall(i, j), 2);
 			this->SetInfluenceMapValue(i, j, 1.f / powf(this->ClosestWall(i, j), 2));
 		}
@@ -845,6 +843,13 @@ void Terrain::AnalyzeVisibility( void )  //DONE- test it - test SUCCESSFUL
 						if (this->IsClearPath(i, j, x, y))
 						{
 							visibleSquares++;
+							if(visibleSquares >=160)
+							{
+								x = g_terrain.GetWidth() + 1;
+								y = x;
+								//i = x;
+								//j = x;
+							}
 						}
 
 					}
