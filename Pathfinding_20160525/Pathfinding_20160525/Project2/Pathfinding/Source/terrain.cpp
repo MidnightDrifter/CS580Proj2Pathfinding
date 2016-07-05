@@ -18,8 +18,8 @@
 
 Terrain::Terrain( void )
 : m_nextMap(0),
-  m_rPlayer(-1),
-  m_cPlayer(-1),
+  m_rPlayer(4),
+  m_cPlayer(4),
   m_reevaluateAnalysis(false),
   m_analysis(TerrainAnalysis_None),
   m_width(40)
@@ -825,7 +825,7 @@ void Terrain::AnalyzeVisibility( void )  //DONE- test it - test SUCCESSFUL
 
 
 	//WRITE YOUR CODE HERE
-
+	
 
 	for(int i=0; i<g_terrain.GetWidth();i++)
 	{
@@ -902,7 +902,9 @@ void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 
 
 	//WRITE YOUR CODE HERE
+
 	
+	this->ResetInfluenceMap();
 	
 	
 	for (int i = 0; i < g_terrain.GetWidth(); i++)
@@ -910,44 +912,30 @@ void Terrain::AnalyzeVisibleToPlayer( void )    //DONE- test it
 		for (int j = 0; j < g_terrain.GetWidth(); j++)
 		{
 			//float valueToStore = 0.f;
-			int num1Neighbors = 0;
-			if (this->IsClearPath(m_rPlayer, m_cPlayer, i, j))
+			if (!g_terrain.IsWall(i, j))
 			{
-				//m_terrainInfluenceMap[i][j] = 1.f;
-				this->SetInfluenceMapValue(i, j, 1.f);
-			}
-
-			else
-			{
-				for (int x = i - 1; x <= i + 1; x++)
+				if (this->IsClearPath(m_rPlayer, m_cPlayer, i, j))
 				{
-					for (int y = j + 1; y <= j+1; y++)
+					//m_terrainInfluenceMap[i][j] = 1.f;
+					this->SetInfluenceMapValue(i, j, 1.f);
+
+					for (int x = i - 1; x <= i + 1; x++)
 					{
-						if (this->isValidNode(x, y) && this->GetInfluenceMapValue(x,y) == 1.f)
+						for (int y = j - 1; y <= j + 1; y++)
 						{
-							//m_terrain
-							num1Neighbors++;
-							x = i + 2;
-							y = j + 2;
+							if (this->isValidNode(x, y) && m_terrainInfluenceMap[x][y] < 1.f && this->IsClearPath(i, j, x, y))
+							{
+								m_terrainInfluenceMap[x][y] = 0.5f;
+							}
 						}
+
 					}
 				}
-			}
 
-			if (num1Neighbors > 0)
-			{
-				//m_terrainInfluenceMap[i][j] = 0.5f;
-				this->SetInfluenceMapValue(i, j, 0.5f);
-			}
-
-			else
-			{
-				//m_terrainInfluenceMap[i][j] = 0.f;
-				this->SetInfluenceMapValue(i, j, 0.f);
 			}
 		}
-
 	}
+	
 
 	
 }
@@ -980,10 +968,29 @@ void Terrain::AnalyzeSearch( void )
 	//Therefore, the vectors to use for 180deg vision are the two vectors perpindicular to (x,z) ->   (-z,x) and (z,-x)
 	
 
-	int leftRayX = -1 * m_dirPlayer.z;
-	int leftRayY = m_dirPlayer.x;
-	int rightRayX = m_dirPlayer.z;
-	int rightRayY = -1 * m_dirPlayer.x;
+	//int leftRayX = -1 * m_dirPlayer.z;
+	//int leftRayY = m_dirPlayer.x;
+	//int rightRayX = m_dirPlayer.z;
+	//int rightRayY = -1 * m_dirPlayer.x;
+	D3DXVECTOR2 playerDir = D3DXVECTOR2(m_dirPlayer.x, m_dirPlayer.z);
+	D3DXVECTOR3 currentPos;
+	D3DXVECTOR3 playerPos = this->GetCoordinates(m_rPlayer, m_cPlayer);
+	D3DXVECTOR2 playerToObject;
+	for (int i = 0; i < g_terrain.GetWidth(); i++)
+	{
+		for (int j = 0; j < g_terrain.GetWidth(); j++)
+		{
+			//Vector from A -> B = B-A
+		 currentPos = this->GetCoordinates(i,j);
+		 playerToObject = D3DXVECTOR2(currentPos.x - playerPos.x, currentPos.z - playerPos.z);
+
+			if(!g_terrain.IsWall(i,j)&&(D3DXVec2Dot(&playerToObject, &playerDir))> -0.0000001 && this->IsClearPath(m_rPlayer, m_cPlayer, i,j))
+			{
+				m_terrainInfluenceMap[i][j] = 1.f;
+			}
+		}
+	}
+
 
 
 
@@ -1023,7 +1030,7 @@ bool Terrain::IsClearPath( int r0, int c0, int r1, int c1 )  //DONE- test it - t
 
 
 
-#define EPSILON 0.0001f
+#define EPSILON 0.000000000001f
 	
 	for(int i=0;i<g_terrain.GetWidth();i++)
 	{

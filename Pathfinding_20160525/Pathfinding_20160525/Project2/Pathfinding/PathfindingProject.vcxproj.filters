@@ -147,27 +147,14 @@
     </ClCompile>
     <ClCompile Include="Source\MultiAnimation.cpp" />
     <ClCompile Include="Source\MultiAnimationLib.cpp" />
-    <ClCompile Include="AStar.cpp">
-      <Filter>GameObject\AStar</Filter>
-    </ClCompile>
-    <ClCompile Include="AStarNode.cpp">
-      <Filter>GameObject\AStar</Filter>
-    </ClCompile>
-    <ClCompile Include="AStarV2.cpp">
-      <Filter>GameObject\AStar</Filter>
-    </ClCompile>
-    <ClCompile Include="AStarV3.cpp">
-      <Filter>GameObject\AStar</Filter>
-    </ClCompile>
-    <ClCompile Include="AStarNodev2.cpp">
-      <Filter>GameObject\AStar</Filter>
-    </ClCompile>
     <ClCompile Include="AStarNodeV3.cpp" />
     <ClCompile Include="AStarV4.cpp" />
     <ClCompile Include="TerrainNode.cpp">
       <Filter>GameObject\TerrainGeneration</Filter>
     </ClCompile>
-    <ClCompile Include="TerrainInfoMap.cpp" />
+    <ClCompile Include="TerrainInfoMap.cpp">
+      <Filter>GameObject\TerrainGeneration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\body.h">
@@ -288,27 +275,14 @@
       <Filter>GameEngine\StateMachineLanguage</Filter>
     </ClInclude>
     <ClInclude Include="Source\MultiAnimation.h" />
-    <ClInclude Include="AStar.h">
-      <Filter>GameObject\AStar</Filter>
-    </ClInclude>
-    <ClInclude Include="AStarNode.h">
-      <Filter>GameObject\AStar</Filter>
-    </ClInclude>
-    <ClInclude Include="AStarV2.h">
-      <Filter>GameObject\AStar</Filter>
-    </ClInclude>
-    <ClInclude Include="AStarV3.h">
-      <Filter>GameObject\AStar</Filter>
-    </ClInclude>
-    <ClInclude Include="AStarNodev2.h">
-      <Filter>GameObject\AStar</Filter>
-    </ClInclude>
     <ClInclude Include="AStarNodeV3.h" />
     <ClInclude Include="AStarV4.h" />
     <ClInclude Include="TerrainNode.h">
       <Filter>GameObject\TerrainGeneration</Filter>
     </ClInclude>
-    <ClInclude Include="TerrainInfoMap.h" />
+    <ClInclude Include="TerrainInfoMap.h">
+      <Filter>GameObject\TerrainGeneration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\DXUT\directx.ico">
