@@ -185,7 +185,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 	D3DXVECTOR3 cur = m_owner->GetBody().GetPos();
 	g_terrain.GetRowColumn(&cur, &curR, &curC);
 
-	if (this->GetStraightlinePath())
+	if (this->GetStraightlinePath() && newRequest)
 	{
 		bool straightLineExists = true;
 		for (int i = min(r, curR); i <= max(r, curR); i++)
@@ -204,6 +204,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 
 		if (straightLineExists)
 		{
+			m_waypointList.clear();
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(r, c)));
 			m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
 			this->editAStarV4().clear();
@@ -225,6 +226,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 		if (newRequest)
 		{
 			m_waypointList.clear();
+			g_terrain.ResetColors();
 		}
 
 		bool pathFound = myAStarV4.findPath(newRequest, this->GetSingleStep(), this->GetHeuristicCalc(), this->GetHeuristicWeight(), curR, curC, r, c, this->GetAnalysis(), this->GetFogOfWar());
@@ -253,14 +255,14 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 
 			if (this->GetRubberbandPath())
 			{
-				bool straightLineExists = true;
+				bool straightLineExists1 = true;
 				for (int i = min(r, curR); i <= max(r, curR); i++)
 				{
 					for (int j = min(curC, c); j <= max(curC, c); j++)
 					{
 						if (g_terrain.IsWall(i, j))
 						{
-							straightLineExists = false;
+							straightLineExists1 = false;
 							j = g_terrain.GetWidth() + 1;
 							i = j;
 						}
@@ -268,7 +270,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 				}
 
 
-				if (straightLineExists)
+				if (straightLineExists1)
 				{
 					m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(r, c)));
 					m_waypointList.push_front(D3DXVECTOR3(g_terrain.GetCoordinates(curR, curC)));
@@ -321,7 +323,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			//myAStarV4.clearOpenList();
 			//m_AStarV3.clearMap();
 			//m_AStarV3.clearOpenList();
-			}
+
 			if (this->GetSmoothPath() && this->GetRubberbandPath() && m_waypointList.size() >= 3)
 			{
 
@@ -332,11 +334,11 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 				std::list<D3DXVECTOR3>::iterator second = m_waypointList.begin();
 				second++;
 				std::list<D3DXVECTOR3>::iterator end = m_waypointList.end();
-				
+
 
 				do
 				{
-					if (first !=end && second != end && sqrtf(pow(((*first).x - (*second).x), 2) + pow(((*first).z - (*second).z), 2)) > 1.5f )
+					if (first != end && second != end && sqrtf(pow(((*first).x - (*second).x), 2) + pow(((*first).z - (*second).z), 2)) > 1.5f)
 					{
 						m_waypointList.insert(second, D3DXVECTOR3(((*first).x + (*second).x) / 2.f, 0.f, ((*first).z + (*second).z) / 2.f));
 						--second;
@@ -347,7 +349,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 						++first;
 						++second;
 					}
-				} while (second != end && first !=end);
+				} while (second != end && first != end);
 
 
 
@@ -389,7 +391,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 
 				//	smoothingList->erase(smoothingList->begin(), smoothingList->end());
 
-				if(m_waypointList.size() <3)
+				if (m_waypointList.size() < 3)
 				{
 					//int bob = 0;
 				}
@@ -508,7 +510,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			}
 
 
-			else if (this->GetSmoothPath() && m_waypointList.size() >=3)
+			else if (this->GetSmoothPath() && m_waypointList.size() >= 3)
 			{
 				if (m_waypointList.size() < 3)
 				{
@@ -561,7 +563,7 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 				}
 
 				else {
-				//	m_waypointList.begin();
+					//	m_waypointList.begin();
 					int waypointListSize = m_waypointList.size();
 					D3DXVECTOR3* temp = this->getTempVector();
 					//std::list<D3DXVECTOR3>* splineList = this->editSplineNodesList();
@@ -684,9 +686,12 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			return true;
 
 
+		}
 
-
-
+		else
+		{
+			return false;
+		}
 
 		}
 	
