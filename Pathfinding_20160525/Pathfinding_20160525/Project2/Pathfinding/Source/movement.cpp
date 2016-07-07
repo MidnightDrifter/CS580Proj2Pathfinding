@@ -324,6 +324,8 @@ bool Movement::ComputePath(int r, int c, bool newRequest)
 			//m_AStarV3.clearMap();
 			//m_AStarV3.clearOpenList();
 
+			//Checking the 1.5 size based on the GRID not the actual 3D space
+			//Use (1/gridwidth) * 1.5 to check
 			if (this->GetSmoothPath() && this->GetRubberbandPath() && m_waypointList.size() >= 3)
 			{
 
