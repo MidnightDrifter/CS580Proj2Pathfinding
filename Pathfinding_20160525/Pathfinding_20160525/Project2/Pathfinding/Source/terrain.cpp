@@ -351,7 +351,7 @@ float Terrain::ClosestWall( int row, int col )   //DONE- test it - test SUCCESSF
 
 
 
-					 if (this->isValidNode(i,j) && g_terrain.IsWall(i, j) && !(i == row && j == col) && sqrtf((powf(row - i, 2) + powf(col - j, 2))) < minDist)
+					 if (this->isWallNode(i,j) && !(i == row && j == col) && sqrtf((powf(row - i, 2) + powf(col - j, 2))) < minDist)
 					 {
 						 minDist = sqrtf((powf(row - i, 2) + powf(col - j, 2)));
 						 foundMin = true;
@@ -437,6 +437,22 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 	{
 		return 1.f;
 	}
+
+	//TODO: Implement this for the Terrain Analysis project.
+
+	//Note: A cardinal wall is a wall to the East, West, North, or South of (row, col).
+	//Note: The sides of the map are considered walls.
+	//Being surrounded by 0 cardinal and 0 diagonal walls -> return 0.0f. 
+	//Being surrounded by 0 cardinal walls and 1 or more diagonal walls -> return 0.05f.
+	//Being surrounded by 1 cardinal wall and any number of diagonal walls -> return 0.10f.
+	//Being surrounded by 2 non-adjacent cardinal walls and less than 2 diagonal walls -> return 0.20f.
+	//Being surrounded by 2 non-adjacent cardinal walls and 2 or more diagonal walls -> return 0.25f.
+	//Being surrounded by 2 adjacent cardinal walls and no adjacent diagonal walls (disregard between cardinal walls) -> return 0.25f.
+	//Being surrounded by 2 adjacent cardinal walls and 1 adjacent diagonal wall (not between cardinal walls) -> return 0.40f.
+	//Being surrounded by 2 adjacent cardinal walls and 2 adjacent diagonal walls (not between cardinal walls) -> return 0.60f.
+	//Being surrounded by 3 of more cardinal walls -> return 1.0f.
+
+
 
 	else
 	{
@@ -641,6 +657,10 @@ float Terrain::RearCoverValue( int row, int col )  //DONE - test it
 
 
 		//cardinal, diag, non-adj cardinal, adj cardinal, adj diag, adj diag not between card walls
+
+
+		//Adj diag wall not between cardinal walls is off?  *** HERE *** HERE ***
+
 
 		if(walls[0]>2)
 		{
